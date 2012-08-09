@@ -200,7 +200,9 @@ class ten_file {
 	 */
 	public static function save_arr($filename, $array) {
 		
-		file_put_contents(ROOT . $filename, serialize($array));
+		$filename = ROOT . $filename;
+		file_put_contents($filename, serialize($array));
+		chmod($filename, 0644);
 	}
 	
 	/**
@@ -656,7 +658,8 @@ class ten_file {
 		}
 		
 		file_put_contents($output_file, ten_file::$output_file);				// Запись итоговой строки в выходящий файл
-		
+		chmod($output_file, 0644);												// Присвоение необходимых прав на файл
+
 		ten_file::$output_file = '';											// Обнуление строки собранного файла
 		
 		return $output_file;													// Возвращается путь к составленному файлу
@@ -682,8 +685,12 @@ class ten_file {
 				$included .= ten_file::include_file($file, $options) . "\n";	// Добавление строки подключения файла в результирующую строку
 		}
 
-		if(!empty($options['output_file']))										// Если указан файл для сохранения результата
-			file_put_contents(ROOT . $options['output_file'], $included);		// сохранение конечной строки в файл
+		if(!empty($options['output_file'])) {									// Если указан файл для сохранения результата
+			
+			$output_file = ROOT . $options['output_file'];
+			file_put_contents($output_file, $included);							// сохранение конечной строки в файл
+			chmod($output_file, 0644);											// Присвоение необходимых прав на файл
+		}
 
 		return $included;														// Возвращение строки подключения всех файлов
 	}

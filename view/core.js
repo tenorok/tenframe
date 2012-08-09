@@ -153,7 +153,7 @@ var Core = (function($) {
 
 			$.post('/sys/ajax/less.php', {						// Отправка post-запроса на сохранение стилей в отдельный файл
 				event:    'save_lesscss',						// Событие для AJAX-файла
-				css:      $.parseJSON(css),						// Сконкатенированные стили
+				css:      JSON.stringify(css),					// Сконкатенированные стили
 				path:     set.path,								// Путь к выходящему файлу
 				compress: compress								// Флаг компрессии CSS-кода
 			});

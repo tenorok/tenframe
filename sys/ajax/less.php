@@ -15,7 +15,9 @@ switch($_POST['event']) {
 			if($_POST['compress'] == 'true')							// Если нужна компрессия
 				$val = trim(str_replace('; ',';',str_replace(' }','}',str_replace('{ ','{',str_replace(array("\r\n","\r","\n","\t",'  ','    ','    '),"",preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!','',$val))))));
 			
-			file_put_contents(ROOT . $_POST['path'] . $file, $val);		// Сохранение файла
+			$filename = ROOT . $_POST['path'] . $file;
+			file_put_contents($filename, $val);							// Сохранение файла
+			chmod($filename, 0644);										// Присвоение необходимых прав на файл
 		}
 		
 		break;
