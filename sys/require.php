@@ -4,6 +4,8 @@ session_start();
 
 define('ROOT', $_SERVER['DOCUMENT_ROOT']);						// Константа для удобства применения
 
+define('BLOCKS',     ROOT . '/view/blocks/');					// Константа директории блоков
+
 // Определение констант для автоподключения классов
 define('SYS',        ROOT . '/sys/classes/');					// Определение директории с классами системы
 define('CONTROLLER', ROOT . '/app/controller/');				// Определение директории с классами контроллеров
