@@ -145,6 +145,26 @@ class core {
 			'content' => $options['content']
 		));
 	}
+
+	/**
+	 * Функция сохранения флага режима разработчика в JS
+	 * 
+	 * @param boolean $dev Флаг режима разработчика
+	 */
+	public static function dev($dev = false) {
+
+		if($_SESSION['DEV'] && !$dev || $dev) {						// Если режим разработчика был включен, а сейчас его выключили или он просто включен
+
+			file_put_contents(ROOT . '/view/includes/dev.js', 'window.DEV=' . (($dev) ? 'true;' : 'false;'));
+			$ret = true;											// то надо вернуть true, чтобы собрать JS-файлы с новым значением
+		}
+		else														// Иначе режим разработчика выключен
+			$ret = false;
+
+		$_SESSION['DEV'] = $dev;									// Присваивание текущего значения флага режима разработчика
+
+		return $ret;
+	}
 }
 
 // Класс работы с GET-переменными

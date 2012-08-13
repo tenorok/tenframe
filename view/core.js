@@ -163,8 +163,6 @@ var Core = (function($) {
 	init = function() {											// Метод инициализации
 
 		$(function() {											// Вызовы после загрузки документа
-			
-			window.DEV = settings.dev || false;					// Определение глобального флага режима разработчика
 
 			saveLess();
 			request();

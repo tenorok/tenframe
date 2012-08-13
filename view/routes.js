@@ -1,6 +1,5 @@
 ﻿/** settings:
-	
-	dev: true | false				// Режим разработчика (по умолчанию выключен)
+
 	saveless: {
 		
 		path: '/assets/css/',		// Директория, в которую будут сохраняться файлы
@@ -28,8 +27,6 @@
 */
 {
 	var settings = {
-
-		dev: true,
 
 		saveless: {
 
