@@ -7,8 +7,7 @@ ten_file::include_files(array(							// Файлы библиотек и пла�
 	'jquery.placeholder_ten.js',
 	'jquery.hoverDelay.js',
 	'jquery.maskedinput-1.3.js',
-	'handlebars-1.0.0.beta.6.js',
-	'steps.json.js'
+	'handlebars-1.0.0.beta.6.js'
 ), array(
 	'path' => array(
 		'js' => '/assets/js/'
