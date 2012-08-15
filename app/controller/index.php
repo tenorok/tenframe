@@ -10,7 +10,7 @@ class index {
 	 */
 	public static function page() {
 
-		$html = new Blitz(ROOT . '/view/blocks/html/view/html.tpl');
+		$html = new Blitz(BLOCKS . 'html/view/html.tpl');
 
 		$files = 
 			file_get_contents('view/includes/libs.tpl') .
