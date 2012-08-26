@@ -9,7 +9,8 @@
 			
 			'lang'  => 'ru   | en',			// Язык
 			'month' => 'full | short',		// Полная или краткая запись месяца
-			'time'  =>  true | false		// Выводить или нет время
+			'time'  =>  true | false,		// Выводить или нет время
+			'now'   =>  300					// Время в секундах для написания "сейчас" (По умолчанию: 5 минут)
 		));
 */
 
@@ -84,10 +85,9 @@ class ten_date {
 	private static $default_options = array(							// Дефолтные параметры
 		'lang'  => 'ru',
 		'month' => 'full',
-		'time'  => false
+		'time'  => false,
+		'now'   => 300
 	);
-	
-	public static $now = 300;											// Время в секундах для написания "сейчас"
 	
 	/**
 	 * Функция преобразования даты в привычный вид
@@ -131,7 +131,7 @@ class ten_date {
 		
 		if(
 			$ret_date == $words['today'][$lang] && 																			// Если дата сегодняшняя
-			strtotime('now') - strtotime($date) < ten_date::$now && 														// и время не далее, чем $now секунд назад
+			strtotime('now') - strtotime($date) < $options['now'] && 														// и время не далее, чем $now секунд назад
 			strtotime('now') - strtotime($date) > 0																			// и разница между текущим временем и переданным положительна
 		)
 			return $words['now'][$lang];																					// Значит это сейчас
