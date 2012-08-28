@@ -12,7 +12,7 @@ ten_file::include_files(array(							// Файлы библиотек и пла�
 	'path' => array(
 		'js' => '/assets/js/'
 	),
-	'output_file' => '/view/includes/libs.tpl',
+	'output_file' => '/view/include/libs.tpl',
 	'hash' => false
 ));
 
@@ -33,7 +33,7 @@ ten_file::include_files(array(							// Файлы для режима разр�
 		'less' => '/assets/css/',
 		'js'   => '/assets/js/'
 	),
-	'output_file' => '/view/includes/developer.tpl',
+	'output_file' => '/view/include/developer.tpl',
 	'hash' => false
 ));
 
@@ -45,5 +45,5 @@ ten_file::include_files(array(							// Основные файлы
 		'css' => '/assets/css/',
 		'js'  => '/assets/js/'
 	),
-	'output_file' => '/view/includes/require.tpl'
+	'output_file' => '/view/include/require.tpl'
 ));

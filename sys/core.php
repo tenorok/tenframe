@@ -1,7 +1,7 @@
 <?php
-defined('SYS') or die('Core error: System path is not declared!');
-defined('CONTROLLER') or die('Core error: Controller path is not declared!');
-defined('MODEL') or die('Core error: Model path is not declared!');
+
+// Version 1.1.0
+// From 28.08.2012
 
 // Класс ядра
 
@@ -13,12 +13,43 @@ defined('MODEL') or die('Core error: Model path is not declared!');
 	Включение автоподгрузки классов:
 		spl_autoload_register(array('core', 'auto_load'));
 	
-	P.S. Данный класс должен использоваться только в index.php
+	Парсинг blitz-шаблонов:
+		echo core::block(array(										// Функция всегда принимает в качестве параметра массив
+			
+			'block' => 'blockname',									// Обязательный. Имя блока
+		 	'view'  => 'viewname',									// Имя шаблона. (По умолчанию: имя блока)
+		 	
+		 	'parse' => array(										// Массив парсинга
+		 		'tplvar1' => 'val',									// Имя_переменной_в_шаблоне => значение
+		 		'tplvar2' => core::block(array(...))				// В качестве значения может быть другой блок. Вложенность не ограничена
+			)
+
+			'iterate' => array(										// Массив итератора. Для парсинга списков begin-end
+
+				'context1' => array(								// Контекст => массив_опций
+					'array' => array(								// Массив значений к перебору
+						array('key' => 'val1'),						// элементом массива может быть как массив,
+						(new stdClass)->key = 'val2'				// так и объект
+					),
+					'parse' => array(								// Массив парсинга
+				 		'tplvar1' => 'key'							// Имя_переменной_в_шаблоне => ключ_массива_или_объекта
+					)
+				),
+				'context2' => array(...)							// Количество контекстов не ограничено
+			)
+		));
+
+	Подключение include-файлов:
+		echo core::includes('libs, developer, require');			// Файлы с именами 'developer' и 'dev' подключаются только при включенном режиме разработчика
 */
+
+defined('SYS')        or die('Core error: System path is not declared!');
+defined('CONTROLLER') or die('Core error: Controller path is not declared!');
+defined('MODEL')      or die('Core error: Model path is not declared!');
 
 class core {
 	
-	protected static $paths = array(SYS, CONTROLLER, MODEL);		// Массив с директориями классов
+	private static $paths = array(SYS, CONTROLLER, MODEL);			// Массив с директориями классов
 	
 	/**
 	 * Функция автоматической подгрузки необходимых файлов
@@ -158,7 +189,7 @@ class core {
 			$dev													// или он просто включен
 		) {
 
-			file_put_contents(ROOT . '/view/includes/dev.js', 'window.DEV=' . (($dev) ? 'true;' : 'false;'));
+			file_put_contents(ROOT . '/view/include/dev.js', 'window.DEV=' . (($dev) ? 'true;' : 'false;'));
 			$ret = true;											// то надо вернуть true, чтобы собрать JS-файлы с новым значением
 		}
 		else														// Иначе режим разработчика выключен
@@ -167,6 +198,74 @@ class core {
 		$_SESSION['DEV'] = $dev;									// Присваивание текущего значения флага режима разработчика
 
 		return $ret;
+	}
+
+	/**
+	 * Функция парсинга блоков
+	 * 
+	 * @param  array $options Параметры парсинга блока
+	 * @return string
+	 */
+	public static function block($options) {
+
+		foreach($options as $opt => $val)										// Переприсваивание массива опций в самостоятельные переменные
+			$$opt = $val;
+
+		if(!isset($view))														// Если представление не указано
+			$view = $block;														// его имя соответствует имени блока
+
+		$tpl = new Blitz(BLOCKS . $block . '/view/' . $view . '.tpl');			// Получение шаблона
+
+		if(isset($iterate))														// Если требуется итератор begin-end
+			foreach($iterate as $context => $value) {							// Цикл по итераторам
+
+				foreach($value['array'] as $element) {							// Цикл по массиву значений к присваиванию
+
+					$tmp = array();												// Временный массив для хранения сопоставленных значений текущей итерации
+					
+					foreach($value['parse'] as $parse_key => $parse_val) {		// Цикл по массиву ключей: переменная_шаблона => ключ_массива_значений
+
+						$tmp_val = 
+							(gettype($element) == 'object') ? 					// Если текущий элемент массива значений является объектом
+							$element->$parse_val : 								// требуется такой способ получения его значения
+							$element [$parse_val];								// Иначе это массив и требуется иной способ получения значения
+
+						$tmp[$parse_key] = $tmp_val;							// Добавление элемента с текущим значением во временный массив
+					}
+
+					$tpl->block($context, $tmp);								// Парсинг текущей итерации
+				}
+			}
+
+		if(!isset($parse))														// Если не задан элемент parse
+			$parse = array();													// нужно его присвоить
+
+		return $tpl->parse($parse);												// Возвращение отпарсиного шаблона
+	}
+
+	private static $include_dev = array('developer', 'dev');								// Массив имён файлов, которые подключаются только при включенном режиме разработчика
+
+	/**
+	 * Функция подключения include-файлов
+	 * 
+	 * @param  string $files Имена include-файлов
+	 * @return string
+	 */
+	public static function includes($files) {
+
+		$includes = '';																		// Переменная для конкатенации содержимого файлов
+
+		foreach(explode(',', $files) as $file) {											// Цикл по массиву переданных имён файлов
+
+			$file = trim($file);															// Обрезание пробелов с обеих сторон имени текущего файла
+			
+			if(in_array($file, core::$include_dev) && !DEV)									// Если текущий файл требуется для режима разработчика и режим разработчика выключен
+				continue;																	// то его подключать не нужно и выполняется переход к следующему файлу
+			
+			$includes .= file_get_contents(ROOT . '/view/include/' . $file . '.tpl');		// Конкатенация содержимого текущего файла
+		}
+
+		return $includes;																	// Возвращение результата конкатенации содержимого файлов
 	}
 }
 

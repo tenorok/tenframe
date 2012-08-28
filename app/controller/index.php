@@ -10,17 +10,15 @@ class index {
 	 */
 	public static function page() {
 
-		$html = new Blitz(BLOCKS . 'html/view/html.tpl');
+		echo core::block(array(
+			
+			'block' => 'html',
 
-		$files = 
-			file_get_contents('view/includes/libs.tpl') .
-			((DEV) ? file_get_contents('view/includes/developer.tpl') : '') .
-			file_get_contents('view/includes/require.tpl');
-
-		echo $html->parse(array(
-			'title' => 'Заголовок',
-			'files' => $files,
-			'body'  => 'Контент'
+			'parse' => array(
+				'title' => 'Заголовок',
+				'files' => core::includes('libs, developer, require'),
+				'body'  => 'Контент'
+			)
 		));
 	}
 }
