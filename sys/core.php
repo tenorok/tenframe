@@ -1,12 +1,44 @@
 <?php
 
-// Version 1.1.0
+// Version 1.2.0
 // From 28.08.2012
 
-// Класс ядра
-
-/*	Использование
+/*	core
 	
+	Маршрутизация (route.php):
+		get|post(													// Проведение GET- и POST-запросов осуществляется одинаково
+			
+			string|array,											// Первым параметром является адрес или массив адресов
+			Например:
+				Один адрес:
+					'/'
+					'/url/my/'
+					'/url/{id}/'
+				Несколько адресов:
+					array(
+						'/',
+						'/url/my/',
+						'/url/{id}/'
+					)
+				Любой адрес:										// Такой вызов будет проведён всегда
+					'*'												// при этом, он не останавливает проведение последующих маршрутов
+																	// поэтому его рекомендуется прописывать самым первым, чтобы другие маршруты не остановили проведение, когда очередь дойдёт до него
+			
+			'controller->method',									// Контроллер и его метод, который будет вызван при проведении маршрута
+			
+			array(													// Правила для переменных
+				Например:
+					'id'   => '/\d+/',
+					'name' => '/^myname$/'
+			)
+		);
+
+		Получить переменную в вызываемом методе контроллера можно двумя способами:
+			1) method(key1, key2, ..., key3)
+			2) get::$arg->key1;
+			   get::$arg->key2;
+			   get::$arg->key3;
+
 	Подключение ядра:
 		require 'sys/core.php';
 		
@@ -43,13 +75,38 @@
 		echo core::includes('libs, developer, require');			// Файлы с именами 'developer' и 'dev' подключаются только при включенном режиме разработчика
 */
 
+/*	get
+
+	Получение значения GET-переменной:
+		$value = get::$arg->key;
+*/
+
+/*	error
+	
+	Отключение отображения ошибок интерпретатора:
+		error_reporting(0);
+	
+	Указание метода, которые будет вызван по окончании выполнения всего скрипта:
+		register_shutdown_function(array('error', 'get_error'));
+	
+	 Вывод ошибки системы:
+		error::print_error('Error text');
+*/
+
+/*	message
+	
+	Вывод сообщения системы:
+		message::print_message('Message text');
+*/
+
 defined('SYS')        or die('Core error: System path is not declared!');
 defined('CONTROLLER') or die('Core error: Controller path is not declared!');
 defined('MODEL')      or die('Core error: Model path is not declared!');
 
+// Класс ядра
 class core {
 	
-	private static $paths = array(SYS, CONTROLLER, MODEL);			// Массив с директориями классов
+	private static $paths = array(SYS, CONTROLLER, MODEL);				// Массив с директориями классов
 	
 	/**
 	 * Функция автоматической подгрузки необходимых файлов
@@ -60,7 +117,7 @@ class core {
 		
 		foreach(core::$paths as $dir) {
 			
-			$path = str_replace('__', '/', strtolower($class));		// Двойное подчёркивание заменяется на слеш
+			$path = str_replace('__', '/', strtolower($class));			// Двойное подчёркивание заменяется на слеш
 			
 			$file = $dir . $path . '.php';
 			
@@ -85,7 +142,7 @@ class core {
 		return preg_split('/\//', $urn, -1, PREG_SPLIT_NO_EMPTY);
 	}
 	
-	private static $called = false;									// Флаг для определения была ли уже вызвана функция по текущему маршруту
+	private static $called = false;										// Флаг для определения была ли уже вызвана функция по текущему маршруту
 	
 	/**
 	 * Функция обработки маршрутов, отправленных методами GET и POST
@@ -96,42 +153,60 @@ class core {
 	 * @param array  $asserts  Массив регулярных выражений для проверки {переменных}
 	 * @return boolean
 	 */
-	public static function request($type, $path, $callback, $asserts = array()) {
+	public static function request($type, $url, $callback, $asserts = array()) {
 		
-		if(core::$called)											// Если маршрут был проведён
-			return false;											// то все последующие роуты игнорируются
+		if(
+			core::$called ||											// Если маршрут был проведён
+			$_SERVER['REQUEST_METHOD'] != $type							// или метод вызова не соответствует
+		)
+			return false;												// то маршрут обрабатывать не нужно
+
+		if(gettype($url) == 'string') {									// Если у маршрута один адрес
+				
+				if(trim($url) == '*')
+					return core::callback($type, $callback);
+
+				$pathArr[0] = core::parse_urn($url);					// Путь текущего адреса
+		}
+		else															// Иначе передан массив адресов
+			foreach($url as $p => $path)								// Цикл по адресам маршрутов
+				$pathArr[$p] = core::parse_urn($path);					// Путь каждого адреса
+
+		$urn  = core::parse_urn();										// Текущий URN
 		
-		if($_SERVER['REQUEST_METHOD'] != $type)						// Проверка на соответствие метода вызова
-			return false;											// значит надо вызывать следующий маршрут в index.php
-		
-		$urn  = core::parse_urn();									// Текущий URN
-		$path = core::parse_urn($path);								// Переданный для маршрутизации путь
-		
-		if(count($urn) != count($path))								// Если количество частей URN и пути разное
-			return false;											// значит надо вызывать следующий маршрут в index.php
-		
-		$args = array();											// Объявление массива аргументов
-		
-		for($part = 0; $part < count($urn); $part++)
-			if(preg_match('|^\{(.*)\}$|', $path[$part], $match))	// Если часть пути является {переменной}
-				if(!isset($asserts[$match[1]]) || 					// Если для этой переменной не назначено регулярное выражение
-					preg_match($asserts[$match[1]], $urn[$part])) {	// или если переменная проходит проверку регулярным выражением
-					$args[$match[1]] = $urn[$part];					// Запись переменной в массив аргументов для дальнейшей передачи функции
-					get::set_arg($match[1], $urn[$part]);			// Добавление пары ключ-значение в объект для работы с переменными
-				}
-				else {												// Иначе переменная не проходит проверку регулярным выражением
-					get::unset_args();								// Нужно очистить объект переменных
-					return false;									// и вызывать следующий маршрут в index.php
-				}
-			else													// иначе часть пути не является переменной
-				if($urn[$part] != $path[$part]) {					// и если часть URN не совпадает с частью пути
-					get::unset_args();								// Нужно очистить объект переменных
-					return false;									// и вызывать следующий маршрут в index.php
-				}
-		
+		foreach($pathArr as $p => $path) {
+
+			if(count($urn) != count($path))								// Если количество частей URN и пути разное
+				continue;												// значит надо вызывать следующий маршрут в index.php
+			
+			$args = array();											// Объявление массива аргументов
+			
+			for($part = 0; $part < count($urn); $part++)
+				if(preg_match('|^\{(.*)\}$|', $path[$part], $match))	// Если часть пути является {переменной}
+					if(!isset($asserts[$match[1]]) || 					// Если для этой переменной не назначено регулярное выражение
+						preg_match($asserts[$match[1]], $urn[$part])) {	// или если переменная проходит проверку регулярным выражением
+						$args[$match[1]] = $urn[$part];					// Запись переменной в массив аргументов для дальнейшей передачи функции
+						get::set_arg($match[1], $urn[$part]);			// Добавление пары ключ-значение в объект для работы с переменными
+					}
+					else {												// Иначе переменная не проходит проверку регулярным выражением
+						get::unset_args();								// Нужно очистить объект переменных
+						continue 2;										// и вызывать следующий маршрут в index.php
+					}
+				else													// иначе часть пути не является переменной
+					if($urn[$part] != $path[$part]) {					// и если часть URN не совпадает с частью пути
+						get::unset_args();								// Нужно очистить объект переменных
+						continue 2;										// и вызывать следующий маршрут в index.php
+					}
+			
+			core::$called = true;										// Изменение флага для определения, что по текущему маршруту уже проведён роут
+
+			return core::callback($type, $callback, $args);
+		}
+	}
+
+	private static function callback($type, $callback, $args = array()) {
+
 		$call = explode('->', $callback);							// Разбор callback на две части: 1) До стрелки и 2) После стрелки
-		
-		core::$called = true;										// Изменение флага для определения, что по текущему маршруту уже проведён роут
 		
 		if(method_exists($call[0], $call[1]))						// Если метод существует
 			call_user_func_array(									// Вызов
@@ -270,13 +345,6 @@ class core {
 }
 
 // Класс работы с GET-переменными
-
-/*	Использование
-
-	Получение значения GET-переменной:
-		$value = get::$arg->key;
-*/
-
 class get {
 	
 	public static $arg;												// Объект, который используется из приложения для обращения к GET-переменным
@@ -305,10 +373,6 @@ class get {
 }
 
 // Класс работы с базой данных
-
-/* 	Использование
-	
-*/
 class orm {
 	
 	public static $mysqli;											// Объект работы с MySQL
@@ -968,18 +1032,6 @@ class orm {
 }
 
 // Класс обработки ошибок
-
-/*	Использование
-	
-	Отключение отображения ошибок интерпретатора:
-		error_reporting(0);
-	
-	Указание метода, которые будет вызван по окончании выполнения всего скрипта:
-		register_shutdown_function(array('error', 'get_error'));
-	
-	 Вывод ошибки системы:
-		error::print_error('Error text');
-*/
 class error {
 	
 	protected static $sys_classes = array(							// Определение классов системы, имена которых нельзя использовать в приложении
@@ -1032,13 +1084,6 @@ class error {
 }
 
 // Класс вывода сообщений
-
-/*	Использование:
-	
-	Вывод сообщения системы:
-		message::print_message('Message text');
-*/
-
 class message {
 	
 	/*
