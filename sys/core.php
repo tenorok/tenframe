@@ -1,7 +1,7 @@
 <?php
 
-// Version 1.2.0
-// From 28.08.2012
+// Version 1.3.0
+// From 31.08.2012
 
 /*	core
 	
@@ -79,6 +79,85 @@
 
 	Получение значения GET-переменной:
 		$value = get::$arg->key;
+*/
+
+/* orm
+	
+	Правило наименования ключей в БД:
+		Первичный ключ: table_id
+		Внешний ключ:   table_fk
+
+	Подключение к MySQL:
+		orm::connect('host', 'login', 'password');
+
+	Выбор базы данных:
+		orm::db('dbname');
+
+	Добавление записи:
+		$last_id = orm::insert('table', array(						// Возвращается идентификатор добавленной записи или false, если запрос не был выполнен
+			'field_1' => 'value',									// Перечисление полей и значений
+			'field_2' => 'func: now()'								// Для использования функций применяется ключевое слово "func:"
+		));
+
+	Обновление записи:
+		orm::update('table', array(									// Возвращается true или false
+			'field_1' => 'value',									// Перечисление полей и значений
+			'field_2' => 'func: now()'								// Для использования функций применяется ключевое слово "func:"
+		))
+		->where('table_id > 10');									// Обязательная опция. В качестве условия может быть строка
+		->where(10);												// или число (такая запись идентична: table_id = 10)
+		->where('all')												// или применить для всех строк таблицы
+
+	Удаление записи:
+		orm::delete('table')										// Возвращается true или false
+			->where(...);											// Обязательная опция. Условия удаления
+
+	Выборка записей:
+		$result = 													// Результаты выборки возвращаются в виде массива объектов
+																	// или в виде одного объекта, если был указан "->where(число)"
+			orm::select('table')									// По умолчанию выбираются все поля таблицы
+				->sub(array(										// Подзапросы
+					'select count(*) from tab1' => 'count1'			// Идентично select count(*) from tab1 as `count1`
+				))
+				->fields('*, sum(field1)')							// Явное          указание select
+				->addfields('sum(field1)')							// Дополнительное указание select (Аналогично предыдущей строке)
+				->order('field1')									// Сортировка
+				->group('field1')									// Группировка
+				->limit('0, 10')									// Лимит
+				->prefix('prefix_')									// Префикс
+				->where(...);										// Обязательно указывать последней! Последовательность предыдущих опций свободна
+
+		$result = 													// Результатом выборки будет всегда массив объектов
+			orm::join('table', array(								// From table и массив join-таблиц
+				
+				array(												// Описание подключаемой таблицы
+					'table'  => 'tablename_1',						// Обязательный. Имя подключаемой таблицы
+					'join'   => 'inner',							// Тип join: inner (по умолчанию), left outer, right outer, full outer, cross
+					'left'   => 'users',							// left | right; По умолчанию: 'left' => 'table' (Обычное направление связи к первоначальной таблице)
+					'prefix' => 'prefix_'							// Префикс для полей данной таблицы
+				),
+
+				array(
+					'table'  => 'tablename_2',						// Таблица tablename_2
+					'right'  => 'tablename_1'						// Подключается к таблице tablename_1 в обратном направлении связи
+																	// Иначе говоря, в данном случае tablename_1 играет роль таблицы-связки
+				),
+
+				array(
+					'table'  => 'tablename_3'						// Таблица tablename_3 подключится к первоначальной таблице table
+				)
+			))
+			->sub, fields, addfields, order, group, limit			// те же опции, что и в select
+			->prefix('prefix_{table}')								// Префикс. Вместо {table} подставится имя таблицы
+			->where(...);											// Обязательно указывать последней! Последовательность предыдущих опций свободна
+
+			Важно:
+				Если в результате объединения таблиц появляются одинаковые поля, то они автоматически будут приведены в вид: таблица_поле.
+				Данная проверка осуществляется, если для таблицы явно не указан префикс ('prefix' => 'prefix_').
+
+	Отладка:
+		orm::result($result);										// Печать результатов выборки в удобочитаемом виде
+		orm::debug();												// Статистика проведённых до этого момента запросов
 */
 
 /*	error
@@ -393,8 +472,12 @@ class orm {
 		orm::$limit      = null;									// Обнуление дополнительных переменных перед каждым новым запросом
 		orm::$order      = null;
 		orm::$group      = null;
+		orm::$fields     = null;
+		orm::$addfields  = null;
 		orm::$subqueries = null;
 		orm::$prefix     = null;
+		
+		orm::$single     = false;									// Выключение флага одиночной выборки
 	}
 	
 	/**
@@ -428,15 +511,19 @@ class orm {
 	 */
 	 private static function get_value($val) {
 		
+		$quote = '';
+
 		if(strpos($val, 'func:') !== false) {					// Если в значении присутствует ключевое слово, указывающее на функцию
 			
 			$val = str_replace('func:', '', $val);				// Удаление ключевого слова из значения
 			$val = str_replace(' ', '', $val);					// Удаление пробелов из значения
 		}
 		else
-			$quote = (gettype($val) == 'string'					// Если у значения строковый тип
-				&& !preg_match('/^\d+$/', $val)					// и это не число со строковым типом
-				&& strtolower($val) != 'null') ? '\'' : '';		// и это не null, то надо добавить кавычки
+			$quote = (
+				gettype($val) == 'string'    &&					// Если у значения строковый тип
+				!preg_match('/^\d+$/', $val) &&					// и это не число со строковым типом
+				strtolower($val) != 'null'						// и это не null
+			) ? '\'' : '';										// то надо добавить кавычки
 		
 		return $quote . $val . $quote;							// При необходимости возвращаемое значение обрамляется в апострофы
 	 }
@@ -456,6 +543,9 @@ class orm {
 		
 		orm::set_debug(debug_backtrace());
 		
+		$fields    = '';
+		$variables = '';
+
 		foreach($values as $key => $val) {
 			
 			$fields .= $key . ', ';
@@ -463,9 +553,9 @@ class orm {
 		}
 		
 		if(!orm::execute_query('insert into ' . $table . '(' . substr($fields, 0, -2) . ') values (' . substr($variables, 0, -2) . ')'))
-			return false;											// Запрос не выполнен и возвращается отрицательный результат
+			return false;										// Запрос не выполнен и возвращается отрицательный результат
 		
-		return orm::$mysqli->insert_id;								// Возвращается последний добавленный идентификатор
+		return orm::$mysqli->insert_id;							// Возвращается последний добавленный идентификатор
 	}
 	
 	/**
@@ -494,6 +584,8 @@ class orm {
 	 */
 	private static function update_query($table, $values) {
 		
+		$variables = '';
+
 		foreach($values as $key => $val)
 			$variables .= $key . ' = ' . orm::get_value($val) . ', ';
 		
@@ -516,7 +608,7 @@ class orm {
 	}
 	
 	/**
-	 * Функция обработки данных перед отправкой на выполнение запроса на удаление записи
+	 * Функция вызова запроса на удаление записи
 	 *
 	 * @param string $table  Имя таблицы
 	 * @return boolean
@@ -542,8 +634,8 @@ class orm {
 	}
 	
 	private static $int_array = array(								// Массив типов данных базы данных, которые необходимо перевести в integer
-		'tinyint' => 1, 'smallint' => 2, 'integer' => 3, 
-		'bigint' => 8, 'mediumint' => 9, 'year' => 13
+		'tinyint' => 1, 'smallint'  => 2, 'integer' => 3, 
+		'bigint'  => 8, 'mediumint' => 9, 'year'    => 13
 	);
 	
 	private static $float_array = array(							// Массив типов данных базы данных, которые необходимо перевести в float
@@ -551,60 +643,175 @@ class orm {
 	);
 	
 	/**
-	 * Функция обработки данных перед отправкой на выполнение запроса на выборку
+	 * Функция вызова запроса на выборку
 	 *
 	 * @param string $table  Имя таблицы
 	 * @return array || boolean
 	 */
 	private static function select_query($table) {
 		
-		$result = orm::execute_query('select *' . orm::$subqueries . ' from ' . $table . orm::$where . orm::$group . orm::$order . orm::$limit);
+		$select = (!is_null(orm::$fields)) ? orm::$fields : '*';
 		
-		if(!$result)
+		return orm::modernize_selection(
+			
+			orm::execute_query(
+				'select '         .
+				$select           .
+				orm::$addfields   .
+				orm::$subqueries  .
+				' from ' . $table .
+				orm::$where .
+				orm::$group .
+				orm::$order .
+				orm::$limit
+			)
+		);
+	}
+
+	/**
+	 * Функция соединения таблиц базы данных
+	 * 
+	 * @param string $table Имя левой таблицы
+	 * @param array  $join  Массив массивов с описанием правых таблиц
+	 * @return object
+	 */
+	public static function join($table, $join) {
+
+		orm::$parameters = array($table, $join);
+		orm::$object = new orm(__FUNCTION__);
+		orm::set_debug(debug_backtrace());
+		
+		return orm::$object;
+	}
+
+	/**
+	 * Функция вызова join-запроса
+	 * 
+	 * @param string $table Имя левой таблицы
+	 * @param array  $join  Массив массивов с описанием правых таблиц
+	 * @return array || boolean
+	 */
+	private static function join_query($table, $join = array()) {
+
+		$exist_fields = array();																	// Массив для хранения всех выбранных полей
+
+		$fields = orm::execute_query('show columns from ' . $table);								// Запрос на получение списка полей левой таблицы
+		
+		while($field = $fields->fetch_object())														// Цикл по полученному списку полей левой таблицы
+			array_push($exist_fields, $field->Field);												// Добавление поля в массив полей
+
+		$joins  = '';																				// Строка для конкатенации подключения таблиц
+
+		$select = (!is_null(orm::$fields)) ? orm::$fields : $table . '.*';							// Если задано значение для select, то используется оно, иначе все поля левой таблицы
+
+		foreach($join as $tab) {																	// Цикл по массивам с описанием правых таблиц
+			
+			$type = (!isset($tab['join'])) ? 'inner' : $tab['join'];								// Если не задан тип join, то по умолчанию устанавливается inner
+			
+			if(isset($tab['right']))																// Если задано правое направление связи
+				$on = $tab['table'] . '.' . $tab['table'] . '_id = ' . $tab['right'] . '.' . $tab['table'] . '_fk';
+			
+			else {																					// Иначе правое направление связи не задано
+				
+				$left = (isset($tab['left'])) ? $tab['left'] : $table;								// Если явно задано левое направление связи, то нужно использовать указанную в направлении таблицу, иначе использовать левую таблицу
+				
+				$on = $tab['table'] . '.' . $left . '_fk = ' . $left . '.' . $left . '_id';
+			}
+
+			$joins .= ' ' . $type . ' join ' . $tab['table'] . ' on ' . $on;						// Конкатенация полной строки подключения таблицы
+
+			if(!is_null(orm::$fields))																// Если задано значение для select
+				continue;																			// то нужно пропустить последующие операции и перейти к следующей правой таблице
+
+			$fields = orm::execute_query('show columns from ' . $tab['table']);						// Запрос на получение списка полей текущей правой таблицы
+
+			if(isset($tab['prefix']))																// Если задан префикс для текущей правой таблицы
+				while($field = $fields->fetch_object())												// Цикл по полученному списку полей правой таблицы
+					$select .= ', ' . $tab['table'] . '.' . $field->Field . ' as ' . $tab['prefix'] . $field->Field;
+			
+			else																					// Иначе префикс для текущей правой таблицы не задан
+				while($field = $fields->fetch_object()) {											// Цикл по полученному списку полей правой таблицы
+
+					$select .= ', ' . $tab['table'] . '.' . $field->Field;
+
+					if(in_array($field->Field, $exist_fields)) {									// Если поле, с именем текущего уже было в одной из предыдущих таблиц
+						
+						$field->Field = $tab['table'] . '_' . $field->Field;						// Значит этому полю нужно добавить табличный префикс
+
+						$select .= ' as ' . $field->Field;											// и в запросе указать его в качестве as
+					}
+
+					array_push($exist_fields, $field->Field);										// Добавление текущего поля в массив хранения всех полей
+				}
+		}
+
+		return orm::modernize_selection(
+			
+			orm::execute_query(
+				'select '         .
+				$select           .
+				orm::$addfields   .
+				orm::$subqueries  .
+				' from ' . $table .
+				$joins            .
+				orm::$where .
+				orm::$group .
+				orm::$order .
+				orm::$limit
+			)
+		);
+	}
+
+	/**
+	 * Функция обработки результатов выборки
+	 * 
+	 * @param array $result Результат выборки
+	 * @return array || boolean
+	 */
+	private static function modernize_selection($result) {
+
+		if(!$result)																				// Если запрос не был выполнен
 			return false;
 		
-		else {
+		else {																						// Иначе запрос был успешно выполнен
 			
-			$result_array = array();
+			$result_array = array();																// Результирующий массив
 			
-			while($current_row = $result->fetch_object()) {			// Цикл по строкам результатов выборки
+			while($current_row = $result->fetch_object()) {											// Цикл по строкам результатов выборки
 				
-				foreach($result->fetch_fields() as $val) {			// Цикл по полям текущей строки
+				foreach($result->fetch_fields() as $val) {											// Цикл по полям текущей строки
 					
-					$name = $val->name;								// Имя текущего поля
+					$name = $val->name;																// Имя текущего поля
 					
-					if(!is_null(orm::$prefix)) {					// Если требуется добавить префикс
+					if(!is_null(orm::$prefix)) {													// Если требуется добавить префикс
 						
-						$key = substr($name, -3);					// Последние три символа названия поля
-						
-						if($key != '_id' && $key != '_fk') {		// Если текущее поле не является первичным или внешним ключом
-							
-							$prefix_name = orm::$prefix . $name;				// Формирование нового имени для поля
-							$current_row->$prefix_name = $current_row->$name;	// Присваивание значения из старого свойства объекта свойству с новым именем
-							unset($current_row->$name);							// Удаление свойства со старым именем
-							$name = $prefix_name;								// Замена основного имени на новое с префиксом
-						}
+						$prefix = str_replace('{table}', $val->table, orm::$prefix);
+
+						$prefix_name = $prefix . $name;												// Формирование нового имени для поля
+						$current_row->$prefix_name = $current_row->$name;							// Присваивание значения из старого свойства объекта свойству с новым именем
+						unset($current_row->$name);													// Удаление свойства со старым именем
+						$name = $prefix_name;														// Замена основного имени на новое с префиксом
 					}
 					
-					if(in_array($val->type, orm::$int_array))					// Если тип данных текущего поля является числовым и целым
-						$current_row->$name = intval($current_row->$name);		// то это поле надо перевести в целое число
+					if(in_array($val->type, orm::$int_array))										// Если тип данных текущего поля является числовым и целым
+						$current_row->$name = intval($current_row->$name);							// то это поле надо перевести в целое число
 					
-					else if(in_array($val->type, orm::$float_array))			// Если тип данных текущего поля является числовым и дробным
-						$current_row->$name = floatval($current_row->$name);	// то это поле надо перевести в дробное число
+					else if(in_array($val->type, orm::$float_array))								// Если тип данных текущего поля является числовым и дробным
+						$current_row->$name = floatval($current_row->$name);						// то это поле надо перевести в дробное число
 				}
 				
-				array_push($result_array, $current_row);			// Запись строки в результирующий массив
+				array_push($result_array, $current_row);											// Запись строки в результирующий массив
 			}
 			
-			if(gettype(orm::$where) == 'integer' || 				// Если в качестве условия было передано число
-				preg_match('/^\d+$/', orm::$where))					// или число в виде строки (т.е. была запрошена одна строка)
-				return $result_array[0];							// то нужно вернуть именно её
+			if(orm::$single)																		// Если нужно выбрать одну строку
+				return $result_array[0];															// то нужно вернуть именно её
 			else
-				return $result_array;								// иначе массив записей
+				return $result_array;																// иначе массив записей
 		}
 	}
 	
-	private static $where;											// Переменная, хранящая переданные условия
+	private static $where;																			// Переменная, хранящая переданные условия
+	private static $single = false;																	// Флаг выборки одной строки
 	
 	/**
 	 * Функция условия
@@ -614,30 +821,38 @@ class orm {
 	 */
 	public function where($where) {
 		
-		if(!$where)																// Если аргумент отсутствует
-			error::print_error('Missing argument for <b>where</b> in <b>' . orm::$queries[count(orm::$queries) - 1]->name . '</b> query');
+		$query_name = orm::$queries[count(orm::$queries) - 1]->name;								// Имя текущей операции
+
+		if(!$where)																					// Если аргумент отсутствует
+			error::print_error('Missing argument for <b>where</b> in <b>' . $query_name . '</b> query');
 		
-		else if(gettype($where) == 'integer' || preg_match('/^\d+$/', $where))	// иначе если аргумент имеется и это целое число или это строка, являющаяся числом
+		else if(gettype($where) == 'integer' || preg_match('/^\d+$/', $where)) {					// иначе если аргумент имеется и это целое число или это строка, являющаяся числом
+			
+			if($query_name == 'select')																// Если выполняется select
+				orm::$single = true;																// нужно отметить, что к выборке требуется одна строка
+			
 			orm::$where = ' where ' . orm::$parameters[0] . '_id = ' . $where;
+		}
 		
-		else if(gettype($where) == 'string')									// иначе если аргумент имеется и это строка
-			orm::$where = ($where == 'all') ? '' : ' where ' . $where;			// Если запрос выполняется для всех записей, то условие не нужно
+		else if(gettype($where) == 'string')														// иначе если аргумент имеется и это строка
+			orm::$where = ($where == 'all') ? '' : ' where ' . $where;								// Если запрос выполняется для всех записей, то условие не нужно
 		
-		else																	// Иначе аргумент имеется, но у него неверный тип данных
-			error::print_error('Wrong argument for <b>where</b> in <b>' . orm::$queries[count(orm::$queries) - 1]->name . '</b> query');
+		else																						// Иначе аргумент имеется, но у него неверный тип данных
+			error::print_error('Wrong argument for <b>where</b> in <b>' . $query_name . '</b> query');
 		
 		return call_user_func_array(
-			array('orm', orm::$queries[count(orm::$queries) - 1]->name . '_query'),
+			array('orm', $query_name . '_query'),
 			orm::$parameters
 		);
 	}
 	
 	/**
-	 * Функция присоединения таблиц
+	 * Функция присоединения таблиц с использованием простых sql-запросов и их объединение в php
 	 *
 	 * @param array  $table Массив массивов выборок
 	 * @return array
 	 */
+	/*
 	public static function inner($tables) {
 		
 		$index = 0;												// Итератор для главного цикла
@@ -850,6 +1065,7 @@ class orm {
 		
 		return $result;
 	}
+	*/
 	
 	private static $limit;											// Переменная, хранящая значение для оператора limit
 	
@@ -861,6 +1077,34 @@ class orm {
 	public function limit($limit) {
 		
 		orm::$limit = ' limit ' . $limit;
+		
+		return orm::$object;
+	}
+
+	private static $fields;											// Переменная, хранящая значение для оператора select
+
+	/**
+	 * Функция изменения полей в select запроса
+	 *
+	 * @param string $fields Перечисление полей
+	 */
+	public function fields($fields) {
+		
+		orm::$fields = $fields;
+		
+		return orm::$object;
+	}
+
+	private static $addfields;										// Переменная, хранящая дополнительное значение для оператора select
+
+	/**
+	 * Функция добавления полей в select запроса
+	 *
+	 * @param string $addfields Перечисление полей
+	 */
+	public function addfields($addfields) {
+		
+		orm::$addfields = ', ' . $addfields;
 		
 		return orm::$object;
 	}
@@ -921,8 +1165,8 @@ class orm {
 		
 		return orm::$object;
 	}
-	
-	public static $print = false;									// Печать всех запросов
+
+	private static $selection_operation = array('select', 'join');												// Операции, выполняющие выборку данных
 	
 	/**
 	 * Функция непосредственного выполнения запроса
@@ -932,30 +1176,27 @@ class orm {
 	 */
 	private static function execute_query($query) {
 		
-		orm::$queries[count(orm::$queries) - 1]->query = $query;	// Запись в массив данных текста текущего запроса
+		orm::$queries[count(orm::$queries) - 1]->query = $query;												// Запись в массив данных текста текущего запроса
 		
-		if(orm::$print)												// Если нужно напечатать текст запроса
-			echo '<br>' . $query . '<br>';
+		$start = microtime(true);																				// Время начала выполнения запроса
+		$result = orm::$mysqli->query($query);																	// Выполнение самого запроса
+		orm::$queries[count(orm::$queries) - 1]																	// Запись в массив данных
+			->duration = microtime(true) - $start;																// длительности выполнения запроса
 		
-		$start = microtime(true);									// Время начала выполнения запроса
-		$result = orm::$mysqli->query($query);						// Выполнение самого запроса
-		orm::$queries[count(orm::$queries) - 1]						// Запись в массив данных
-			->duration = microtime(true) - $start;					// длительности выполнения запроса
-		
-		if(!$result) {
+		if(!$result) {																							// Если запрос не был выполнен
 			
-			orm::$queries[count(orm::$queries) - 1]->result = '<b>error:</b> ' . orm::$mysqli->error;
-			return false;
+			orm::$queries[count(orm::$queries) - 1]->result = '<b>error:</b> ' . orm::$mysqli->error;			// Запись ошибки в результат выполнения запроса
+			return false;																						// и возвращение отрицательного результата
 		}
-		else if(orm::$queries[count(orm::$queries) - 1]->name == 'select') {
+		else if(in_array(orm::$queries[count(orm::$queries) - 1]->name, orm::$selection_operation)) {			// Иначе запрос был выполнен и если текущая операция относится к операциям, выполняющим выборку данных
 			
-			orm::$queries[count(orm::$queries) - 1]->result = 'complete: ' . $result->num_rows . ' rows';
-			return $result;
+			orm::$queries[count(orm::$queries) - 1]->result = 'complete: ' . $result->num_rows . ' rows';		// Запись количества выбранных строк в результат выполнения запроса
+			return $result;																						// и возвращение результата выборки
 		}
-		else {
+		else {																									// Иначе запрос успешно выполнен, но текущая операция не относится к выполняющим выборку
 			
-			orm::$queries[count(orm::$queries) - 1]->result = 'complete';
-			return true;
+			orm::$queries[count(orm::$queries) - 1]->result = 'complete';										// Запись сообщения об успешном выполнении в качестве результата
+			return true;																						// и возвращение положительного результата
 		}
 	}
 	
@@ -965,8 +1206,8 @@ class orm {
 	 */
 	private static function set_debug($backtrace) {
 		
-		orm::$queries[count(orm::$queries) - 1]->file = $backtrace[0]['file'];
-		orm::$queries[count(orm::$queries) - 1]->line = $backtrace[0]['line'];
+		orm::$queries[count(orm::$queries) - 1]->file = $backtrace[0]['file'];									// Запись в массив данных пути к файлу
+		orm::$queries[count(orm::$queries) - 1]->line = $backtrace[0]['line'];									// и строки, откуда был вызван запрос
 	}
 	
 	/**
@@ -977,21 +1218,23 @@ class orm {
 		
 		echo "<pre><b>Queries debuger:</b>\n\n";
 		
+		$duration_sum = 0;
+		
 		foreach(orm::$queries as $key => $val) {
 			
 			echo $key + 1 . " -> " . $val->name . " [\n"
-				. "\t"   . "file -> "     . $val->file
-				. "\n\t" . "line -> "     . $val->line
-				. "\n\t" . "query -> "    . $val->query
+				. "\t"   . "file     -> " . $val->file
+				. "\n\t" . "line     -> " . $val->line
+				. "\n\t" . "query    -> " . $val->query
 				. "\n\t" . "duration -> " . $val->duration
-				. "\n\t" . "result -> "   . $val->result
+				. "\n\t" . "result   -> " . $val->result
 				. "\n]\n\n";
 			
 			$duration_sum += $val->duration;
 		}
 		
 		echo "total [\n"
-			. "\t" .   "count -> "    . count(orm::$queries)
+			. "\t" .   "count    -> " . count(orm::$queries)
 			. "\n\t" . "duration -> " . $duration_sum
 			. "\n]</pre>";
 	}
@@ -1001,7 +1244,7 @@ class orm {
 	 *
 	 * @param array || object $query
 	 */
-	public static function print_query($query) {
+	public static function result($query) {
 		
 		if(gettype($query) == 'object')								// Если параметр является объектом (одна строка в результате выборки)
 			$table[0] = $query;										// то надо добавить его в массив

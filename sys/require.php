@@ -23,5 +23,5 @@ else
 
 register_shutdown_function(array('error', 'get_error'));		// Указание метода, который будет вызван по окончании выполнения всего скрипта
 
-// orm::connect('localhost', 'root', '');						// Подключение к mysql
+// orm::connect('localhost', 'root', 'password');				// Подключение к mysql
 // orm::db('dbname');											// Выбор базы данных
