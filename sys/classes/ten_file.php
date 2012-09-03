@@ -1,7 +1,7 @@
 <?php
 
-// Version 1.1.2
-// From 01.08.2012
+// Version 1.2.4
+// From 03.09.2012
 
 // Класс работы с файлами
 
@@ -103,12 +103,16 @@
 			// или
 			'files'       => 'reg: /\.ctrl\.js$/',			// Обязательный. Мод регулярного выражения
 
-			'input_path'  => '/view/',						// Обязательный. Корневая директория, содержащая объединяемые файлы
 			'output_file' => '/assets/{ext}/file.{ext}',	// Обязательный. Выходящий файл
 															   Это может быть маска формируемых на выходе файлов при передаче нескольких расширений.
 															   Где {ext} - расширение (extension) файла.
 															   Переменная существует только при использовании мода расширений ('files' => 'ext: ')
 			
+			'input_path'  => '/view/',						// Корневая директория, содержащая объединяемые файлы
+			// или
+			'input_path'  => array('/view1/', '/view2/'),	// Массив корневых директорий
+															   По умолчанию: array('/view/', mods), где mods - это пути к папками view подключенных модулей
+
 			'before'      => "\n start: {filename} { \n",	// Строка, помещаемая перед содержанием очередного файла
 			'after'       => "\n } {filename} :end \n",		// Строка, помещаемая после содержания очередного файла
 															   Где {filename} - путь и имя текущего файла
@@ -225,6 +229,26 @@ class ten_file {
 	
 	public  static $debug = false;									// Флаг отладки скрипта для вывода ошибок
 	
+	/**
+	 * Функция создания директории, если её не существует
+	 * 
+	 * @param string $path Путь к папке или файлу
+	 * @return die || true
+	 */
+	private static function make_dir($path) {
+
+		if(substr($path, 0, -1) != '/')								// Если в конце переданной строки нет слеша
+			$path = implode('/', array_slice(						// то это путь к файлу и нужно получить чистый путь без имени файла
+				explode('/', $path), 0, -1
+			));
+
+		if(!file_exists($path))										// Если указанного пути не существует
+			if(!mkdir($path, 0, true))								// Если не удалось создать каталоги, указанные в пути
+				error::print_error('<b>Error:</b> can\'t find and make directory: <b>' . $path . '</b>');
+
+		return true;												// Если скрипт не был убит, значит операция прошла успешно
+	}
+
 	/**
 	 * Функция загрузки изображения
 	 *
@@ -515,6 +539,8 @@ class ten_file {
 	private static $folder_array = array();										// Массив директорий
 	private static $input_files  = array();										// Массив путей объединённых файлов
 	private static $output_file;												// Строка, в которую собираются файлы
+
+	public  static $input_path   = array('/view/');								// Массив входящих директорий
 	
 	private static $default_merge_options = array(								// Дефолтные параметры объединения файлов
 		'before' => '',
@@ -533,8 +559,6 @@ class ten_file {
 	 */
 	public static function merge_files($options) {
 		
-		$options['input_path']  = ten_text::rgum($options['input_path'], '/');			// Добавление слеша в конец пути корневой директории, если его там нет
-		$options['input_path']  = ROOT . $options['input_path'];						// Абсолютный путь корневой директории
 		$options['output_file'] = ROOT . $options['output_file'];						// Абсолютный путь выходящего файла
 
 		foreach(ten_file::$default_merge_options as $key => $val)						// Установка значений по умолчанию
@@ -547,8 +571,11 @@ class ten_file {
 		if($files_mod == 'ext')															// Если задан мод расширений
 			$files_val    = explode(',', $files[1]);									// то строку значения надо разбить в массив расширений
 		else if($files_mod == 'reg')													// Если задан мод регулярного выражения
-			$files_val[0] = $files[1];													// то достаточно просто переприсвоить строку значения
+			$files_val[0] = $files[1];													// то достаточно просто переприсвоить строку значения		
 		
+		if(!isset($options['input_path']))												// Если входящие директории не указаны явно
+			$options['input_path'] = ten_file::$input_path;								// будут использоваться сгенерированные автоматически
+
 		if(
 			$files_mod == 'reg' || 														// Если задан мод регулярного выражения
 			$files_mod == 'ext' && count($files_val) == 1								// или мод расширений и указано всего одно расширение
@@ -585,84 +612,109 @@ class ten_file {
 	 */
 	private static function merge_file($mod, $val, $options) {
 		
-		$output_extension = end(explode('.', $options['output_file']));			// Расширение выходящего файла
+		$output_extension = end(explode('.', $options['output_file']));					// Расширение выходящего файла
 
-		if($input = opendir($options['input_path'])) {							// Если открылась первоначальная директория
+		if(gettype($options['input_path']) == 'array')									// Если указан массив входящих директорий
+			$input_path    = $options['input_path'];
+		else																			// Иначе указана одна входящая директория
+			$input_path[0] = $options['input_path'];
+
+		foreach($input_path as $path) {													// Цикл по входящим директориям
+
+			$options['input_path'] = ten_text::rgum(ROOT . $path, '/');					// Абсолютный путь входящей корневой директории и добавление слеша в конец пути, если его там нет
+
+			ten_file::merge($mod, $val, $options);										// Вызов функции рекурсивного перебора директорий
+		}
+
+		ten_file::$output_file = 														// Добавление
+			$options['start_str']  . 													// первой строки
+			ten_file::$output_file . 													// к выходящему файлу
+			$options['end_str'];														// и последней строки
+
+		$extension = ($mod == 'ext') ? $val : '';										// Переменная расширения будет существовать только когда задан мод расширений
+		
+		if($extension == 'css' || $output_extension == 'css') {							// Если текущее расширение или расширение выходящего файла является CSS
 			
-			while($object = readdir($input)) {									// Цикл по объектам в текущей директории
+			if(is_null($options['compress']) || $options['compress'])					// Если сжатие конечного файла не отключено
+				ten_file::$output_file = trim(str_replace('; ',';',str_replace(' }','}',str_replace('{ ','{',str_replace(array("\r\n","\r","\n","\t",'  ','    ','    '),"",preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!','',ten_file::$output_file))))));
+		}
+		else if($extension == 'js' || $output_extension == 'js') {						// Если текущее расширение или расширение выходящего файла является JS
+			
+			if(is_null($options['compress']) || $options['compress'])					// Если сжатие конечного файла не отключено
+				ten_file::$output_file = trim(ten_file_jsmin::minify(ten_file::$output_file));
+		}
+		
+		$output_file = str_replace('{ext}', $extension, $options['output_file']);
+
+		ten_file::make_dir($output_file);												// Создание пути, если его не существует
+
+		file_put_contents($output_file, ten_file::$output_file);						// Запись итоговой строки в выходящий файл
+		chmod($output_file, 0644);														// Присвоение необходимых прав на файл
+
+		ten_file::$output_file = '';													// Обнуление строки собранного файла
+		
+		return $output_file;															// Возвращается путь к составленному файлу
+	}
+
+	/**
+	 * Функция рекурсивного перебора директорий для объединения файлов
+	 * 
+	 * @param  string $mod       Мод поиска файлов (ext или reg)
+	 * @param  string $val       Значение поиска файлов (расширение или регулярное выражение)
+	 * @param  array  $options   Параметры объединения файлов
+	 * @return function
+	 */
+	private static function merge($mod, $val, $options) {
+
+		if($input = opendir($options['input_path'])) {									// Если открылась первоначальная директория
+			
+			while($object = readdir($input)) {											// Цикл по объектам в текущей директории
 				
-				if($object != '.' && $object != '..') {							// Если текущий объект является файлом или директорией
+				if($object != '.' && $object != '..') {									// Если текущий объект является файлом или директорией
 					
 					$directory = $options['input_path'] . $object . '/';
 					
 					if(
-						is_dir($directory) &&									// Если текущий объект является директорией
-						$options['recursion']									// и требуется рекурсивный перебор директорий
+						is_dir($directory) &&											// Если текущий объект является директорией
+						$options['recursion']											// и требуется рекурсивный перебор директорий
 					) {
 
-						array_push(ten_file::$folder_array, $directory);		// он добавляется в массив директорий
+						array_push(ten_file::$folder_array, $directory);				// он добавляется в массив директорий
 					}
-					else if (													// Иначе текущий объект - это файл
-						$mod == 'ext' && 										// Если задан мод расширений
-						end(explode('.', $object)) == $val ||					// и расширение текущего файла соответствует заданному для поиска
+					else if (															// Иначе текущий объект - это файл
+						$mod == 'ext' && 												// Если задан мод расширений
+						end(explode('.', $object)) == $val ||							// и расширение текущего файла соответствует заданному для поиска
 						
-						$mod == 'reg' &&										// Или задан мод регулярного выражения
-						preg_match($val, $object)								// и имя текущего файла удовлетворяет условия регулярного выражения
+						$mod == 'reg' &&												// Или задан мод регулярного выражения
+						preg_match($val, $object)										// и имя текущего файла удовлетворяет условия регулярного выражения
 					) {
 						
-						$file = $options['input_path'] . $object;				// Полный путь к файлу
+						$file = $options['input_path'] . $object;						// Полный путь к файлу
 						
-						array_push(ten_file::$input_files, $file);				// Добавление пути текущего файла в массив путей объединённых файлов
+						array_push(ten_file::$input_files, $file);						// Добавление пути текущего файла в массив путей объединённых файлов
 						
 						$before = str_replace('{filename}', $file, $options['before']);
 						$after  = str_replace('{filename}', $file, $options['after']);
 
-						ten_file::$output_file .=								// Добавление
-							$before                  .							// предваряющей строки
-							file_get_contents($file) .							// к содержанию текущего файла
-							$after;												// и последующей строки
+						ten_file::$output_file .=										// Добавление
+							$before                  .									// предваряющей строки
+							file_get_contents($file) .									// к содержанию текущего файла
+							$after;														// и последующей строки
 					}
 				}
 			}
 			
-			if(count(ten_file::$folder_array)) {								// Если имеются непросмотренные директории
+			if(count(ten_file::$folder_array)) {										// Если имеются непросмотренные директории
 				
-				$options['input_path'] = ten_file::$folder_array[0];			// Задание новой директории для дальнейшего рекурсивного вызова функции
-				array_shift(ten_file::$folder_array);							// Удаление присвоенной директории из массива непросмотренных директорий
-				return ten_file::merge_file($mod, $val, $options);				// Рекурсивный вызов функции
+				$options['input_path'] = ten_file::$folder_array[0];					// Задание новой директории для дальнейшего рекурсивного вызова функции
+				array_shift(ten_file::$folder_array);									// Удаление присвоенной директории из массива непросмотренных директорий
+				return ten_file::merge($mod, $val, $options);							// Рекурсивный вызов функции
 			}
 			
-			closedir($input);													// Закрытие текущего объекта
+			closedir($input);															// Закрытие текущего объекта
 		}
 		else
 			error::print_error('Can\'t open directory: ' . $options['input_path']);
-		
-		$extension = ($mod == 'ext') ? $val : '';								// Переменная расширения будет существовать только когда задан мод расширений
-
-		$output_file = str_replace('{ext}', $extension, $options['output_file']);
-
-		ten_file::$output_file = 												// Добавление
-			$options['start_str']  . 											// первой строки
-			ten_file::$output_file . 											// к выходящему файлу
-			$options['end_str'];												// и последней строки
-		
-		if($extension == 'css' || $output_extension == 'css') {					// Если текущее расширение или расширение выходящего файла является CSS
-			
-			if(is_null($options['compress']) || $options['compress'])			// Если сжатие конечного файла не отключено
-				ten_file::$output_file = trim(str_replace('; ',';',str_replace(' }','}',str_replace('{ ','{',str_replace(array("\r\n","\r","\n","\t",'  ','    ','    '),"",preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!','',ten_file::$output_file))))));
-		}
-		else if($extension == 'js' || $output_extension == 'js') {				// Если текущее расширение или расширение выходящего файла является JS
-			
-			if(is_null($options['compress']) || $options['compress'])			// Если сжатие конечного файла не отключено
-				ten_file::$output_file = trim(ten_file_jsmin::minify(ten_file::$output_file));
-		}
-		
-		file_put_contents($output_file, ten_file::$output_file);				// Запись итоговой строки в выходящий файл
-		chmod($output_file, 0644);												// Присвоение необходимых прав на файл
-
-		ten_file::$output_file = '';											// Обнуление строки собранного файла
-		
-		return $output_file;													// Возвращается путь к составленному файлу
 	}
 	
 	/**
@@ -688,7 +740,10 @@ class ten_file {
 		if(!empty($options['output_file'])) {									// Если указан файл для сохранения результата
 			
 			$output_file = ROOT . $options['output_file'];
-			file_put_contents($output_file, $included);							// сохранение конечной строки в файл
+
+			ten_file::make_dir($output_file);									// Создание пути, если его не существует
+
+			file_put_contents($output_file, $included);							// Сохранение конечной строки в файл
 			chmod($output_file, 0644);											// Присвоение необходимых прав на файл
 		}
 

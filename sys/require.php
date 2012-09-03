@@ -25,3 +25,5 @@ register_shutdown_function(array('error', 'get_error'));		// Указание м
 
 // orm::connect('localhost', 'root', 'password');				// Подключение к mysql
 // orm::db('dbname');											// Выбор базы данных
+
+// mod::init(array('admin'));										// Инициализация модулей

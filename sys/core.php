@@ -1,7 +1,7 @@
 <?php
 
-// Version 1.3.0
-// From 31.08.2012
+// Version 1.3.3
+// From 03.09.2012
 
 /*	core
 	
@@ -48,6 +48,7 @@
 	Парсинг blitz-шаблонов:
 		echo core::block(array(										// Функция всегда принимает в качестве параметра массив
 			
+			'mod'   => 'modulename',								// Имя модуля. Если шаблон находится в модуле
 			'block' => 'blockname',									// Обязательный. Имя блока
 		 	'view'  => 'viewname',									// Имя шаблона. (По умолчанию: имя блока)
 		 	
@@ -56,9 +57,10 @@
 		 		'tplvar2' => core::block(array(...))				// В качестве значения может быть другой блок. Вложенность не ограничена
 			)
 
-			'iterate' => array(										// Массив итератора. Для парсинга списков begin-end
+			'context' => array(										// Массив контекстов begin-end
 
-				'context1' => array(								// Контекст => массив_опций
+				'context1',											// Простая активация контекста
+				'context2' => array(								// Итерирование контекста и парсинг переменных. Контекст => массив_опций
 					'array' => array(								// Массив значений к перебору
 						array('key' => 'val1'),						// элементом массива может быть как массив,
 						(new stdClass)->key = 'val2'				// так и объект
@@ -67,7 +69,7 @@
 				 		'tplvar1' => 'key'							// Имя_переменной_в_шаблоне => ключ_массива_или_объекта
 					)
 				),
-				'context2' => array(...)							// Количество контекстов не ограничено
+				'context3' => array(...)							// Количество контекстов не ограничено
 			)
 		));
 
@@ -106,7 +108,7 @@
 		))
 		->where('table_id > 10');									// Обязательная опция. В качестве условия может быть строка
 		->where(10);												// или число (такая запись идентична: table_id = 10)
-		->where('all')												// или применить для всех строк таблицы
+		->where('all');												// или применить для всех строк таблицы
 
 	Удаление записи:
 		orm::delete('table')										// Возвращается true или false
@@ -178,6 +180,16 @@
 		message::print_message('Message text');
 */
 
+/*	mod
+	
+	Инициализация модулей (require.php):
+		mod::init(array('mod1', 'mod2', ..., 'modN'));
+		
+		Инициализация модуля:
+			1) добавляет его стили и скрипты в единый объединённый файл
+			2) обеспечивает автоподключение вызываемых классов модуля
+*/
+
 defined('SYS')        or die('Core error: System path is not declared!');
 defined('CONTROLLER') or die('Core error: Controller path is not declared!');
 defined('MODEL')      or die('Core error: Model path is not declared!');
@@ -185,7 +197,7 @@ defined('MODEL')      or die('Core error: Model path is not declared!');
 // Класс ядра
 class core {
 	
-	private static $paths = array(SYS, CONTROLLER, MODEL);				// Массив с директориями классов
+	public static $paths = array(SYS, CONTROLLER, MODEL);				// Массив с директориями классов
 	
 	/**
 	 * Функция автоматической подгрузки необходимых файлов
@@ -368,27 +380,32 @@ class core {
 		if(!isset($view))														// Если представление не указано
 			$view = $block;														// его имя соответствует имени блока
 
-		$tpl = new Blitz(BLOCKS . $block . '/view/' . $view . '.tpl');			// Получение шаблона
+		$blocks = (isset($mod)) ? ROOT . '/mod/' . $mod . '/view/blocks/' : BLOCKS;	// Изменение начального пути, если указан модуль
 
-		if(isset($iterate))														// Если требуется итератор begin-end
-			foreach($iterate as $context => $value) {							// Цикл по итераторам
+		$tpl = new Blitz($blocks . $block . '/view/' . $view . '.tpl');			// Получение шаблона
 
-				foreach($value['array'] as $element) {							// Цикл по массиву значений к присваиванию
+		if(isset($context))														// Если требуется контекст begin-end
+			foreach($context as $ctx => $val) {									// Цикл по контекстам
 
-					$tmp = array();												// Временный массив для хранения сопоставленных значений текущей итерации
-					
-					foreach($value['parse'] as $parse_key => $parse_val) {		// Цикл по массиву ключей: переменная_шаблона => ключ_массива_значений
+				if(gettype($val) == 'array')									// Если контекст нужно проитерировать
+					foreach($val['array'] as $element) {						// Цикл по массиву значений к присваиванию
 
-						$tmp_val = 
-							(gettype($element) == 'object') ? 					// Если текущий элемент массива значений является объектом
-							$element->$parse_val : 								// требуется такой способ получения его значения
-							$element [$parse_val];								// Иначе это массив и требуется иной способ получения значения
+						$tmp = array();											// Временный массив для хранения сопоставленных значений текущей итерации
+						
+						foreach($val['parse'] as $parse_key => $parse_val) {	// Цикл по массиву ключей: переменная_шаблона => ключ_массива_значений
 
-						$tmp[$parse_key] = $tmp_val;							// Добавление элемента с текущим значением во временный массив
+							$tmp_val = 
+								(gettype($element) == 'object') ? 				// Если текущий элемент массива значений является объектом
+								$element->$parse_val : 							// требуется такой способ получения его значения
+								$element [$parse_val];							// Иначе это массив и требуется иной способ получения значения
+
+							$tmp[$parse_key] = $tmp_val;						// Добавление элемента с текущим значением во временный массив
+						}
+
+						$tpl->block($ctx, $tmp);								// Парсинг текущей итерации
 					}
-
-					$tpl->block($context, $tmp);								// Парсинг текущей итерации
-				}
+				else															// Иначе контекст нужно просто активировать
+					$tpl->iterate($val);										// Активация контекста
 			}
 
 		if(!isset($parse))														// Если не задан элемент parse
@@ -1278,7 +1295,7 @@ class orm {
 class error {
 	
 	protected static $sys_classes = array(							// Определение классов системы, имена которых нельзя использовать в приложении
-		'core', 'get', 'orm', 'error', 'message'
+		'core', 'get', 'orm', 'error', 'message', 'mods'
 	);
 	
 	/**
@@ -1315,7 +1332,7 @@ class error {
 		}
 	}
 	
-	/*
+	/**
 	 * Функция печати ошибок системы
 	 *
 	 * @param string $text Текст ошибки
@@ -1329,7 +1346,7 @@ class error {
 // Класс вывода сообщений
 class message {
 	
-	/*
+	/**
 	 * Функция печати сообщений системы
 	 *
 	 * @param string $text Текст сообщения
@@ -1337,5 +1354,28 @@ class message {
 	public static function print_message($text) {
 		
 		echo '<br><b>Framework message</b>: ' . $text;
+	}
+}
+
+// Класс работы с модулями фреймворка
+class mod {
+
+	/**
+	 * Функция инициализации модулей
+	 * 
+	 * @param array $mods Массив имён модулей
+	 */
+	public static function init($mods) {
+
+		foreach($mods as $mod) {											// Цикл по перечисленным именам модулей
+			
+			array_push(ten_file::$input_path, '/mod/' . $mod . '/view/');	// Добавление пути к представлениям модуля для объединения файлов
+			
+			array_push(														// Добавление путей для автоподключения файлов модуля
+				core::$paths,
+				ROOT . '/mod/' . $mod . '/app/controller/',
+				ROOT . '/mod/' . $mod . '/app/model/'
+			);
+		}
 	}
 }
