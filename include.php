@@ -1,5 +1,18 @@
 <?php
 
+ten_file::include_files(array(							// Markdown для модулей
+	'markdown.css',
+	'highlight/github.css',
+	'highlight.js'
+), array(
+	'path' => array(
+		'css' => '/assets/css/',
+		'js'  => '/assets/js/'
+	),
+	'output_file' => '/view/include/markdown.tpl',
+	'hash' => false
+));
+
 ten_file::include_files(array(							// Файлы библиотек и плагинов
 	'jquery-1.7.2.min.js',
 	'jquery-ui-1.8.21.min.js',

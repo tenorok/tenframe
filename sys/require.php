@@ -21,9 +21,9 @@ if(!DEV)														// Если выключен режим разработч
 else
 	error_reporting(E_ALL);										// Включение отображения всех ошибок интерпретатора
 
-register_shutdown_function(array('error', 'get_error'));		// Указание метода, который будет вызван по окончании выполнения всего скрипта
+register_shutdown_function(array('core', 'shutdown'));			// Указание метода, который будет вызван по окончании выполнения всего скрипта
 
 // orm::connect('localhost', 'root', 'password');				// Подключение к mysql
 // orm::db('dbname');											// Выбор базы данных
 
-// mod::init(array('admin'));										// Инициализация модулей
+mod::init(array('admin'));										// Инициализация модулей

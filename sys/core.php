@@ -1,6 +1,6 @@
 <?php
 
-// Version 1.3.3
+// Version 1.4.0
 // From 03.09.2012
 
 /*	core
@@ -182,6 +182,10 @@
 
 /*	mod
 	
+	Просмотр readme модуля:
+		Адрес: domen.com/mod/{modname}/
+		В корне модуля должен лежать readme.md
+
 	Инициализация модулей (require.php):
 		mod::init(array('mod1', 'mod2', ..., 'modN'));
 		
@@ -265,7 +269,7 @@ class core {
 
 		$urn  = core::parse_urn();										// Текущий URN
 		
-		foreach($pathArr as $p => $path) {
+		foreach($pathArr as $p => $path) {								// Цикл по маршрутам
 
 			if(count($urn) != count($path))								// Если количество частей URN и пути разное
 				continue;												// значит надо вызывать следующий маршрут в index.php
@@ -295,6 +299,13 @@ class core {
 		}
 	}
 
+	/**
+	 * Функция обработки колбека
+	 * 
+	 * @param string $type     Тип запроса [GET || POST]
+	 * @param string $callback Класс->Метод для вызова
+	 * @param array  $args     Массив переданных аргументов
+	 */
 	private static function callback($type, $callback, $args = array()) {
 
 		$call = explode('->', $callback);							// Разбор callback на две части: 1) До стрелки и 2) После стрелки
@@ -309,6 +320,38 @@ class core {
 				'[' . $type . '] Route error: Function is undefined: '
 				. $call[0] . '->' . $call[1]
 			);
+	}
+
+	private static $routes_default = array(								// Умолчания для системных маршрутов
+		'type'    => 'GET',
+		'asserts' => array(),
+		'dev'     => false												// Проводить маршрут всегда
+	);
+	
+	private static $routes = array(										// Системные маршруты
+		
+		array(
+			'url'      => '/mod/{mod}/',
+			'callback' => 'mod->readme',
+			'dev'      => true											// Проводить маршрут только когда включен режим разработчика
+		)
+	);
+
+	/**
+	 * Функция проведения системных маршуртов
+	 * 
+	 */
+	public static function routes() {
+
+		foreach(core::$routes as $route) {							// Цикл по системным маршрутам
+			
+			foreach(core::$routes_default as $key => $val)			// Установка значений по умолчанию
+				if(!isset($route[$key]))							// для незаданных опций
+					$route[$key] = $val;
+			
+			if(!$route['dev'] || $route['dev'] && DEV)				// Если маршрут надо проводить всегда или только для режима разработчика и режим включен
+				core::request($route['type'], $route['url'], $route['callback'], $route['asserts']);
+		}
 	}
 	
 	private static $default_404_options = array(					// Дефолтные параметры для ненайденной страницы
@@ -327,7 +370,7 @@ class core {
 		
 		if(core::$called && $options['sysauto'])					// Если маршрут был проведён и функция вызывается автоматически с главной страницы после всех роутов
 			return false;											// то страница найдена и ошибка 404 не нужна
-		
+
 		header('HTTP/1.1 404 Not Found');
 		
 		foreach(core::$default_404_options as $key => $val)			// Установка значений по умолчанию
@@ -437,6 +480,24 @@ class core {
 		}
 
 		return $includes;																	// Возвращение результата конкатенации содержимого файлов
+	}
+
+	/**
+	 * Функция выполняется после завершения работы всего скрипта
+	 * 
+	 */
+	public static function shutdown() {
+
+		core::routes();															// Проведение системных маршрутов
+
+		core::not_found(array(													// Если ни один маршрут не был проведён, значит страница не найдена
+			'sysauto' => true													// Опция символизирует возврат автоматической страницы 404
+		));
+
+		if(isset(orm::$mysqli))
+			orm::$mysqli->close();												// Разрыв соединения с базой данных
+
+		error::get_error();														// Обработка ошибок интерпретатора
 	}
 }
 
@@ -1377,5 +1438,26 @@ class mod {
 				ROOT . '/mod/' . $mod . '/app/model/'
 			);
 		}
+	}
+
+	/**
+	 * Функция отображения readme модулей
+	 * 
+	 */
+	public static function readme($mod) {
+
+		require ROOT . '/assets/php/markdown.php';
+
+		echo core::block(array(
+				
+			'block' => 'html',
+
+			'parse' => array(
+				
+				'title' => 'Модуль — ' . $mod,
+				'files' => core::includes('markdown'),
+				'body'  => Markdown(file_get_contents(ROOT . '/mod/' . $mod . '/readme.md'))
+			)
+		));
 	}
 }
