@@ -35,6 +35,13 @@
 		$text = ten_text::lgum($text, 'symbol');
 	Добавление символа в конец строки, если его там ещё нет:
 		$text = ten_text::rgum($text, 'symbol');
+
+	Удаление символа из начала и конца строки, если он там есть
+		$text = ten_text::del($text, 'symbol');
+	Удаление символа из начала строки, если он там есть
+		$text = ten_text::ldel($text, 'symbol');
+	Удаление символа из конца строки, если он там есть
+		$text = ten_text::rdel($text, 'symbol');
 */
 
 class ten_text {
@@ -282,8 +289,8 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
 	 */
 	public static function gum($string, $char) {
 
-		$string = ten_file::lgum($string, $char);
-		return    ten_file::rgum($string, $char);
+		$string = ten_text::lgum($string, $char);
+		return    ten_text::rgum($string, $char);
 	}
 
 	/**
@@ -308,5 +315,42 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
 	public static function rgum($string, $char) {
 
 		return (substr($string, -1) != $char) ? $string . $char : $string;
+	}
+
+	/**
+	 * Удаление символа из начала и конца строки, если он там есть
+	 * 
+	 * @param  string $string Строка
+	 * @param  string $char   Символ
+	 * @return string
+	 */
+	public static function del($string, $char) {
+
+		$string = ten_text::ldel($string, $char);
+		return    ten_text::rdel($string, $char);
+	}
+
+	/**
+	 * Удаление символа из начала строки, если он там есть
+	 * 
+	 * @param  string $string Строка
+	 * @param  string $char   Символ
+	 * @return string
+	 */
+	public static function ldel($string, $char) {
+
+		return (substr($string, 0, 1) == $char) ? substr($string, 1) : $string;
+	}
+
+	/**
+	 * Удаление символа из конца строки, если он там есть
+	 * 
+	 * @param  string $string Строка
+	 * @param  string $char   Символ
+	 * @return string
+	 */
+	public static function rdel($string, $char) {
+
+		return (substr($string, -1) == $char) ? substr($string, 0, -1) : $string;
 	}
 }

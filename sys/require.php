@@ -2,7 +2,11 @@
 
 session_start();
 
-define('ROOT', $_SERVER['DOCUMENT_ROOT']);						// Константа для удобства применения
+define('ROOT', $_SERVER['DOCUMENT_ROOT']);						// Константа корневого пути
+
+define('SELF', '/' . implode('/', array_slice(					// Чистый $_SERVER['PHP_SELF'] без index.php
+	explode('/', $_SERVER['PHP_SELF']), 2
+)));
 
 define('BLOCKS',     ROOT . '/view/blocks/');					// Константа директории блоков
 
@@ -22,6 +26,13 @@ else
 	error_reporting(E_ALL);										// Включение отображения всех ошибок интерпретатора
 
 register_shutdown_function(array('core', 'shutdown'));			// Указание метода, который будет вызван по окончании выполнения всего скрипта
+
+if(
+	$_SERVER['PHP_SELF'] != '/index.php'         &&				// Если текущий адрес не index.php
+	preg_match('/\.php$/', $_SERVER['PHP_SELF']) && 			// а какой-то другой php-файл
+	file_exists(ROOT .     $_SERVER['PHP_SELF'])				// и он существует
+)
+	core::$called = true;										// Маршрут считается проведённым
 
 // orm::connect('localhost', 'root', 'password');				// Подключение к mysql
 // orm::db('dbname');											// Выбор базы данных

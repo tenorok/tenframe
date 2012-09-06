@@ -1,0 +1,13 @@
+.mod-admin-header {
+	padding: 20px;
+	font-size: 1.4em;
+
+	.clearfix;
+}
+	.mod-admin-to_site {
+		float: left;
+	}
+	.mod-admin-logout {
+		padding: 2px 4px;
+		float: right;
+	}

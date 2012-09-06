@@ -1,0 +1,19 @@
+.mod-admin-menu {
+	font-size: 1.4em;
+	width: 150px;
+	margin: 50px 40px 0 20px;
+	float: left;
+}
+	.mod-admin-menu__item {
+		margin-bottom: 10px;
+		padding: 3px 6px;
+	}
+	.mod-admin-menu__item_indent {
+		margin-top: 30px;
+	}
+	.mod-admin-menu__item_active {
+		background-color: #F3EDC3;
+	}
+		.mod-admin-menu__url {
+			color: #4F3FFF;
+		}
