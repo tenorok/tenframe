@@ -22,28 +22,5 @@
 	</head>
 	<body>
 		{{ $body }}
-
-		{{ begin ctx1 }}
-			i
-			
-			{{ begin ctx2}}
-				j
-				{{ begin ctx3 }}
-					x<br>
-					{{ $key }}
-				{{ end }}
-			
-			{{ end }}
-			
-			{{ begin ctx4 }}
-				y
-			{{ end }}
-			<br>
-		{{ end }}
-		
-		{{ begin ctx5 }}
-			z
-			{{ $key }}
-		{{ end }}
 	</body>
 </html>
