@@ -73,9 +73,12 @@
 			'href' => '/page1/',					// Адрес (Пример: domen.com/admin/page1/)
 			
 			'tabs' => array(						// Вкладки страницы
-				'name' => 'tab1',					// Имя вкладки
-				'text' => 'Вкладка 1',				// Текст ссылки
-				'href' => '/tab1/'					// Адрес (Пример: domen.com/admin/page1/tab1/)
+				
+				array(
+					'name' => 'tab1',				// Имя вкладки
+					'text' => 'Вкладка 1',			// Текст ссылки
+					'href' => '/tab1/'				// Адрес (Пример: domen.com/admin/page1/tab1/)
+				)
 			)
 		)
 	);

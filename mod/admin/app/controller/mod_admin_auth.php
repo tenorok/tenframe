@@ -107,6 +107,15 @@ class mod_admin_auth {
 										'parse' => array(
 											'href' => 'href'
 										)
+									),
+
+									'subitems' => array(
+
+										'array' => 'tabs',
+										'parse' => array(
+											'href' => 'href',
+											'text' => 'text'
+										)
 									)
 								)
 							)

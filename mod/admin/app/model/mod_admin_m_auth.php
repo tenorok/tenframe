@@ -73,11 +73,17 @@ class mod_admin_m_auth {
 		require ROOT . '/mod/admin/conf/settings.php';
 		require ROOT . '/mod/admin/conf/menu.php';
 
-		foreach($menu as $key => $item) {
+		foreach($menu as $key => $item) {																					// Цикл по элементам меню
+
+			$main_url = ten_text::rgum($settings['urls']['page'], '/');														// Адрес главной страницы административной панели
 
 			$menu[$key]['active'] = (ten_text::del($page, '/') == ten_text::del($item['href'], '/')) ? ' mod-admin-menu__item_active' : '';
 			
-			$menu[$key]['href']   =  ten_text::rgum($settings['urls']['page'], '/') . ten_text::ldel($menu[$key]['href'], '/');
+			$menu[$key]['href']   =  $main_url . ten_text::ldel($menu[$key]['href'], '/');									// Прибавление адреса главной страницы в начало ссылки
+
+			if(isset($menu[$key]['tabs']))
+				foreach($menu[$key]['tabs'] as $i => $tab)
+					$menu[$key]['tabs'][$i]['href'] = $main_url . ten_text::ldel($menu[$key]['tabs'][$i]['href'], '/');		// Прибавление адреса главной страницы в начало ссылки
 		}
 
 		return $menu;
