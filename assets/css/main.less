@@ -214,13 +214,18 @@ a:hover {
 	}
 }.mod-admin-header {
 	padding: 20px;
-	font-size: 1.4em;
+	font-size: 14px;
 
 	.clearfix;
 }
-	.mod-admin-to_site {
+	.mod-admin-to-site {
 		float: left;
+		color: #555;
+		text-decoration: none;
 	}
+		.mod-admin-to-site__text {
+			text-decoration: underline;
+		}
 	.mod-admin-logout {
 		padding: 2px 4px;
 		float: right;
@@ -237,7 +242,7 @@ a:hover {
 	width: @width;
 	height: @height;
 	
-	font-size: 1.6em;
+	font-size: 16px;
 }
 	.mod-admin-logon__item {
 		margin: 10px 0;
@@ -449,18 +454,25 @@ a:hover {
 	.mod-admin-content__center-block {
 		
 	}.mod-admin-menu {
-	font-size: 1.4em;
-	width: 150px;
-	margin: 50px 40px 0 20px;
 	float: left;
+	margin: 50px 40px 0 20px;
+	width: 150px;
+	font-size: 14px;
+	color: #333;
 }
 	.mod-admin-menu__item {
-		margin-bottom: 10px;
-		padding: 3px 6px;
+		margin-bottom: 5px;
 	}
-	.mod-admin-menu__item_indent {
-		margin-top: 30px;
-	}
+		.mod-admin-menu__item-wrap {
+			padding: 3px 6px;
+		}
+		.mod-admin-submenu {
+			margin: 5px 0 0 15px;
+			font-size: 12px;
+		}
+			.mod-admin-submenu__item {
+				padding: 3px 6px;
+			}
 	.mod-admin-menu__item_active {
 		background-color: #F3EDC3;
 	}

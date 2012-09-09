@@ -4,6 +4,7 @@ $settings = array(
 	
 	'urls' => array(
 
-		'page' => '/admin/'
+		'page'  => '/admin/',
+		'index' => '/page1/'
 	)
 );

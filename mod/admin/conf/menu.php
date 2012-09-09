@@ -5,7 +5,7 @@ $menu = array(
 	array(
 		'name' => 'page1',					// Имя страницы
 		'text' => 'Страница 1',				// Текст ссылки
-		'href' => '/',						// Адрес (Пример: domen.com/admin/page1/)
+		'href' => '/page1/',				// Адрес (Пример: domen.com/admin/page1/)
 
 		'tabs' => array(					// Вкладки страницы
 			

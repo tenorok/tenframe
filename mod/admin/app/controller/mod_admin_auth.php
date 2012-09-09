@@ -8,7 +8,12 @@ class mod_admin_auth {
 	 * Формирование страницы авторизации
 	 *
 	 */
-	public static function page($page = '/', $tab = '') {
+	public static function page($page = null, $tab = '') {
+
+		require ROOT . '/mod/admin/conf/settings.php';
+
+		if(!$page)														// Если страница не указана
+			$page = ten_text::del($settings['urls']['index'], '/');		// то подразумевается главная страница
 
 		if(mod_admin_m_auth::get_admin_info())							// Если администратор авторизован
 			mod_admin_auth::view_page($page, $tab);						// Отображение главной страницы административной панели
@@ -109,12 +114,26 @@ class mod_admin_auth {
 										)
 									),
 
-									'subitems' => array(
+									'sub' => array(
 
-										'array' => 'tabs',
-										'parse' => array(
-											'href' => 'href',
-											'text' => 'text'
+										'if'       => 'tabs',
+
+										'subitems' => array(
+
+											'array' => 'tabs',
+											
+											'deactive' => array(
+												
+												'!if'   => 'active',
+												'parse' => array(
+													'href' => 'href'
+												)
+											),
+
+											'parse' => array(
+												'active' => 'active',
+												'text'   => 'text'
+											)
 										)
 									)
 								)

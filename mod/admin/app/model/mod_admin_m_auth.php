@@ -73,17 +73,43 @@ class mod_admin_m_auth {
 		require ROOT . '/mod/admin/conf/settings.php';
 		require ROOT . '/mod/admin/conf/menu.php';
 
-		foreach($menu as $key => $item) {																					// Цикл по элементам меню
+		foreach($menu as $key => $item) {												// Цикл по элементам меню
 
-			$main_url = ten_text::rgum($settings['urls']['page'], '/');														// Адрес главной страницы административной панели
+			$main_url = ten_text::rgum($settings['urls']['page'], '/');					// Адрес главной страницы административной панели
 
-			$menu[$key]['active'] = (ten_text::del($page, '/') == ten_text::del($item['href'], '/')) ? ' mod-admin-menu__item_active' : '';
+			$menuInfo = $menu[$key];													// Заведение информационной переменной для удобства
+
+			$menu[$key]['active'] = (													// Задание активного класса
+				
+				ten_text::del($page . '/' . $tab, '/') ==								// Если текущий адрес соответствует
+				ten_text::del($item['href'], '/')										// адресу ссылки меню
 			
-			$menu[$key]['href']   =  $main_url . ten_text::ldel($menu[$key]['href'], '/');									// Прибавление адреса главной страницы в начало ссылки
+			) ? ' mod-admin-menu__item_active' : '';
 
-			if(isset($menu[$key]['tabs']))
-				foreach($menu[$key]['tabs'] as $i => $tab)
-					$menu[$key]['tabs'][$i]['href'] = $main_url . ten_text::ldel($menu[$key]['tabs'][$i]['href'], '/');		// Прибавление адреса главной страницы в начало ссылки
+			if(isset($menuInfo['tabs'])) {												// Если у меню существует подменю
+				
+				foreach($menuInfo['tabs'] as $i => $curTab) {							// Цикл по подменю
+					
+					$tabInfo = $menuInfo['tabs'][$i];									// Заведение информационной переменной для удобства
+
+					$menu[$key]['tabs'][$i]['active'] = (								// Задание активного класса
+
+						ten_text::del($page . '/' . $tab, '/') ==						// Если текущий адрес соответствует
+						ten_text::del($menuInfo['href'], '/') . '/' . 					// адресу ссылки подменю
+						ten_text::del($tabInfo['href'], '/')
+
+					) ? ' mod-admin-menu__item_active' : '';
+					
+					$menu[$key]['tabs'][$i]['href'] =									// Изменение адреса ссылки подменю
+						$main_url .														// Прибавление адреса главной страницы в начало ссылки
+						ten_text::ldel($menuInfo['href'], '/') . 						// Прибавление адреса родительского меню
+						ten_text::ldel($tabInfo['href'], '/');
+				}
+			}
+
+			$menu[$key]['href'] =														// Изменение адреса ссылки меню
+				$main_url .																// Прибавление адреса главной страницы в начало ссылки
+				ten_text::ldel($menuInfo['href'], '/');
 		}
 
 		return $menu;

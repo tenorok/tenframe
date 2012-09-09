@@ -1,16 +1,23 @@
 .mod-admin-menu {
-	font-size: 1.4em;
-	width: 150px;
-	margin: 50px 40px 0 20px;
 	float: left;
+	margin: 50px 40px 0 20px;
+	width: 150px;
+	font-size: 14px;
+	color: #333;
 }
 	.mod-admin-menu__item {
-		margin-bottom: 10px;
-		padding: 3px 6px;
+		margin-bottom: 5px;
 	}
-	.mod-admin-menu__item_indent {
-		margin-top: 30px;
-	}
+		.mod-admin-menu__item-wrap {
+			padding: 3px 6px;
+		}
+		.mod-admin-submenu {
+			margin: 5px 0 0 15px;
+			font-size: 12px;
+		}
+			.mod-admin-submenu__item {
+				padding: 3px 6px;
+			}
 	.mod-admin-menu__item_active {
 		background-color: #F3EDC3;
 	}

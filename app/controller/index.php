@@ -9,7 +9,7 @@ class index {
 	 *
 	 */
 	public static function page() {
-
+		
 		echo core::block(array(
 			
 			'block' => 'html',
