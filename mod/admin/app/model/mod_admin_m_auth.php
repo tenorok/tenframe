@@ -56,62 +56,29 @@ class mod_admin_m_auth {
 
 		if(isset($_SESSION['mod_admin_logon_info']))
 			return array(
-				$_SESSION['mod_admin_logon_info']['role'],
-				$_SESSION['mod_admin_logon_info']['login'],
-				$_SESSION['mod_admin_logon_info']['password']
+				'role'     => $_SESSION['mod_admin_logon_info']['role'],
+				'login'    => $_SESSION['mod_admin_logon_info']['login'],
+				'password' => $_SESSION['mod_admin_logon_info']['password']
 			);
 		else
 			return false;
 	}
 
 	/**
-	 * Получение блока меню
+	 * Получение параметров роли
 	 * 
+	 * @return array | false
 	 */
-	public static function get_menu($page, $tab) {
+	public static function get_role_info() {
 
-		require ROOT . '/mod/admin/conf/settings.php';
-		require ROOT . '/mod/admin/conf/menu.php';
+		require ROOT . '/mod/admin/conf/roles.php';
 
-		foreach($menu as $key => $item) {												// Цикл по элементам меню
+		$admin_info = mod_admin_m_auth::get_admin_info();								// Получение информации об авторизованном администраторе
 
-			$main_url = ten_text::rgum($settings['urls']['page'], '/');					// Адрес главной страницы административной панели
-
-			$menuInfo = $menu[$key];													// Заведение информационной переменной для удобства
-
-			$menu[$key]['active'] = (													// Задание активного класса
-				
-				ten_text::del($page . '/' . $tab, '/') ==								// Если текущий адрес соответствует
-				ten_text::del($item['href'], '/')										// адресу ссылки меню
-			
-			) ? ' mod-admin-menu__item_active' : '';
-
-			if(isset($menuInfo['tabs'])) {												// Если у меню существует подменю
-				
-				foreach($menuInfo['tabs'] as $i => $curTab) {							// Цикл по подменю
-					
-					$tabInfo = $menuInfo['tabs'][$i];									// Заведение информационной переменной для удобства
-
-					$menu[$key]['tabs'][$i]['active'] = (								// Задание активного класса
-
-						ten_text::del($page . '/' . $tab, '/') ==						// Если текущий адрес соответствует
-						ten_text::del($menuInfo['href'], '/') . '/' . 					// адресу ссылки подменю
-						ten_text::del($tabInfo['href'], '/')
-
-					) ? ' mod-admin-menu__item_active' : '';
-					
-					$menu[$key]['tabs'][$i]['href'] =									// Изменение адреса ссылки подменю
-						$main_url .														// Прибавление адреса главной страницы в начало ссылки
-						ten_text::ldel($menuInfo['href'], '/') . 						// Прибавление адреса родительского меню
-						ten_text::ldel($tabInfo['href'], '/');
-				}
-			}
-
-			$menu[$key]['href'] =														// Изменение адреса ссылки меню
-				$main_url .																// Прибавление адреса главной страницы в начало ссылки
-				ten_text::ldel($menuInfo['href'], '/');
-		}
-
-		return $menu;
+		foreach($roles as $role)														// Цикл по ролям
+			if($role['name'] == $admin_info['role'])									// Если имя роли совпадает с текущим именем роли администратора
+				return $role;															// нужно её вернуть
+		
+		return false;																	// Иначе такой роли нет
 	}
 }

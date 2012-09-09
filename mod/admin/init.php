@@ -9,7 +9,7 @@ array_push(core::$routes, array(
 		$settings['urls']['page'] . '{page}/',
 		$settings['urls']['page'] . '{page}/{tab}/'
 	),
-	'callback' => 'mod_admin_auth->page'
+	'callback' => 'mod_admin_page->page'
 ), array(
 	
 	'url'      => $settings['urls']['page'] . 'auth/',
