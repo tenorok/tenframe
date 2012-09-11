@@ -82,7 +82,7 @@ class mod_admin_m_menu {
 	 * @param  string | null $tab      Имя подстраницы для проверки
 	 * @return boolean
 	 */
-	private static function get_access($roleInfo, $page, $tab = null) {
+	public static function get_access($roleInfo, $page, $tab = null) {
 
 		if(!$roleInfo)																	// Если информация о роли не была получена
 			return false;																// значит такой роли нет

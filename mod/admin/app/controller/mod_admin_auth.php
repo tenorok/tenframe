@@ -18,7 +18,7 @@ class mod_admin_auth {
 
 			'parse' => array(
 				
-				'title' => 'Заголовок',
+				'title' => 'Вход в административную панель',
 				'files' => core::includes('libs, developer, require'),
 				
 				'body'  => core::block(array(

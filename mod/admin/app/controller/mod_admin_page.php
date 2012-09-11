@@ -16,8 +16,15 @@ class mod_admin_page {
 		
 		if($admin_info) {												// Если администратор авторизован
 			
-			if(!$page)													// Если страница не указана
-				$page = ten_text::del($settings['urls']['index'], '/');	// то подразумевается главная страница
+			if(!$page) {												// Если страница не указана
+				
+				$index = explode('/', ten_text::del(					// Нужно открыть главную страницу
+					$settings['urls']['index'], '/'						// указанную в настройках
+				));
+
+				$page = $index[0];
+				$tab = (isset($index[1])) ? $index[1] : '';				// Если в настройках задана подстраница
+			}
 
 			mod_admin_page::view_page(									// Отображение главной страницы административной панели
 				$admin_info['login'], $page, $tab
@@ -38,13 +45,15 @@ class mod_admin_page {
 
 		require ROOT . '/mod/admin/conf/settings.php';
 
-		echo core::block(array(
+		$content = mod_admin_m_content::get_content($page, $tab);		// Получение массива наполнения текущей страницы
+
+		echo core::block(array(											// Парсинг всей страницы
 			
 			'block' => 'html',
 
 			'parse' => array(
 				
-				'title' => 'Заголовок',
+				'title' => 'Административная панель &mdash; ' . $content['title'],
 				'files' => core::includes('libs, developer, require'),
 				
 				'body'  => core::block(array(
@@ -60,7 +69,6 @@ class mod_admin_page {
 							'block' => 'header',
 							
 							'parse' => array(
-
 								'login'  => $login,
 								'action' => ten_text::rgum($settings['urls']['page'], '/') . 'quit/'
 							)
@@ -77,7 +85,7 @@ class mod_admin_page {
 									
 									'array' => mod_admin_m_menu::get_menu($page, $tab),
 									'parse' => array(
-										'text'   => 'text',
+										'title'  => 'title',
 										'active' => 'active'
 									),
 									
@@ -107,11 +115,22 @@ class mod_admin_page {
 
 											'parse' => array(
 												'active' => 'active',
-												'text'   => 'text'
+												'title'  => 'title'
 											)
 										)
 									)
 								)
+							)
+						)),
+
+						'content' => core::block(array(
+							
+							'mod'   => 'admin',
+							'block' => 'content',
+							
+							'parse' => array(
+								'title'   => $content['title'],
+								'content' => $content['content']
 							)
 						))
 					)

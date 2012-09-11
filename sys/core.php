@@ -93,6 +93,13 @@
 
 	Подключение include-файлов:
 		echo core::includes('libs, developer, require');			// Файлы с именами 'developer' и 'dev' подключаются только при включенном режиме разработчика
+
+	Вывод страницы 404:
+		core::not_found(array(
+			'title'   => 'title',									// По умолчанию: "Страница не найдена"
+			'header'  => 'header,									// По умолчанию: "Страница не найдена"
+			'content' => 'content'									// По умолчанию: ""
+		));
 */
 
 /*	get
@@ -382,11 +389,16 @@ class core {
 	/**
 	 * Функция возврата ошибки 404
 	 *
-	 * @param array $options Массив опций [title, header, content]
+	 * @param  array $options Массив опций [title, header, content]
+	 * @return boolean false
 	 */
 	public static function not_found($options = array()) {
 		
-		if(core::$called && $options['sysauto'])					// Если маршрут был проведён и функция вызывается автоматически с главной страницы после всех роутов
+		if(
+			core::$called              &&							// Если маршрут был проведён
+			isset($options['sysauto']) &&							// и функция вызывается автоматически с главной страницы после всех роутов
+			$options['sysauto']
+		)
 			return false;											// то страница найдена и ошибка 404 не нужна
 
 		header('HTTP/1.1 404 Not Found');
@@ -397,11 +409,11 @@ class core {
 		
 		$template = new Blitz(ROOT . '/view/blocks/html/view/404.tpl');
 		
-		echo $template->parse(array(
+		die($template->parse(array(
 			'title'   => $options['title'],
 			'header'  => $options['header'],
 			'content' => $options['content']
-		));
+		)));
 	}
 
 	/**

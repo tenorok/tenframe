@@ -4,7 +4,7 @@
 			
 			<div class="mod-admin-menu__item-wrap{{ $active }}">
 				{{ begin deactive }}<a href="{{ $href }}" class="mod-admin-menu__url">{{ end }}
-					{{ $text }}
+					{{ $title }}
 				{{ begin deactive }}</a>{{ end }}
 			</div>
 
@@ -14,7 +14,7 @@
 						<li class="mod-admin-submenu__item{{ $active }}">
 							
 							{{ begin deactive }}<a href="{{ $href }}" class="mod-admin-menu__url">{{ end }}
-								{{ $text }}
+								{{ $title }}
 							{{ begin deactive }}</a>{{ end }}
 
 						</li>
