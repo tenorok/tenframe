@@ -356,7 +356,7 @@ class core {
 	public static $routes = array(										// Системные маршруты
 		
 		array(
-			'url'      => '/mod/{mod}/',
+			'url'      => '/module/{mod}/',
 			'callback' => 'mod->readme',
 			'dev'      => true											// Проводить маршрут только когда включен режим разработчика
 		)

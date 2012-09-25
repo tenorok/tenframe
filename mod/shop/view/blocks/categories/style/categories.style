@@ -1,0 +1,123 @@
+.mod-admin-categories {
+	
+}
+	.mod-admin-categories__add {
+		margin-left: -18px;
+		padding-left: 18px;
+
+		color: #3232FF;
+		background: url(/mod/shop/view/blocks/categories/images/plus.png) 0 4px no-repeat;
+	}
+	.mod-admin-categories__h2 {
+		margin: 18px 0 6px;
+		font: normal 17px georgia, serif;
+	}
+
+	.mod-admin-categories__addform {
+		margin-bottom: 30px;
+	}
+		.mod-admin-categories__textinput {
+			width: 150px;
+			padding: 2px 4px;
+			border: 1px solid #aaa;
+		}
+		.mod-admin-categories__submit {
+			width: 100px;
+		}
+	
+	@mod_admin_categories__item_margin_top_bottom: 15px;
+
+	.mod-admin-categories__mainlist {
+
+	}
+	.mod-admin-categories__list {
+		margin-top: @mod_admin_categories__item_margin_top_bottom;
+		margin-bottom: @mod_admin_categories__item_margin_top_bottom;
+	}
+		.mod-admin-categories__list ul {
+			margin-left: 30px;
+		}
+		.mod-admin-categories__item {
+			margin-bottom: @mod_admin_categories__item_margin_top_bottom;
+		}
+			.mod-admin-categories__name {
+				
+				margin-left: -20px;
+
+				&:hover .mod-admin-categories__draggable {
+					opacity: 1;
+				}
+			}
+				.mod-admin-categories__draggable {
+					opacity: 0;
+					display: inline-block;
+					width: 16px;
+					height: 16px;
+
+					background: url(/mod/shop/view/blocks/categories/images/draggable.png) no-repeat;
+					vertical-align: bottom;
+					cursor: url(/mod/shop/view/blocks/categories/images/openhand.cur), move;
+
+					.transition(opacity);
+				}
+				.mod-admin-categories__cat {
+					border-bottom: 1px dotted #3232FF;
+					color: #3232FF;
+					text-decoration: none;
+					outline: none;
+
+					&:hover {
+						border-bottom-color: #f00;
+					}
+				}
+				.mod-admin-categories__harr {
+					opacity: 0.3;
+					display: inline-block;
+					width: 25px;
+
+					color: #3232FF;
+					font-size: 10px;
+					text-align: center;
+					text-decoration: none;
+					cursor: pointer;
+
+					&:hover {
+						color: #f00;
+					}
+				}
+
+.mod-admin-categories__dropdown {
+	position: absolute;
+
+	display: none;
+
+	background: #fff;
+	.box-shadow(#C4C4C4, 0 2px 9px rgba(0, 0, 0, 0.6));
+
+	font-size: 12px;
+
+	&:after {
+		position: absolute;
+	    left: 6px;
+	    top: -12px;
+	    content: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAKCAYAAABblxXYAAABK0lEQVR42n2SvUrEQBSFjbvZkM2CoijoWknARRDtrLNFwELyBkltZ2UTa1/Ax0heIFVaTWXhA1ikkASEgE0IZjwDZ5MtMrnwkZn7c2Zy7+wIIZTANDABuxu410brRoO9yNzzvHv53RwyLqoWmwID7Pu+f1dV1Y/rumu5p3+qElcJ6sACJ+Aqy7IPAUvT9E3u6beAPiSsElyw8DIMwydBa9v2LwiCB+lnfDEk3A2EgjMmHoFzcFuW5afYsjzP36Wf8WPmz1ivUa9b6MAEB+AUXCRJ8iwGLIqiR8RXYMl8E+j9BflseJrFpKXjONdN03wPidZ1/WXbtmzBGfMt1k960b6Xc073sCiKV6EwtuGFbdpjXdeCbkDEACamfCMvpBLk0H7jOF7x143t9/sPgoxm6q49Rw0AAAAASUVORK5CYIIA");
+	}
+}
+	.mod-admin-categories__dropdown__item {
+		
+	}
+		
+		@mod_admin_categories_dropdown__menu_color: #333;
+
+		.mod-admin-categories__dropdown__menu {
+			display: block;
+			padding: 4px 8px;
+
+			text-decoration: none;
+			color: @mod_admin_categories_dropdown__menu_color;
+
+			&:hover {
+				color: @mod_admin_categories_dropdown__menu_color;
+				.gradient(#D6D6D6, #C4C4C4, #EAEAEA);
+			}
+		}

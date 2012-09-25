@@ -8,6 +8,8 @@
       Portenart Emile-Victor,
       Ryan Faerman
 
+    Modified by Artem Kurbatov
+
     More info at: http://lesselements.com
 -----------------------------------------------------*/
 
@@ -92,17 +94,19 @@
   -moz-transform:scale(@ratio);
   transform:scale(@ratio);
 }
-.transition(@duration:0.2s, @ease:ease-out) {
-  -webkit-transition: all @duration @ease;
-  -moz-transition: all @duration @ease;
-  transition: all @duration @ease;
+.transition(@property:all, @duration:0.2s, @ease:ease-out) {
+  -webkit-transition: @property @duration @ease;
+     -moz-transition: @property @duration @ease;
+       -o-transition: @property @duration @ease;
+          transition: @property @duration @ease;
 }
 .inner-shadow(@horizontal:0, @vertical:1px, @blur:2px, @alpha: 0.4) {
   -webkit-box-shadow: inset @horizontal @vertical @blur rgba(0, 0, 0, @alpha);
   -moz-box-shadow: inset @horizontal @vertical @blur rgba(0, 0, 0, @alpha);
   box-shadow: inset @horizontal @vertical @blur rgba(0, 0, 0, @alpha);
 }
-.box-shadow(@arguments) {
+.box-shadow(@color, @arguments) {
+  border: 1px solid @color;
   -webkit-box-shadow: @arguments;
   -moz-box-shadow: @arguments;
   box-shadow: @arguments;

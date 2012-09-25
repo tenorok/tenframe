@@ -11,7 +11,7 @@ class mod_admin_m_menu {
 	 * @param  string $tab  Адрес подстраницы
 	 * @return array
 	 */
-	public static function get_menu($page, $tab) {
+	public static function get_menu($page = null, $tab = null) {
 
 		require ROOT . '/mod/admin/conf/settings.php';
 		require ROOT . '/mod/admin/conf/menu.php';
