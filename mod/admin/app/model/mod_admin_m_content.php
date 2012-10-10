@@ -14,7 +14,8 @@ class mod_admin_m_content {
 	public static function get_content($page, $tab) {
 
 		require ROOT . '/mod/admin/conf/settings.php';
-		require ROOT . '/mod/admin/conf/menu.php';
+		
+		$menu = mod_admin_m_menu::get_menu_conf();
 
 		$content = array();																// Итоговый массив
 		

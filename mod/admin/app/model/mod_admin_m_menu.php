@@ -4,6 +4,24 @@
 
 class mod_admin_m_menu {
 
+	private static $menu_conf = null;													// Переменная для хранения файла настроек меню
+
+	/**
+	 * Получение файла настроек меню
+	 * 
+	 * @return array
+	 */
+	public static function get_menu_conf() {
+
+		if(is_null(mod_admin_m_menu::$menu_conf)) {										// Если конфигурационный файл ещё не был получен
+
+			require ROOT . '/mod/admin/conf/menu.php';									// Подключение файла
+			mod_admin_m_menu::$menu_conf = $menu;										// Присваивание его содержания
+		}
+
+		return mod_admin_m_menu::$menu_conf;											// Возвращение содержания конфигурационного файла
+	}
+
 	/**
 	 * Получение блока меню
 	 * 
@@ -14,7 +32,8 @@ class mod_admin_m_menu {
 	public static function get_menu($page = null, $tab = null) {
 
 		require ROOT . '/mod/admin/conf/settings.php';
-		require ROOT . '/mod/admin/conf/menu.php';
+
+		$menu = mod_admin_m_menu::get_menu_conf();
 
 		$roleInfo = mod_admin_m_auth::get_role_info();									// Получение информации о роли текущего администратора
 

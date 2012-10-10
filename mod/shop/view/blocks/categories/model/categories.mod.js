@@ -1,4 +1,4 @@
-﻿// Модель работы с категориями
+// Модель работы с категориями
 
 var mod_shop_m_categories = {
 
@@ -6,7 +6,7 @@ var mod_shop_m_categories = {
 
 		var obj = mod_shop_m_categories;
 		
-		$('.mod-admin-categories__cat').click(obj.showDropdown);						// Событие клика по категории
+		$('.mod-shop-categories__cat').click(obj.showDropdown);							// Событие клика по категории
 
 		$('body').click(obj.hideDropdown);												// Событие клика в пустое место
 
@@ -20,9 +20,9 @@ var mod_shop_m_categories = {
 			top      = position.top,
 			left     = position.left,
 			href     = $(this).attr('href'),
-			dropdown = '.mod-admin-categories__dropdown__menu_';
+			dropdown = '.mod-shop-categories__dropdown__menu_';
 
-		$('.mod-admin-categories__dropdown').css({										// Изменение положения выпадушки
+		$('.mod-shop-categories__dropdown').css({										// Изменение положения выпадушки
 			'display': 'block',
 			'top'    : top  + 29,
 			'left'   : left - 8
@@ -45,20 +45,20 @@ var mod_shop_m_categories = {
 
 	hideDropdown: function() {															// Скрытие выпадушки с меню работы над категорией
 		
-		$('.mod-admin-categories__dropdown').css({
+		$('.mod-shop-categories__dropdown').css({
 			'display': 'none'
 		});
 	},
 
 	drawHarr: function() {																// Отрисовка сворачивающих стрелочек для вложенных списков категорий
 
-		var arrow = '<span class="mod-admin-categories__harr">&#9660;</span>';			// Шаблон стрелочки
+		var arrow = '<span class="mod-shop-categories__harr">&#9660;</span>';			// Шаблон стрелочки
 
-		$('.mod-admin-categories__item:has(.mod-admin-categories__list)')				// Если у категории есть подкатегория
-			.children('.mod-admin-categories__name')									// то после её имени
+		$('.mod-shop-categories__item:has(.mod-shop-categories__list)')					// Если у категории есть подкатегория
+			.children('.mod-shop-categories__name')										// то после её имени
 			.append(arrow);																// добавляется стрелочка
 
-		$('.mod-admin-categories__harr')												// Добавление события клика по сворачивающим стрелочкам
+		$('.mod-shop-categories__harr')													// Добавление события клика по сворачивающим стрелочкам
 			.click(mod_shop_m_categories.slideCategoryList);
 	},
 
@@ -68,7 +68,7 @@ var mod_shop_m_categories = {
 
 		arrow
 			.parent()
-			.next('.mod-admin-categories__list')										// Получение объекта списка, который нужно скрыть или отобразить
+			.next('.mod-shop-categories__list')											// Получение объекта списка, который нужно скрыть или отобразить
 			.slideToggle(200, function() {												// Скрытие и отображение списка
 				
 				if($(this).is(':hidden'))												// Изменение стрелочки
@@ -80,7 +80,7 @@ var mod_shop_m_categories = {
 
 	sortable: function() {																// Сортировка категорий
 		
-		$('.mod-admin-categories__list')
+		$('.mod-shop-categories__list')
 			.disableSelection()
 			.sortable({
 				start: function(e, ui) {
@@ -91,7 +91,7 @@ var mod_shop_m_categories = {
 				},
 				tolerance: 'pointer',
 				update: mod_shop_m_categories.serializeList,
-				handle: '.mod-admin-categories__draggable',								// Элемент для зацепки
+				handle: '.mod-shop-categories__draggable',								// Элемент для зацепки
 				axis: 'y',																// Перемещение элементов допускается только по вертикали
 				containment: 'parent'													// Перемещение допускается только в родительском контейнере
 			});
@@ -101,7 +101,7 @@ var mod_shop_m_categories = {
 
 		var arr = [];
 
-		$.each($('.mod-admin-categories__mainlist li'), function() {
+		$.each($('.mod-shop-categories__mainlist li'), function() {
 			arr.push($(this).attr('id'));
 		});
 

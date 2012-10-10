@@ -1,0 +1,76 @@
+.mod-shop-categories__addform {
+	margin-bottom: 30px;
+}
+	.mod-shop-categories__fieldlist {
+
+	}
+		.mod-shop-categories__fielditem {
+			margin: 20px 0 30px;
+			border-bottom: 1px solid #ddd;
+			padding-bottom: 20px;
+			width: 500px;
+
+			&:last-child {
+				border-bottom: none;
+			}
+		}
+			.mod-shop-categories__labellist {
+				
+			}
+				.mod-shop-categories__labelitem {
+					margin: 10px 0;
+				}
+					
+					@mod_shop_categories__input_padding_top_bottom: 2px;
+
+					.mod-shop-categories__label {
+						display: inline-block;
+						padding: @mod_shop_categories__input_padding_top_bottom + 1px 0;
+						width: 100px;
+
+						vertical-align: top;
+					}
+					.mod-shop-categories__label_long {
+						width: auto;
+					}
+					.mod-shop-categories__label_left-column {
+						float: left;
+					}
+					.mod-shop-categories__textinput,
+					.mod-shop-categories__numberinput {
+						border: 1px solid #aaa;
+						padding: @mod_shop_categories__input_padding_top_bottom 4px;
+					}
+					.mod-shop-categories__textinput {
+						width: 150px;
+					}
+					.mod-shop-categories__textinput_right-column {
+						display: block;
+						margin: 10px 0 10px 104px;
+					}
+					.mod-shop-categories__numberinput {
+						width: 30px;
+					}
+					.mod-shop-categories__checkboxinput {
+						float: left;
+						margin: 4px 7px 0 0;
+					}
+
+					.mod-shop-categories__selectinput {
+						border: 1px solid #aaa;
+
+						color: #333;
+					}
+					.mod-shop-categories__selectinput_right-column {
+						margin-left: 104px;
+					}
+						.mod-shop-categories__optioninput {
+							padding: @mod_shop_categories__input_padding_top_bottom 4px;
+						}
+				.mod-shop-categories__hiddenitem {
+					display: none;
+				}
+	
+	.mod-shop-categories__submit {
+		padding: 3px 6px;
+	}

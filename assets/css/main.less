@@ -318,57 +318,121 @@ a:hover {
 	}
 		.mod-admin-menu__url {
 			color: #4F3FFF;
-		}.mod-admin-categories {
+		}.mod-shop-categories__addform {
+	margin-bottom: 30px;
+}
+	.mod-shop-categories__fieldlist {
+
+	}
+		.mod-shop-categories__fielditem {
+			margin: 20px 0 30px;
+			border-bottom: 1px solid #ddd;
+			padding-bottom: 20px;
+			width: 500px;
+
+			&:last-child {
+				border-bottom: none;
+			}
+		}
+			.mod-shop-categories__labellist {
+				
+			}
+				.mod-shop-categories__labelitem {
+					margin: 10px 0;
+				}
+					
+					@mod_shop_categories__input_padding_top_bottom: 2px;
+
+					.mod-shop-categories__label {
+						display: inline-block;
+						padding: @mod_shop_categories__input_padding_top_bottom + 1px 0;
+						width: 100px;
+
+						vertical-align: top;
+					}
+					.mod-shop-categories__label_long {
+						width: auto;
+					}
+					.mod-shop-categories__label_left-column {
+						float: left;
+					}
+					.mod-shop-categories__textinput,
+					.mod-shop-categories__numberinput {
+						border: 1px solid #aaa;
+						padding: @mod_shop_categories__input_padding_top_bottom 4px;
+					}
+					.mod-shop-categories__textinput {
+						width: 150px;
+					}
+					.mod-shop-categories__textinput_right-column {
+						display: block;
+						margin: 10px 0 10px 104px;
+					}
+					.mod-shop-categories__numberinput {
+						width: 30px;
+					}
+					.mod-shop-categories__checkboxinput {
+						float: left;
+						margin: 4px 7px 0 0;
+					}
+
+					.mod-shop-categories__selectinput {
+						border: 1px solid #aaa;
+
+						color: #333;
+					}
+					.mod-shop-categories__selectinput_right-column {
+						margin-left: 104px;
+					}
+						.mod-shop-categories__optioninput {
+							padding: @mod_shop_categories__input_padding_top_bottom 4px;
+						}
+				.mod-shop-categories__hiddenitem {
+					display: none;
+				}
+	
+	.mod-shop-categories__submit {
+		padding: 3px 6px;
+	}.mod-shop-categories {
 	
 }
-	.mod-admin-categories__add {
+	.mod-shop-categories__add {
 		margin-left: -18px;
 		padding-left: 18px;
 
 		color: #3232FF;
 		background: url(/mod/shop/view/blocks/categories/images/plus.png) 0 4px no-repeat;
 	}
-	.mod-admin-categories__h2 {
-		margin: 18px 0 6px;
+
+	.mod-shop-categories__h2 {
+		margin: 40px 0 20px;
 		font: normal 17px georgia, serif;
 	}
-
-	.mod-admin-categories__addform {
-		margin-bottom: 30px;
-	}
-		.mod-admin-categories__textinput {
-			width: 150px;
-			padding: 2px 4px;
-			border: 1px solid #aaa;
-		}
-		.mod-admin-categories__submit {
-			width: 100px;
-		}
 	
 	@mod_admin_categories__item_margin_top_bottom: 15px;
 
-	.mod-admin-categories__mainlist {
+	.mod-shop-categories__mainlist {
 
 	}
-	.mod-admin-categories__list {
+	.mod-shop-categories__list {
 		margin-top: @mod_admin_categories__item_margin_top_bottom;
 		margin-bottom: @mod_admin_categories__item_margin_top_bottom;
 	}
-		.mod-admin-categories__list ul {
+		.mod-shop-categories__list ul {
 			margin-left: 30px;
 		}
-		.mod-admin-categories__item {
+		.mod-shop-categories__item {
 			margin-bottom: @mod_admin_categories__item_margin_top_bottom;
 		}
-			.mod-admin-categories__name {
+			.mod-shop-categories__name {
 				
 				margin-left: -20px;
 
-				&:hover .mod-admin-categories__draggable {
+				&:hover .mod-shop-categories__draggable {
 					opacity: 1;
 				}
 			}
-				.mod-admin-categories__draggable {
+				.mod-shop-categories__draggable {
 					opacity: 0;
 					display: inline-block;
 					width: 16px;
@@ -380,7 +444,7 @@ a:hover {
 
 					.transition(opacity);
 				}
-				.mod-admin-categories__cat {
+				.mod-shop-categories__cat {
 					border-bottom: 1px dotted #3232FF;
 					color: #3232FF;
 					text-decoration: none;
@@ -390,7 +454,7 @@ a:hover {
 						border-bottom-color: #f00;
 					}
 				}
-				.mod-admin-categories__harr {
+				.mod-shop-categories__harr {
 					opacity: 0.3;
 					display: inline-block;
 					width: 25px;
@@ -406,7 +470,7 @@ a:hover {
 					}
 				}
 
-.mod-admin-categories__dropdown {
+.mod-shop-categories__dropdown {
 	position: absolute;
 
 	display: none;
@@ -423,13 +487,13 @@ a:hover {
 	    content: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAKCAYAAABblxXYAAABK0lEQVR42n2SvUrEQBSFjbvZkM2CoijoWknARRDtrLNFwELyBkltZ2UTa1/Ax0heIFVaTWXhA1ikkASEgE0IZjwDZ5MtMrnwkZn7c2Zy7+wIIZTANDABuxu410brRoO9yNzzvHv53RwyLqoWmwID7Pu+f1dV1Y/rumu5p3+qElcJ6sACJ+Aqy7IPAUvT9E3u6beAPiSsElyw8DIMwydBa9v2LwiCB+lnfDEk3A2EgjMmHoFzcFuW5afYsjzP36Wf8WPmz1ivUa9b6MAEB+AUXCRJ8iwGLIqiR8RXYMl8E+j9BflseJrFpKXjONdN03wPidZ1/WXbtmzBGfMt1k960b6Xc073sCiKV6EwtuGFbdpjXdeCbkDEACamfCMvpBLk0H7jOF7x143t9/sPgoxm6q49Rw0AAAAASUVORK5CYIIA");
 	}
 }
-	.mod-admin-categories__dropdown__item {
+	.mod-shop-categories__dropdown__item {
 		
 	}
 		
 		@mod_admin_categories_dropdown__menu_color: #333;
 
-		.mod-admin-categories__dropdown__menu {
+		.mod-shop-categories__dropdown__menu {
 			display: block;
 			padding: 4px 8px;
 
