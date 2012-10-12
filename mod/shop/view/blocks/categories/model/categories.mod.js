@@ -54,7 +54,7 @@ var mod_shop_m_categories = {
 
 		var arrow = '<span class="mod-shop-categories__harr">&#9660;</span>';			// Шаблон стрелочки
 
-		$('.mod-shop-categories__item:has(.mod-shop-categories__list)')					// Если у категории есть подкатегория
+		$('.mod-shop-categories__item:has(.mod-shop-categories__item)')					// Если у категории есть подкатегория
 			.children('.mod-shop-categories__name')										// то после её имени
 			.append(arrow);																// добавляется стрелочка
 
@@ -97,14 +97,22 @@ var mod_shop_m_categories = {
 			});
 	},
 
-	serializeList: function() {
+	serializeList: function(data) {														// Сохранение новой последовательности категорий
 
-		var arr = [];
+		var items = $(data.target).children('.mod-shop-categories__item');				// Все участвующие в сортировке категории
 
-		$.each($('.mod-shop-categories__mainlist li'), function() {
-			arr.push($(this).attr('id'));
+		var arr = [];																	// Массив для сохранения id категорий
+
+		$.each(items, function() {														// Цикл по категориям
+			
+			var id =																	// Формирование чистого идентификатора текущей категории
+				$(this)
+					.attr('id')
+					.split('_')[1];
+			
+			arr.push(id);																// Добавление чистого идентификатора в массив
 		});
 
-		// console.log(arr.join(', '));
+		console.log(arr.join(', '));
 	}
 };

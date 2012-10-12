@@ -16,8 +16,8 @@ file_put_contents(ROOT . '/mod/shop/view/include/routes.js', "routes.push({
 	func: 'list'
 }, {
 	url: [
-		'/" . $adminpage . "/modshop/{categories}/add/',
-		'/" . $adminpage . "/modshop/{categories}/{categoryid}/addcategory/'
+		'/" . $adminpage . "/modshop/categories/add/',
+		'/" . $adminpage . "/modshop/categories/{categoryid}/addcategory/'
 	],
 	ctrl: 'mod_shop_categories',
 	func: 'add'

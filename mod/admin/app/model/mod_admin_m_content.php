@@ -18,8 +18,6 @@ class mod_admin_m_content {
 		$menu = mod_admin_m_menu::get_menu_conf();
 
 		$content = array();																// Итоговый массив
-		
-		$roleInfo = mod_admin_m_auth::get_role_info();									// Получение информации о роли текущего администратора
 
 		foreach($menu as $key => $item) {												// Цикл по элементам меню
 
@@ -29,7 +27,7 @@ class mod_admin_m_content {
 
 			if($menuInfo['name'] == $page) {											// Если найдена искомая страница
 
-				if(!mod_admin_m_menu::get_access($roleInfo, $menuInfo['name']))			// Если администратор не имеет доступ к текущей странице
+				if(!mod_admin_m_menu::get_access($menuInfo['name']))					// Если администратор не имеет доступ к текущей странице
 					break;
 
 				$content['title'] = $menuInfo['title'];									// Присваивание заголовка страницы
@@ -43,7 +41,7 @@ class mod_admin_m_content {
 						if($tabInfo['name'] == $tab) {									// Если найдена искомая подстраница
 
 							if(!mod_admin_m_menu::get_access(							// Если администратор не имеет доступа к текущей подстранице
-								$roleInfo, $menuInfo['name'], $tabInfo['name']
+								$menuInfo['name'], $tabInfo['name']
 							))
 								break 2;
 

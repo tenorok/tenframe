@@ -7,6 +7,8 @@ class mod_shop_m_categories {
 	/**
 	 * Получение списка категорий с учётом вложенностей
 	 * 
+	 * @param string $page Адрес главной страницы административной панели
+	 * @return string
 	 */
 	public static function get_categories_list($page) {
 
@@ -39,8 +41,11 @@ class mod_shop_m_categories {
 	/**
 	 * Рекурсивная функция парсинга подкатегорий
 	 * 
+	 * @param string  $page       Адрес главной страницы административной панели
 	 * @param array   $categories Массив всех категорий
 	 * @param integer $current    Идентификатор текущей категории
+	 * @param string  $template   Шаблон для парсинга
+	 * @return string
 	 */
 	private static function get_category($page, $categories, $current, $template) {
 

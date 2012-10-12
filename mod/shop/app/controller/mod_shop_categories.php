@@ -60,24 +60,34 @@ class mod_shop_categories {
 	);
 
 	/**
-	 * Отображение формы создания категории
+	 * Проверка доступа к страницам работы с категориями
 	 * 
 	 */
-	public static function add_category_form($parentcat = null) {
-
-		require ROOT . '/mod/admin/conf/settings.php';
-		require ROOT . '/mod/admin/conf/roles.php';
+	private static function get_categories_access() {
 
 		$admin_info = mod_admin_m_auth::get_admin_info();				// Получение данных об администраторе
-
+		
 		if(
 			!$admin_info || 											// Если администратор не авторизован
 			!mod_admin_m_menu::get_access(								// Или если администратор не имеет доступа к текущей странице
-				mod_admin_m_auth::get_role_info(),
 				'categories'
 			)
 		)
 			core::not_found();											// то страница не найдена
+	}
+
+	/**
+	 * Отображение формы создания категории
+	 * 
+	 * @param integer $parentcat Идентификатор родительской категории
+	 */
+	public static function add_category_form($parentcat = null) {
+
+		require ROOT . '/mod/admin/conf/settings.php';
+
+		$admin_info = mod_admin_m_auth::get_admin_info();				// Получение данных об администраторе
+
+		mod_shop_categories::get_categories_access();					// Проверка доступа к страницам работы с категориями
 
 		$fieldslist = orm::join('tmod_shop_categories', array(			// Получение списка существующих полей
 			array(
@@ -85,7 +95,7 @@ class mod_shop_categories {
 			)
 		))
 		->where('isnull(tmod_shop_fields.tmod_shop_fields_fk)');
-// var_dump(get::$arg->categoryid);
+
 		if(!is_null($parentcat))										// Если задана родительская категория
 			$title = 'Добавление подкатегории в &laquo;' . orm::select('tmod_shop_categories')->where($parentcat)->name . '&raquo;';
 		else
@@ -222,49 +232,51 @@ class mod_shop_categories {
 	 */
 	public static function insert_category() {
 
-		array_pop($_POST['existfield']);							// Удаление последнего элемента подмассива, так как это всегда незполенное поле
+		mod_shop_categories::get_categories_access();					// Проверка доступа к страницам работы с категориями
+		
+		array_pop($_POST['existfield']);								// Удаление последнего элемента подмассива, так как это всегда незполенное поле
 
-		$category_id = orm::insert('tmod_shop_categories', array(	// Добавление записи о категории
+		$category_id = orm::insert('tmod_shop_categories', array(		// Добавление записи о категории
 			'name'  => $_POST['catname'],
 			'alias' => $_POST['catalias'],
 			'tmod_shop_categories_fk' => (!empty($_POST['catparent'])) ? $_POST['catparent'] : 'null'
 		));
 
-		foreach($_POST['existfield'] as $i => $existfield) {		// Цикл по полям категории
+		foreach($_POST['existfield'] as $i => $existfield) {			// Цикл по полям категории
 
 			if(
-				$existfield == 'new' &&								// Если нужно создать новое поле
-				!empty($_POST['name'][$i])							// у которого заполнено имя
+				$existfield == 'new' &&									// Если нужно создать новое поле
+				!empty($_POST['name'][$i])								// у которого заполнено имя
 			) {
 
-				$field_id = orm::insert('tmod_shop_fields', array(	// Добавление записи о поле
+				$field_id = orm::insert('tmod_shop_fields', array(		// Добавление записи о поле
 					'name'  => $_POST['name'][$i],
 					'type'  => $_POST['type'][$i],
 					'count' => $_POST['count'][$i],
 					'tmod_shop_categories_fk' => $category_id
 				));
 
-				$options = array_filter(							// Удаление пустых элементов в массиве значений выпадающего списка
+				$options = array_filter(								// Удаление пустых элементов в массиве значений выпадающего списка
 					$_POST['options_' . $i],
 					'mod_shop_categories::foo'
 				);
 
-				foreach($options as $option)						// Цикл по значениям выпадающего списка
-					orm::insert('tmod_shop_values', array(			// Добавление записи значения выпадающего списка
+				foreach($options as $option)							// Цикл по значениям выпадающего списка
+					orm::insert('tmod_shop_values', array(				// Добавление записи значения выпадающего списка
 						'val_' . $_POST['type'][$i] => $option,
 						'tmod_shop_fields_fk' => $field_id
 					));
 			}
-			else if(is_numeric($existfield)) {						// Иначе не нужно создавать новое поле, а привязать уже существующее по его номеру
+			else if(is_numeric($existfield)) {							// Иначе не нужно создавать новое поле, а привязать уже существующее по его номеру
 
-				orm::insert('tmod_shop_fields', array(				// Добавление записи связанного поля
+				orm::insert('tmod_shop_fields', array(					// Добавление записи связанного поля
 					'tmod_shop_fields_fk'     => $existfield,
 					'tmod_shop_categories_fk' => $category_id
 				));
 			}
 		}
 
-		// header('location: ');
+		header('location: /admin/');
 	}
 
 	/**
