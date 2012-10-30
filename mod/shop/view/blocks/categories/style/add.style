@@ -20,7 +20,7 @@
 				.mod-shop-categories__labelitem {
 					margin: 10px 0;
 				}
-					
+				
 					@mod_shop_categories__input_padding_top_bottom: 2px;
 
 					.mod-shop-categories__label {
@@ -40,6 +40,8 @@
 					.mod-shop-categories__numberinput {
 						border: 1px solid #aaa;
 						padding: @mod_shop_categories__input_padding_top_bottom 4px;
+
+						color: #333;
 					}
 					.mod-shop-categories__textinput {
 						width: 150px;

@@ -66,11 +66,13 @@ class mod_shop_categories {
 	private static function get_categories_access() {
 
 		$admin_info = mod_admin_m_auth::get_admin_info();				// Получение данных об администраторе
+
+		require ROOT . '/mod/shop/conf/pages.php';
 		
 		if(
 			!$admin_info || 											// Если администратор не авторизован
 			!mod_admin_m_menu::get_access(								// Или если администратор не имеет доступа к текущей странице
-				'categories'
+				$pages['categories']
 			)
 		)
 			core::not_found();											// то страница не найдена
@@ -79,9 +81,8 @@ class mod_shop_categories {
 	/**
 	 * Отображение формы создания категории
 	 * 
-	 * @param integer $parentcat Идентификатор родительской категории
 	 */
-	public static function add_category_form($parentcat = null) {
+	public static function add_category_form() {
 
 		require ROOT . '/mod/admin/conf/settings.php';
 
@@ -93,13 +94,25 @@ class mod_shop_categories {
 			array(
 				'table' => 'tmod_shop_fields'
 			)
-		))
-		->where('isnull(tmod_shop_fields.tmod_shop_fields_fk)');
+		))->where('isnull(tmod_shop_fields.tmod_shop_fields_fk)');
 
-		if(!is_null($parentcat))										// Если задана родительская категория
-			$title = 'Добавление подкатегории в &laquo;' . orm::select('tmod_shop_categories')->where($parentcat)->name . '&raquo;';
+		$info = mod_shop_m_categories::get_info();						// Получение массива с информацией для парсинга
+
+		if(isset(get::$arg->categoryid)) {
+
+			$edit = core::block(array(
+				'mod'   => 'shop',
+				'block' => 'categories',
+				'view'  => 'edit',
+
+				'parse' => array(
+					'hided'      => $info['hided'],
+					'categories' => mod_shop_m_categories::get_categories_list(get::$arg->categoryid)
+				)
+			));
+		}
 		else
-			$title = 'Добавление новой категории';
+			$edit = '';
 
 		echo core::block(array(											// Парсинг всей страницы
 			
@@ -107,7 +120,7 @@ class mod_shop_categories {
 
 			'parse' => array(
 				
-				'title' => 'Административная панель &mdash; ' . $title,
+				'title' => 'Административная панель &mdash; ' . $info['title'],
 				'files' => core::includes('libs, developer, require'),
 				
 				'body'  => core::block(array(
@@ -184,7 +197,7 @@ class mod_shop_categories {
 							
 							'parse' => array(
 								
-								'title'   => $title,
+								'title'   => $info['title'],
 								
 								'content' => core::block(array(
 									'mod'   => 'shop',
@@ -193,7 +206,11 @@ class mod_shop_categories {
 
 									'parse' => array(
 										'page'   => ten_text::del($settings['urls']['page'], '/'),
-										'parent' => $parentcat
+										'action' => $info['action'],
+										'parent' => $info['parentid'],
+										'name'   => $info['name'],
+										'alias'  => $info['alias'],
+										'edit'   => $edit
 									),
 
 									'context' => array(

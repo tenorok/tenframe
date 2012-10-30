@@ -1,15 +1,18 @@
 <div class="mod-shop-categories">
-	<form action="/{{ $page }}/modshop/categories/insert/" method="post" class="mod-shop-categories__addform">
+	<form action="/{{ $page }}/modshop/categories/{{ $action }}/" method="post" class="mod-shop-categories__addform">
 		<input type="hidden" name="catparent" value="{{ $parent }}">
 		<ul class="mod-shop-categories__labellist">
 			<li class="mod-shop-categories__labelitem">
 				<label for="mod-shop-categories-catname" class="mod-shop-categories__label">Название</label>
-				<input type="text" name="catname" placeholder="Телевизоры" id="mod-shop-categories-catname" autofocus class="mod-shop-categories__textinput">
+				<input type="text" value="{{ $name }}" name="catname" placeholder="Телевизоры" id="mod-shop-categories-catname" autofocus class="mod-shop-categories__textinput">
 			</li>
 			<li class="mod-shop-categories__labelitem">
 				<label for="mod-shop-categories-catalias" class="mod-shop-categories__label">Алиас</label>
-				<input type="text" name="catalias" placeholder="tv" id="mod-shop-categories-catalias" class="mod-shop-categories__textinput">
+				<input type="text" value="{{ $alias }}" name="catalias" placeholder="tv" id="mod-shop-categories-catalias" class="mod-shop-categories__textinput">
 			</li>
+			
+			{{ $edit }}
+
 		</ul>
 		<h2 class="mod-shop-categories__h2">Поля</h2>
 		<ul class="mod-shop-categories__fieldlist">
@@ -39,9 +42,6 @@
 								<option value="{{ $value }}" class="mod-shop-categories__optioninput">{{ $text }}</option>
 							{{ end }}
 
-							<!-- <option value="int" class="mod-shop-categories__optioninput">Целое число</option>
-							<option value="str" class="mod-shop-categories__optioninput">Строка</option>
-							<option value="flt" class="mod-shop-categories__optioninput" selected>Дробное число</option> -->
 						</select>
 					</li>
 					<li class="mod-shop-categories__labelitem">

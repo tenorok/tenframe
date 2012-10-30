@@ -113,6 +113,14 @@ var mod_shop_m_categories = {
 			arr.push(id);																// Добавление чистого идентификатора в массив
 		});
 
-		console.log(arr.join(', '));
+		$.ajax({																		// Отправка запроса
+			type: 'GET',
+			url: '/mod/shop/app/ajax/categories.php',
+			data: {
+				event: 'sort',															// на сохранение порядка категорий
+				categories: arr															// с полученным массивом
+			},
+			dataType: 'json'
+		});
 	}
 };

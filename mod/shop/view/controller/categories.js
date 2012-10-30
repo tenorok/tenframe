@@ -10,5 +10,11 @@ var mod_shop_categories = {
 	add: function() {
 
 		mod_shop_m_categories_add.init();
+	},
+
+	edit: function() {
+
+		mod_shop_m_categories_add.init();
+		mod_shop_m_categories_edit.init();
 	}
 };

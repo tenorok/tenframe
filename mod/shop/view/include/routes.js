@@ -9,8 +9,12 @@ routes.push({
 }, {
 	url: [
 		'/admin/modshop/categories/add/',
-		'/admin/modshop/categories/{categoryid}/addcategory/'
+		'/admin/modshop/categories/{parentid}/addcategory/'
 	],
 	ctrl: 'mod_shop_categories',
 	func: 'add'
+}, {
+	url:  '/admin/modshop/categories/{categoryid}/',
+	ctrl: 'mod_shop_categories',
+	func: 'edit'
 });

@@ -340,7 +340,7 @@ a:hover {
 				.mod-shop-categories__labelitem {
 					margin: 10px 0;
 				}
-					
+				
 					@mod_shop_categories__input_padding_top_bottom: 2px;
 
 					.mod-shop-categories__label {
@@ -360,6 +360,8 @@ a:hover {
 					.mod-shop-categories__numberinput {
 						border: 1px solid #aaa;
 						padding: @mod_shop_categories__input_padding_top_bottom 4px;
+
+						color: #333;
 					}
 					.mod-shop-categories__textinput {
 						width: 150px;
@@ -504,4 +506,49 @@ a:hover {
 				color: @mod_admin_categories_dropdown__menu_color;
 				.gradient(#D6D6D6, #C4C4C4, #EAEAEA);
 			}
+		}.mod-shop-categories__labelitem_position_right {
+	position: absolute;
+	top: -10px;
+
+	margin-left: 350px;
+	
+	color: #888888;
+}
+
+.mod-shop-categories__labelitem_independent {
+	margin: 40px 0 40px -20px;
+	padding: 10px 20px;
+
+	background: #F7F5E6;
+}
+	.mod-shop-categories__link_pseudo {
+		color: #4F3FFF;
+		text-decoration: none;
+	}
+		.mod-shop-categories__link-text {
+			border-bottom: 1px dotted #4F3FFF;
+
+			&:hover {
+				border-bottom-color: #f00;
+			}
+			
+			&:hover + .mod-shop-categories__harr {
+				color: #f00;
+			}
+		}
+
+	.mod-shop-categories__list_edit {
+		display: none;
+		margin-left: 100px;
+	}
+		.mod-shop-categories__cat_edit {
+			color: #333;
+			border-bottom-color: #888;
+		}
+		.mod-shop-categories__cat_selected {
+			margin-left: -4px;
+			border-bottom: medium none;
+			padding: 2px 4px;
+			
+			background: #C0DCED;
 		}

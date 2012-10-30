@@ -17,23 +17,27 @@ file_put_contents(ROOT . '/mod/shop/view/include/routes.js', "routes.push({
 }, {
 	url: [
 		'/" . $adminpage . "/modshop/categories/add/',
-		'/" . $adminpage . "/modshop/categories/{categoryid}/addcategory/'
+		'/" . $adminpage . "/modshop/categories/{parentid}/addcategory/'
 	],
 	ctrl: 'mod_shop_categories',
 	func: 'add'
+}, {
+	url:  '/" . $adminpage . "/modshop/categories/{categoryid}/',
+	ctrl: 'mod_shop_categories',
+	func: 'edit'
 });");
 
 array_push(core::$routes, array(
 	
-	'url'      => '/' . $adminpage . '/modshop/categories/add/',
+	'url'      => array(
+		'/' . $adminpage . '/modshop/categories/add/',
+		'/' . $adminpage . '/modshop/categories/{parentid}/addcategory/',
+		'/' . $adminpage . '/modshop/categories/{categoryid}/'
+	),
 	'callback' => 'mod_shop_categories->add_category_form'
 ), array(
 	
 	'type'     => 'POST',
 	'url'      => '/' . $adminpage . '/modshop/categories/insert/',
 	'callback' => 'mod_shop_categories->insert_category'
-), array(
-	
-	'url'      => '/' . $adminpage . '/modshop/categories/{categoryid}/addcategory/',
-	'callback' => 'mod_shop_categories->add_category_form'
 ));
