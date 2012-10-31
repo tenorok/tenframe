@@ -110,6 +110,8 @@ class mod_shop_categories {
 					'categories' => mod_shop_m_categories::get_categories_list(get::$arg->categoryid)
 				)
 			));
+
+			mod_shop_m_categories::get_fields(get::$arg->categoryid);
 		}
 		else
 			$edit = '';
@@ -249,14 +251,40 @@ class mod_shop_categories {
 	 */
 	public static function insert_category() {
 
+		require ROOT . '/mod/admin/conf/settings.php';
+		
 		mod_shop_categories::get_categories_access();					// Проверка доступа к страницам работы с категориями
 		
 		array_pop($_POST['existfield']);								// Удаление последнего элемента подмассива, так как это всегда незполенное поле
 
+		if(!empty($_POST['catparent'])) {								// Если задана родительская категория
+
+			$catparent = $_POST['catparent'];
+
+			$serial =													// Получение сортировочного номера для новой категории
+				array_shift(
+					orm::select('tmod_shop_categories')
+						->fields('count(*) as serial')
+						->where('tmod_shop_categories_fk = ' . $catparent)
+				)->serial;
+		}
+		else {															// Иначе добавляется корневая категория
+
+			$catparent = 'null';
+
+			$serial =													// Получение сортировочного номера для новой категории
+				array_shift(
+					orm::select('tmod_shop_categories')
+						->fields('count(*) as serial')
+						->where('all')
+				)->serial;
+		}
+
 		$category_id = orm::insert('tmod_shop_categories', array(		// Добавление записи о категории
-			'name'  => $_POST['catname'],
-			'alias' => $_POST['catalias'],
-			'tmod_shop_categories_fk' => (!empty($_POST['catparent'])) ? $_POST['catparent'] : 'null'
+			'name'   => $_POST['catname'],
+			'alias'  => $_POST['catalias'],
+			'serial' => $serial,
+			'tmod_shop_categories_fk' => $catparent
 		));
 
 		foreach($_POST['existfield'] as $i => $existfield) {			// Цикл по полям категории
@@ -270,6 +298,7 @@ class mod_shop_categories {
 					'name'  => $_POST['name'][$i],
 					'type'  => $_POST['type'][$i],
 					'count' => $_POST['count'][$i],
+					'list'  => $_POST['list'][$i],
 					'tmod_shop_categories_fk' => $category_id
 				));
 
@@ -293,7 +322,7 @@ class mod_shop_categories {
 			}
 		}
 
-		header('location: /admin/');
+		header('location: ' . ten_text::gum($settings['urls']['page'], '/'));
 	}
 
 	/**

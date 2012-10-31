@@ -362,6 +362,16 @@ a:hover {
 						padding: @mod_shop_categories__input_padding_top_bottom 4px;
 
 						color: #333;
+
+						@placeholder-color: #aaa;
+
+						&::-webkit-input-placeholder {
+							color: @placeholder-color;
+						}
+
+						&:-moz-placeholder {
+							color: @placeholder-color;
+						}
 					}
 					.mod-shop-categories__textinput {
 						width: 150px;
@@ -455,6 +465,10 @@ a:hover {
 					&:hover {
 						border-bottom-color: #f00;
 					}
+				}
+				.mod-shop-categories__cat_hided {
+					color: #777;
+					border-bottom-color: #aaa;
 				}
 				.mod-shop-categories__harr {
 					opacity: 0.3;

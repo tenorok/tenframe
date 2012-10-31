@@ -51,6 +51,7 @@
 					<li class="mod-shop-categories__labelitem">
 						<label class="mod-shop-categories__label mod-shop-categories__label_long">
 							<input type="checkbox" class="mod-shop-categories__checkboxinput"> выпадающий список
+							<input type="hidden" name="list[]" value="0">
 						</label>
 					</li>
 					<li class="mod-shop-categories__labelitem mod-shop-categories__hiddenitem">

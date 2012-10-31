@@ -1,6 +1,6 @@
 <?php
 
-// Version 1.5.7
+// Version 1.5.8
 // From 09.09.2012
 
 /*	core
@@ -160,6 +160,7 @@
 				array(												// Описание подключаемой таблицы
 					'table'  => 'tablename_1',						// Обязательный. Имя подключаемой таблицы
 					'join'   => 'inner',							// Тип join: inner (по умолчанию), left outer, right outer, full outer, cross
+					'on'     => '...',								// Дополнительное условие для соединения таблиц
 					'left'   => 'users',							// left | right; По умолчанию: 'left' => 'table' (Обычное направление связи к первоначальной таблице)
 					'prefix' => 'prefix_'							// Префикс для полей данной таблицы
 				),
@@ -909,6 +910,8 @@ class orm {
 				
 				$on = $tab['table'] . '.' . $left . '_fk = ' . $left . '.' . $left . '_id';
 			}
+
+			$on .= (isset($tab['on'])) ? ' and ' . $tab['on'] : '';									// Добавление опции on
 
 			$joins .= ' ' . $type . ' join ' . $tab['table'] . ' on ' . $on;						// Конкатенация полной строки подключения таблицы
 

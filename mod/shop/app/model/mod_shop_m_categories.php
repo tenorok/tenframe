@@ -24,7 +24,9 @@ class mod_shop_m_categories {
 					$page,
 					$category->tmod_shop_categories_id,
 					$category->name,
-					(isset($category->parent)) ? $category->parent : ''
+					(isset($category->parent)) ? $category->parent : '',
+					($category->hide) ? 'mod-shop-categories__cat_hided' : '',
+					($category->hide) ? 'Скрытая категория' : ''
 				);
 
 				$items = mod_shop_m_categories::get_category(							// Получение дочерних категорий
@@ -58,7 +60,9 @@ class mod_shop_m_categories {
 					$page,
 					$category->tmod_shop_categories_id,
 					$category->name,
-					(isset($category->parent)) ? $category->parent : ''
+					(isset($category->parent)) ? $category->parent : '',
+					($category->hide) ? 'mod-shop-categories__cat_hided' : '',
+					($category->hide) ? 'Скрытая категория' : ''
 				);
 
 				$child_tmp = '[[child_' . $current . ']]';								// Генерация переменной шаблона
@@ -84,9 +88,11 @@ class mod_shop_m_categories {
 	 * @param integer $id     Идентификатор категории
 	 * @param string  $name   Название категории
 	 * @param string  $parent Имя класса для выделения родительской категории
+	 * @param string  $hided  Класс скрытой категории
+	 * @param string  $title  Значение атрибута title для скрытой категории
 	 * @return string
 	 */
-	private static function parse_category_item($page, $id, $name, $parent) {
+	private static function parse_category_item($page, $id, $name, $parent, $hided, $title) {
 
 		if((int) $page > 0)																// Если вместо адреса страницы админки передан идентификатор категории
 			return core::block(array(													// Значит нужно парсить список категорий для изменения родительской категории
@@ -113,7 +119,9 @@ class mod_shop_m_categories {
 
 					'page'   => $page,
 					'id'     => $id,
-					'name'   => $name
+					'name'   => $name,
+					'hided'  => $hided,
+					'title'  => $title
 				)
 			));
 	}
@@ -176,7 +184,8 @@ class mod_shop_m_categories {
 					->sub(array(
 						'select tmod_shop_categories_fk from tmod_shop_categories where tmod_shop_categories_id = ' . $category_id => 'parent'
 					))
-					->where('all');
+					->order('serial')
+					->where('tmod_shop_categories_id <> ' . $category_id);
 
 			foreach($categories as $category) {											// Цикл по полученным категориям
 				
@@ -194,5 +203,29 @@ class mod_shop_m_categories {
 					orm::select('tmod_shop_categories')									// Получение списка существующих категорий
 						->order('serial')
 						->where('all');
+	}
+
+	/**
+	 * Формирование массива полей категории
+	 * 
+	 * @param string $category_id Номер текущей категории
+	 * @return array
+	 */
+	public static function get_fields($category_id) {
+
+		$fields = 
+			orm::join('tmod_shop_fields', array(
+				array(
+					'table' => 'tmod_shop_values',
+					'join'  => 'left',
+					'on'    => 'tmod_shop_fields.list = 1'
+				)
+			))
+			->where('tmod_shop_fields.tmod_shop_categories_fk = ' . $category_id);
+		
+		echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
+		print_r($fields);
+
+		orm::debug();
 	}
 }

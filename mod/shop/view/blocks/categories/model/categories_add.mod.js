@@ -94,6 +94,8 @@ var mod_shop_m_categories_add = {
 				.parents('.mod-shop-categories__labellist')
 				.children('.mod-shop-categories__hiddenitem');
 
+		var hiddenInput = $(this).next();								// Получение скрытого поля-флага, говорящего, является ли поле выпадающим списком
+
 		if($(this).is(':checked')) {									// Если флажок поставлен
 			
 			$(classifier).css({'display': 'block'});					// Нужно показать поля для ввода значений выпадающего списка
@@ -101,10 +103,14 @@ var mod_shop_m_categories_add = {
 			$(classifier)												// Поставить фокус в первое поле
 				.children('.mod-shop-categories__textinput')
 				.focus();
+
+			$(hiddenInput).attr('value', '1');							// Изменение флага, поле является выпадающим списком
 		}
 		else {															// Иначе флажок не поставлен
 
 			$(classifier).css({'display': 'none'});						// И нужно скрыть поля для ввода значений выпадающего списка
+
+			$(hiddenInput).attr('value', '0');							// Изменение флага, поле не является выпадающим списком
 		}
 	},
 

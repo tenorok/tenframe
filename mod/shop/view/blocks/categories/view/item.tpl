@@ -2,7 +2,7 @@
 	
 	<div class="mod-shop-categories__name">
 		<span class="mod-shop-categories__draggable"></span>
-		<a href="/{{ $page }}/modshop/categories/{{ $id }}/" class="mod-shop-categories__cat">{{ $name }}</a>
+		<a href="/{{ $page }}/modshop/categories/{{ $id }}/" class="mod-shop-categories__cat {{ $hided }}" title="{{ $title }}">{{ $name }}</a>
 	</div>
 
 	<ul class="mod-shop-categories__list">

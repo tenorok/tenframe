@@ -59,6 +59,10 @@
 						border-bottom-color: #f00;
 					}
 				}
+				.mod-shop-categories__cat_hided {
+					color: #777;
+					border-bottom-color: #aaa;
+				}
 				.mod-shop-categories__harr {
 					opacity: 0.3;
 					display: inline-block;
