@@ -1,20 +1,20 @@
-routes.push({
+core.addRoute({
 	url:  [
 		'/admin/',
 		'/admin/{page}/',
 		'/admin/{page}/{tab}'
 	],
-	ctrl: 'mod_shop_categories',
+	ctrl: 'core.mod.shop.categories.controller',
 	func: 'list'
 }, {
 	url: [
 		'/admin/modshop/categories/add/',
 		'/admin/modshop/categories/{parentid}/addcategory/'
 	],
-	ctrl: 'mod_shop_categories',
+	ctrl: 'core.mod.shop.categories.controller',
 	func: 'add'
 }, {
 	url:  '/admin/modshop/categories/{categoryid}/',
-	ctrl: 'mod_shop_categories',
+	ctrl: 'core.mod.shop.categories.controller',
 	func: 'edit'
 });

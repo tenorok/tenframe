@@ -20,7 +20,7 @@
 				'/',
 				'/url/my/'
 			]
-	ctrl:  Контроллер
+	ctrl:  Контроллер (в его контексте будет вызван метод)
 	func:  Метод контроллера
 	rules: Правила для переменных
 		Примеры правил:
@@ -34,20 +34,25 @@
 			load - единожды при загрузке страницы
 
 */
-{
-	var settings = {
 
-		saveless: {
-
-			path: '/assets/css/'
-		}
-	};
+core.add({
 	
-	var routes = [
-		// {
-		// 	url: '/',
-		// 	ctrl: 'controller',
-		// 	func: 'method'
-		// }
-	];
-};
+	routes: {
+		
+		settings: {
+
+			saveless: {
+
+				path: '/assets/css/'
+			}
+		},
+		
+		routes: [
+			// {
+			// 	url: '/',
+			// 	ctrl: 'controller',
+			// 	func: 'method'
+			// }
+		]
+	}
+});

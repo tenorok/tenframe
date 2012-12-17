@@ -54,7 +54,7 @@ class mod_admin_page {
 			'parse' => array(
 				
 				'title' => 'Административная панель &mdash; ' . $content['title'],
-				'files' => core::includes('libs, developer, require'),
+				'files' => core::includes('libs, developer, require', '__autogen__'),
 				
 				'body'  => core::block(array(
 					

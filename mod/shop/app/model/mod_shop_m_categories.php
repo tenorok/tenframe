@@ -16,25 +16,28 @@ class mod_shop_m_categories {
 
 		$items = '';																	// Переменная для вывода категорий
 
-		foreach($categories as $category) {												// Цикл по списку категорий
+		if(!empty($categories)) {														// Если категории существуют
 
-			if(!$category->tmod_shop_categories_fk) {									// Если категория не имеет родителя
+			foreach($categories as $category) {											// Цикл по списку категорий
 
-				$items .= mod_shop_m_categories::parse_category_item(					// Парсинг блока категории
-					$page,
-					$category->tmod_shop_categories_id,
-					$category->name,
-					(isset($category->parent)) ? $category->parent : '',
-					($category->hide) ? 'mod-shop-categories__cat_hided' : '',
-					($category->hide) ? 'Скрытая категория' : ''
-				);
+				if(!$category->tmod_shop_categories_fk) {								// Если категория не имеет родителя
 
-				$items = mod_shop_m_categories::get_category(							// Получение дочерних категорий
-					$page,
-					$categories,
-					$category->tmod_shop_categories_id,
-					$items
-				);
+					$items .= mod_shop_m_categories::parse_category_item(				// Парсинг блока категории
+						$page,
+						$category->tmod_shop_categories_id,
+						$category->name,
+						(isset($category->parent)) ? $category->parent : '',
+						($category->hide) ? 'mod-shop-categories__cat_hided' : '',
+						($category->hide) ? 'Скрытая категория' : ''
+					);
+
+					$items = mod_shop_m_categories::get_category(						// Получение дочерних категорий
+						$page,
+						$categories,
+						$category->tmod_shop_categories_id,
+						$items
+					);
+				}
 			}
 		}
 

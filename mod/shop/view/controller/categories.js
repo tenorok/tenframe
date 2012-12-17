@@ -1,20 +1,32 @@
 ﻿// Контроллер работы с категориями
 
-var mod_shop_categories = {
+core.add({
 
-	list: function() {
+	mod: {
 
-		mod_shop_m_categories.init();		// Инициализация работы с категориями
-	},
+		shop: {
 
-	add: function() {
+			categories: {
+		
+				controller: {
+					
+					list: function() {
 
-		mod_shop_m_categories_add.init();
-	},
+						core.mod.shop.categories.list.init();		// Инициализация работы с категориями
+					},
 
-	edit: function() {
+					add: function() {
 
-		mod_shop_m_categories_add.init();
-		mod_shop_m_categories_edit.init();
+						core.mod.shop.categories.add.init();
+					},
+
+					edit: function() {
+
+						core.mod.shop.categories.add.init();
+						core.mod.shop.categories.edit.init();
+					}
+				}
+			}
+		}
 	}
-};
+});

@@ -6,24 +6,24 @@ require ROOT . '/mod/admin/conf/settings.php';
 
 $adminpage = ten_text::del($settings['urls']['page'], '/');
 
-file_put_contents(ROOT . '/mod/shop/view/include/routes.js', "routes.push({
+ten_file::autogen('/mod/shop/view/include/routes.js', "core.addRoute({
 	url:  [
 		'" . $settings['urls']['page'] . "',
 		'" . $settings['urls']['page'] . "{page}/',
 		'" . $settings['urls']['page'] . "{page}/{tab}'
 	],
-	ctrl: 'mod_shop_categories',
+	ctrl: 'core.mod.shop.categories.controller',
 	func: 'list'
 }, {
 	url: [
 		'/" . $adminpage . "/modshop/categories/add/',
 		'/" . $adminpage . "/modshop/categories/{parentid}/addcategory/'
 	],
-	ctrl: 'mod_shop_categories',
+	ctrl: 'core.mod.shop.categories.controller',
 	func: 'add'
 }, {
 	url:  '/" . $adminpage . "/modshop/categories/{categoryid}/',
-	ctrl: 'mod_shop_categories',
+	ctrl: 'core.mod.shop.categories.controller',
 	func: 'edit'
 });");
 

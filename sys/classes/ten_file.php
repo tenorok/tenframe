@@ -1,7 +1,7 @@
 <?php
 
-// Version 1.2.4
-// From 03.09.2012
+// Version 1.3.5
+// From 17.12.2012
 
 // Класс работы с файлами
 
@@ -99,13 +99,19 @@
 			
 			'files'       => 'ext: css, js, ... , etc',		// Обязательный. Мод расширений объединяемых файлов
 			// или
-			'files'       => 'reg: /\.ctrl\.js$/',			// Обязательный. Мод регулярного выражения
+			'files'       => 'reg: /\.ctrl\.js$/',			//               Мод регулярного выражения
+			// или
+			'files'       => array('file1', 'file2'),		//               Массив файлов к объединению
 
 			'output_file' => '/assets/{ext}/file.{ext}',	// Обязательный. Выходящий файл
 															   Это может быть маска формируемых на выходе файлов при передаче нескольких расширений.
 															   Где {ext} - расширение (extension) файла.
 															   Переменная существует только при использовании мода расширений ('files' => 'ext: ')
 			
+			'priority'    => '/view/core.js',				// Файл, который нужно подключить первым
+			// или
+			'priority'    => array('file1', 'file2'),		// или несколько первых файлов
+
 			'input_path'  => '/view/',						// Корневая директория, содержащая объединяемые файлы
 			// или
 			'input_path'  => array('/view1/', '/view2/'),	// Массив корневых директорий
@@ -172,7 +178,8 @@
 				 	'ico' => '/assets/'
 				),
 				'output_file' => '/view/include.tpl',		// Файл для сохранения строк подключений файлов
-				'hash' => true | false						// Флаг добавления хеш-метки к файлу (по умолчанию включено)
+				'prefix'      => '__autogen__',				// Префикс для сохраняемого файла (по умолчанию не добавляется)
+				'hash'        => true | false				// Флаг добавления хеш-метки к файлу (по умолчанию включено)
 			));
 
 			Если имя передаётся в виде строки и это не JS-файл, то он автоматически подключается с помощью тега link.
@@ -180,6 +187,14 @@
 			array(
 				'src' => 'filename.java'
 			)
+
+	Сохранение автогенерированного файла
+		ten_file::autogen(
+			'/my/path/file.name',							// Обязательный. Путь к файлу (можно относительный, можно абсолютный)
+			'content',										// Обязательный. Контент файла
+			'__prefix__'									// По умолчанию: "__autogen__" - префикс, который будет добавлен к имени файла
+		);
+		Возвращается полный путь к сохранённому файлу, например: /Users/name/my/path/__prefix__file.name
 */
 
 class ten_file {
@@ -241,7 +256,7 @@ class ten_file {
 			));
 
 		if(!file_exists($path))										// Если указанного пути не существует
-			if(!mkdir($path, 0, true))								// Если не удалось создать каталоги, указанные в пути
+			if(!mkdir($path, 0777, true))							// Если не удалось создать каталоги, указанные в пути
 				error::print_error('<b>Error:</b> can\'t find and make directory: <b>' . $path . '</b>');
 
 		return true;												// Если скрипт не был убит, значит операция прошла успешно
@@ -534,10 +549,11 @@ class ten_file {
 	public  static $input_path   = array('/view/');								// Массив входящих директорий
 	
 	private static $default_merge_options = array(								// Дефолтные параметры объединения файлов
-		'before' => '',
-		'after'  => '',
+		'before'    => '',
+		'after'     => '',
 		'start_str' => '',
 		'end_str'   => '',
+		'priority'  => '',
 		'compress'  => true,
 		'recursion' => true
 	);
@@ -556,32 +572,42 @@ class ten_file {
 			if(!isset($options[$key]))													// для незаданных опций
 				$options[$key] = $val;
 
-		$files = explode(':', $options['files']);										// Разбиение строки объединяемых файлов в массив
-		$files_mod = trim($files[0]);													// Мод поиска файлов (ext или reg)
-		
-		if($files_mod == 'ext')															// Если задан мод расширений
-			$files_val    = explode(',', $files[1]);									// то строку значения надо разбить в массив расширений
-		else if($files_mod == 'reg')													// Если задан мод регулярного выражения
-			$files_val[0] = $files[1];													// то достаточно просто переприсвоить строку значения		
-		
-		if(!isset($options['input_path']))												// Если входящие директории не указаны явно
-			$options['input_path'] = ten_file::$input_path;								// будут использоваться сгенерированные автоматически
+		if(!empty($options['priority']))												// Если указаны приоритетные файлы
+			ten_file::add_merge_files($options['priority'], $options);					// нужно сперва прилепить их
 
-		if(
-			$files_mod == 'reg' || 														// Если задан мод регулярного выражения
-			$files_mod == 'ext' && count($files_val) == 1								// или мод расширений и указано всего одно расширение
-		) {
-			$output = ten_file::merge_file($files_mod, trim($files_val[0]), $options);	// То можно просто вызвать функцию объединения один раз
+		if(gettype($options['files']) == 'array') {										// Если передан массив файлов
+
+			$output = ten_file::merge_file('fls', $options['files'], $options);			// Нужно просто их объединить
 		}
-		else {																			// Иначе задан мод расширений и указано больше одного расширения
+		else {																			// Иначе передан мод расширений или регулярных выражений
+
+			$files = explode(':', $options['files']);									// Разбиение строки объединяемых файлов в массив
+			$files_mod = trim($files[0]);												// Мод поиска файлов (ext или reg)
 			
-			$output = array();															// Массив для путей собранных файлов
+			if($files_mod == 'ext')														// Если задан мод расширений
+				$files_val    = explode(',', $files[1]);								// то строку значения надо разбить в массив расширений
+			else if($files_mod == 'reg')												// Если задан мод регулярного выражения
+				$files_val[0] = $files[1];												// то достаточно просто переприсвоить строку значения		
 			
-			foreach($files_val as $extension)											// Цикл по полученным расширениям
-				array_push(																// Добавление
-					$output,															// в массив путей
-					ten_file::merge_file($files_mod, trim($extension), $options)		// результата слияния файлов
-				);
+			if(!isset($options['input_path']))											// Если входящие директории не указаны явно
+				$options['input_path'] = ten_file::$input_path;							// будут использоваться стандартные
+
+			if(
+				$files_mod == 'reg' || 													// Если задан мод регулярного выражения
+				$files_mod == 'ext' && count($files_val) == 1							// или мод расширений и указано всего одно расширение
+			) {
+				$output = ten_file::merge_file($files_mod, trim($files_val[0]), $options);	// То можно просто вызвать функцию объединения один раз
+			}
+			else {																		// Иначе задан мод расширений и указано больше одного расширения
+				
+				$output = array();														// Массив для путей собранных файлов
+				
+				foreach($files_val as $extension)										// Цикл по полученным расширениям
+					array_push(															// Добавление
+						$output,														// в массив путей
+						ten_file::merge_file($files_mod, trim($extension), $options)	// результата слияния файлов
+					);
+			}
 		}
 		
 		$input = ten_file::$input_files;
@@ -596,8 +622,8 @@ class ten_file {
 	/**
 	 * Функция непосредственного объединения файлов
 	 *
-	 * @param  string $mod       Мод поиска файлов (ext или reg)
-	 * @param  string $val       Значение поиска файлов (расширение или регулярное выражение)
+	 * @param  string $mod       Мод поиска файлов (fls, ext или reg)
+	 * @param  string $val       Значение поиска файлов (расширение, регулярное выражение или массив файлов)
 	 * @param  array  $options   Параметры объединения файлов
 	 * @return string
 	 */
@@ -605,16 +631,23 @@ class ten_file {
 		
 		$output_extension = end(explode('.', $options['output_file']));					// Расширение выходящего файла
 
-		if(gettype($options['input_path']) == 'array')									// Если указан массив входящих директорий
-			$input_path    = $options['input_path'];
-		else																			// Иначе указана одна входящая директория
-			$input_path[0] = $options['input_path'];
+		if($mod == 'fls') {																// Если переданы конкретные файлы для объединения
 
-		foreach($input_path as $path) {													// Цикл по входящим директориям
+			ten_file::add_merge_files($file, $options);									// Непосредственное прилепливание текущего файла к конечному
+		}
+		else {																			// Иначе передано расширение или регулярное выражение
 
-			$options['input_path'] = ten_text::rgum(ROOT . $path, '/');					// Абсолютный путь входящей корневой директории и добавление слеша в конец пути, если его там нет
+			if(gettype($options['input_path']) == 'array')								// Если указан массив входящих директорий
+				$input_path    = $options['input_path'];
+			else																		// Иначе указана одна входящая директория
+				$input_path[0] = $options['input_path'];
 
-			ten_file::merge($mod, $val, $options);										// Вызов функции рекурсивного перебора директорий
+			foreach($input_path as $path) {												// Цикл по входящим директориям
+
+				$options['input_path'] = ten_text::rgum(ROOT . $path, '/');				// Абсолютный путь входящей корневой директории и добавление слеша в конец пути, если его там нет
+
+				ten_file::merge($mod, $val, $options);									// Вызов функции рекурсивного перебора директорий
+			}
 		}
 
 		ten_file::$output_file = 														// Добавление
@@ -640,7 +673,7 @@ class ten_file {
 		ten_file::make_dir($output_file);												// Создание пути, если его не существует
 
 		file_put_contents($output_file, ten_file::$output_file);						// Запись итоговой строки в выходящий файл
-		chmod($output_file, 0644);														// Присвоение необходимых прав на файл
+		@chmod($output_file, 0644);														// Присвоение необходимых прав на файл
 
 		ten_file::$output_file = '';													// Обнуление строки собранного файла
 		
@@ -651,7 +684,7 @@ class ten_file {
 	 * Функция рекурсивного перебора директорий для объединения файлов
 	 * 
 	 * @param  string $mod       Мод поиска файлов (ext или reg)
-	 * @param  string $val       Значение поиска файлов (расширение или регулярное выражение)
+	 * @param  string $val       Значение поиска файлов (расширение, регулярное выражение или массив файлов)
 	 * @param  array  $options   Параметры объединения файлов
 	 * @return function
 	 */
@@ -669,7 +702,6 @@ class ten_file {
 						is_dir($directory) &&											// Если текущий объект является директорией
 						$options['recursion']											// и требуется рекурсивный перебор директорий
 					) {
-
 						array_push(ten_file::$folder_array, $directory);				// он добавляется в массив директорий
 					}
 					else if (															// Иначе текущий объект - это файл
@@ -679,18 +711,10 @@ class ten_file {
 						$mod == 'reg' &&												// Или задан мод регулярного выражения
 						preg_match($val, $object)										// и имя текущего файла удовлетворяет условия регулярного выражения
 					) {
-						
-						$file = $options['input_path'] . $object;						// Полный путь к файлу
-						
-						array_push(ten_file::$input_files, $file);						// Добавление пути текущего файла в массив путей объединённых файлов
-						
-						$before = str_replace('{filename}', $file, $options['before']);
-						$after  = str_replace('{filename}', $file, $options['after']);
-
-						ten_file::$output_file .=										// Добавление
-							$before                  .									// предваряющей строки
-							file_get_contents($file) .									// к содержанию текущего файла
-							$after;														// и последующей строки
+						ten_file::add_merge_files(										// Непосредственное прилепливание текущего файла
+							$options['input_path'] . $object,							// Полный путь к файлу
+							$options
+						);
 					}
 				}
 			}
@@ -706,6 +730,34 @@ class ten_file {
 		}
 		else
 			error::print_error('Can\'t open directory: ' . $options['input_path']);
+	}
+
+	/**
+	 * Непосредственное прилепливание файлов к выходящему файлу
+	 * 
+	 * @param string | array $files   Полный путь прилепляемого файла
+	 * @param array          $options Параметры объединения файлов
+	 */
+	private static function add_merge_files($files, $options) {
+
+		if(gettype($files) == 'string')													// Если передан один файл
+			$files = array($files);														// нужно сделать из него массив
+
+		foreach($files as $file) {														// Цикл по файлам
+
+			if(!preg_match('/^' . str_replace('/', '\/', ROOT) . '/', $file))			// Если в пути не указана корневая директория
+				$file = ROOT . $file;													// то её надо добавить
+			
+			if(in_array($file, ten_file::$input_files))									// Если файл уже был прилеплен
+				return;																	// то его уже не нужно прилеплять
+
+			array_push(ten_file::$input_files, $file);									// Добавление пути текущего файла в массив путей объединённых файлов
+
+			ten_file::$output_file .=													// Добавление
+				str_replace('{filename}', $file, $options['before']) .					// предваряющей строки
+				file_get_contents($file)                             .					// к содержанию текущего файла
+				str_replace('{filename}', $file, $options['after']);					// и последующей строки
+		}
 	}
 	
 	/**
@@ -730,12 +782,13 @@ class ten_file {
 
 		if(!empty($options['output_file'])) {									// Если указан файл для сохранения результата
 			
-			$output_file = ROOT . $options['output_file'];
-
-			ten_file::make_dir($output_file);									// Создание пути, если его не существует
-
-			file_put_contents($output_file, $included);							// Сохранение конечной строки в файл
-			chmod($output_file, 0644);											// Присвоение необходимых прав на файл
+			$output_file = ten_file::autogen(									// Сохранение файла
+				$options['output_file'],
+				$included,
+				(!empty($options['prefix'])) ? $options['prefix'] : ''			// Префикс для сохраняемого файла
+			);
+			
+			@chmod($output_file, 0644);											// Присвоение необходимых прав на файл
 		}
 
 		return $included;														// Возвращение строки подключения всех файлов
@@ -831,5 +884,30 @@ class ten_file {
 			case 'link':															// Если тег link
 				return '<link' . $attrs_str . '>';
 		}
+	}
+
+	/**
+	 * Функция сохранения автоматически сгенерированных файлов
+	 *
+	 * @param  string $path    Путь к файлу
+	 * @param  string $content Контент сохраняемого файла
+	 * @param  string $prefix  Префикс сохраняемого файла
+	 * @return string          Сформированный путь к сгенерированному файлу
+	 */
+	public static function autogen($path, $content, $prefix = '__autogen__') {
+		
+		if(!preg_match('/^' . str_replace('/', '\/', ROOT) . '/', $path))			// Если в пути не указана корневая директория
+			$path = ROOT . $path;													// то её надо добавить
+
+		$path_arr = explode('/', $path);
+		$last     = count($path_arr) - 1;
+		$path_arr[$last] = $prefix . $path_arr[$last];
+
+		$final_path = implode('/', $path_arr);
+
+		ten_file::make_dir($final_path);
+		file_put_contents($final_path, $content);
+
+		return $final_path;
 	}
 }

@@ -17,7 +17,7 @@ switch($_POST['event']) {
 			
 			$filename = ROOT . $_POST['path'] . $file;
 			file_put_contents($filename, $val);							// Сохранение файла
-			chmod($filename, 0644);										// Присвоение необходимых прав на файл
+			@chmod($filename, 0644);									// Присвоение необходимых прав на файл
 		}
 		
 		break;

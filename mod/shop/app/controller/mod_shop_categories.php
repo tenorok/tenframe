@@ -123,7 +123,7 @@ class mod_shop_categories {
 			'parse' => array(
 				
 				'title' => 'Административная панель &mdash; ' . $info['title'],
-				'files' => core::includes('libs, developer, require'),
+				'files' => core::includes('libs, developer, require', '__autogen__'),
 				
 				'body'  => core::block(array(
 					

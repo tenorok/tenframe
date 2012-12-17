@@ -10,6 +10,7 @@ ten_file::include_files(array(							// Markdown для модулей
 		'js'  => '/assets/js/'
 	),
 	'output_file' => '/view/include/markdown.tpl',
+	'prefix' => '__autogen__',
 	'hash' => false
 ));
 
@@ -26,6 +27,7 @@ ten_file::include_files(array(							// Файлы библиотек и пла�
 		'js' => '/assets/js/'
 	),
 	'output_file' => '/view/include/libs.tpl',
+	'prefix' => '__autogen__',
 	'hash' => false
 ));
 
@@ -47,6 +49,7 @@ ten_file::include_files(array(							// Файлы для режима разр�
 		'js'   => '/assets/js/'
 	),
 	'output_file' => '/view/include/developer.tpl',
+	'prefix' => '__autogen__',
 	'hash' => false
 ));
 
@@ -58,5 +61,6 @@ ten_file::include_files(array(							// Основные файлы
 		'css' => '/assets/css/',
 		'js'  => '/assets/js/'
 	),
-	'output_file' => '/view/include/require.tpl'
+	'output_file' => '/view/include/require.tpl',
+	'prefix' => '__autogen__'
 ));

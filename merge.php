@@ -1,7 +1,8 @@
 <?php
 
 ten_file::merge_files(array(							// Сборка всех js-файлов
-	'files'       => 'ext: js',
+	'priority'    => array('/view/core.js', '/view/routes.js'),
+    'files'       => 'ext: js',
 	'output_file' => '/assets/js/main.js'
 ));
 

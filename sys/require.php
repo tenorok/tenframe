@@ -34,7 +34,7 @@ if(
 )
 	core::$called = true;										// Маршрут считается проведённым
 
-orm::connect('localhost', 'root', '753951');				// Подключение к mysql
+orm::connect('localhost', 'root', '');          				// Подключение к mysql
 orm::db('tmod_shop');											// Выбор базы данных
 
 mod::init(array('admin', 'shop'));								// Инициализация модулей

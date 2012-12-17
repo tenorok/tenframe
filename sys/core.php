@@ -92,7 +92,10 @@
 		));
 
 	Подключение include-файлов:
-		echo core::includes('libs, developer, require');			// Файлы с именами 'developer' и 'dev' подключаются только при включенном режиме разработчика
+		echo core::includes(
+			'libs, developer, require',								// Обязательный. Файлы с именами 'developer' и 'dev' подключаются только при включенном режиме разработчика
+			'__autogen__'											// Префикс перед именами файлов (по умолчанию отсутствует)
+		);
 
 	Вывод страницы 404:
 		core::not_found(array(
@@ -429,7 +432,7 @@ class core {
 			$dev													// или он просто включен
 		) {
 
-			file_put_contents(ROOT . '/view/include/dev.js', 'window.DEV=' . (($dev) ? 'true;' : 'false;'));
+			ten_file::autogen('/view/include/dev.js', 'core.dev=' . (($dev) ? 'true;' : 'false;'));
 			$ret = true;											// то надо вернуть true, чтобы собрать JS-файлы с новым значением
 		}
 		else														// Иначе режим разработчика выключен
@@ -577,10 +580,11 @@ class core {
 	/**
 	 * Функция подключения include-файлов
 	 * 
-	 * @param  string $files Имена include-файлов
+	 * @param  string $files  Имена include-файлов
+	 * @param  string $prefix Префикс перед именами include-файлов
 	 * @return string
 	 */
-	public static function includes($files) {
+	public static function includes($files, $prefix = '') {
 
 		$includes = '';																		// Переменная для конкатенации содержимого файлов
 
@@ -591,7 +595,7 @@ class core {
 			if(in_array($file, core::$include_dev) && !DEV)									// Если текущий файл требуется для режима разработчика и режим разработчика выключен
 				continue;																	// то его подключать не нужно и выполняется переход к следующему файлу
 			
-			$includes .= file_get_contents(ROOT . '/view/include/' . $file . '.tpl');		// Конкатенация содержимого текущего файла
+			$includes .= file_get_contents(ROOT . '/view/include/' . $prefix . $file . '.tpl');		// Конкатенация содержимого текущего файла
 		}
 
 		return $includes;																	// Возвращение результата конкатенации содержимого файлов
@@ -683,6 +687,7 @@ class orm {
 	public static function connect($host, $login, $password) {
 		
 		orm::$mysqli = new mysqli($host, $login, $password);
+		orm::$mysqli->set_charset('utf8');
 	}
 	
 	/**
@@ -1563,7 +1568,8 @@ class mod {
 
 	/**
 	 * Функция отображения readme модулей
-	 * 
+	 *
+	 * @param string $mod Имя модуля
 	 */
 	public static function readme($mod) {
 
@@ -1576,7 +1582,7 @@ class mod {
 			'parse' => array(
 				
 				'title' => 'Модуль — ' . $mod,
-				'files' => core::includes('markdown'),
+				'files' => core::includes('markdown', '__autogen__'),
 				'body'  => Markdown(file_get_contents(ROOT . '/mod/' . $mod . '/readme.md'))
 			)
 		));
