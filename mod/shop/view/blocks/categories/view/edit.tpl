@@ -5,7 +5,7 @@
 </li>
 <li class="mod-shop-categories__labelitem mod-shop-categories__labelitem_independent">
 	
-	<a href="" class="mod-shop-categories__link_pseudo mod-shop-categories__link_change-parent">
+	<a href="" class="mod-shop-categories__link mod-shop-categories__link_pseudo mod-shop-categories__link_change-parent">
 		<span class="mod-shop-categories__link-text">Изменить родительскую категорию</span>
 		<span class="mod-shop-categories__harr">&#9650;</span>
 	</a>

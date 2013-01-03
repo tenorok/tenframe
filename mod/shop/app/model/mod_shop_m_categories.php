@@ -195,7 +195,7 @@ class mod_shop_m_categories {
 				if($category->tmod_shop_categories_id != $category->parent)				// Если категория не является родительской для текущей
 					$category->parent = '';
 				else																	// Иначе категория является родительской для текущей
-					$category->parent = 'mod-shop-categories__cat_selected';
+					$category->parent = 'mod-shop-categories__cat_selected_yes';
 			}
 			
 			return $categories;															// Возврат обработанных результатов выборки

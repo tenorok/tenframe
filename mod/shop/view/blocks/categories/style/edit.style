@@ -37,7 +37,7 @@
 			color: #333;
 			border-bottom-color: #888;
 		}
-		.mod-shop-categories__cat_selected {
+		.mod-shop-categories__cat_selected_yes {
 			margin-left: -4px;
 			border-bottom: medium none;
 			padding: 2px 4px;

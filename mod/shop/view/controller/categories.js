@@ -7,6 +7,8 @@ core.add({
 		shop: {
 
 			categories: {
+
+				block: '%mod-shop-categories',
 		
 				controller: {
 					

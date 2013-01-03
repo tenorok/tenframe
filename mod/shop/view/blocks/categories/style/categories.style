@@ -96,13 +96,13 @@
 	    content: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAKCAYAAABblxXYAAABK0lEQVR42n2SvUrEQBSFjbvZkM2CoijoWknARRDtrLNFwELyBkltZ2UTa1/Ax0heIFVaTWXhA1ikkASEgE0IZjwDZ5MtMrnwkZn7c2Zy7+wIIZTANDABuxu410brRoO9yNzzvHv53RwyLqoWmwID7Pu+f1dV1Y/rumu5p3+qElcJ6sACJ+Aqy7IPAUvT9E3u6beAPiSsElyw8DIMwydBa9v2LwiCB+lnfDEk3A2EgjMmHoFzcFuW5afYsjzP36Wf8WPmz1ivUa9b6MAEB+AUXCRJ8iwGLIqiR8RXYMl8E+j9BflseJrFpKXjONdN03wPidZ1/WXbtmzBGfMt1k960b6Xc073sCiKV6EwtuGFbdpjXdeCbkDEACamfCMvpBLk0H7jOF7x143t9/sPgoxm6q49Rw0AAAAASUVORK5CYIIA");
 	}
 }
-	.mod-shop-categories__dropdown__item {
+	.mod-shop-categories__dropdown-item {
 		
 	}
 		
 		@mod_admin_categories_dropdown__menu_color: #333;
 
-		.mod-shop-categories__dropdown__menu {
+		.mod-shop-categories__dropdown-menu {
 			display: block;
 			padding: 4px 8px;
 

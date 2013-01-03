@@ -2,65 +2,73 @@
 
 core.add({
 
-	mod: {
+    mod: {
 
-		shop: {
+        shop: {
 
-			categories: {
+            categories: {
 
-				edit: {
+                edit: {
 
-					init: function() {																	// Инициализация изменения категории
-						
-						$('.mod-shop-categories__link_change-parent')									// Событие клика по заголовку "Изменить родительскую категорию"
-							.click(core.mod.shop.categories.edit.toggleParentForm);
+                    init: function() {                                                                    // Инициализация изменения категории
+                        
+                        var that = this;
+                        
+                        this.block = core.mod.shop.categories.block;
 
-						$('.mod-shop-categories__cat_edit')												// Событие выбора родительской категории
-							.click(core.mod.shop.categories.edit.changeParent);
-					},
+                        $(this.block + '(link){change-parent}').click(function() {                        // Событие клика по заголовку "Изменить родительскую категорию"
+                            return that.toggleParentForm.call(that, this);
+                        });
 
-					toggleParentForm: function() {														// Скрытие/показ блока со списком для выбора родительской категории
-						
-						var arrow = $(this).children('.mod-shop-categories__harr');						// Элемент-стрелочка рядом с заголовком
-						
-						$('.mod-shop-categories__list_edit')											// Список категорий
-							.slideToggle(200, function() {												// Скрытие и отображение списка
-								
-								if($(this).is(':hidden'))												// Изменение стрелочки
-									arrow.html('&#9650;');
-								else
-									arrow.html('&#9660;');
-							});
+                        $(this.block + '(cat){edit}').click(function() {                                  // Событие выбора родительской категории
+                            return that.changeParent.call(that, this);
+                        });
+                    },
 
-						return false;																	// Отмена перехода по ссылке
-					},
+                    toggleParentForm: function(link) {                                                    // Скрытие/показ блока со списком для выбора родительской категории
+                        
+                        var arrow = $(link).children(this.block + '(harr)');                              // Элемент-стрелочка рядом с заголовком
+                        
+                        $(this.block + '(list){edit}')                                                    // Список категорий
+                            .slideToggle(200, function() {                                                // Скрытие и отображение списка
+                                
+                                if($(this).is(':hidden'))                                                 // Изменение стрелочки
+                                    arrow.html('&#9650;');
+                                else
+                                    arrow.html('&#9660;');
+                            });
 
-					changeParent: function() {															// Изменение родительской категории
+                        return false;                                                                     // Отмена перехода по ссылке
+                    },
 
-						if($(this).hasClass('mod-shop-categories__cat_selected')) {						// Если клик по выбранной категории
-							
-							$(this)																		// То у неё нужно
-								.removeClass('mod-shop-categories__cat_selected');						// удалить класс выбранности
+                    changeParent: function(category) {                                                    // Изменение родительской категории
 
-							$('input[name="catparent"]')												// И удалить значение у скрытого поля
-								.attr('value', '');
-						}
-						else {																			// Иначе клик по категории, не являвшейся родителем
+                        var $category = $(category);
+                        
+                        if($category.bemGetMod('selected')) {                                             // Если клик по выбранной категории
+                            
+                            $category                                                                     // То у неё нужно
+                                .bemDelMod('selected');                                                   // удалить модификатор выбранности
 
-							$('.mod-shop-categories__cat_edit')											// У всех категорий
-								.removeClass('mod-shop-categories__cat_selected');						// удаляется класс выбранности
-							
-							$(this)																		// Выбранной категории
-								.addClass('mod-shop-categories__cat_selected');							// добавляется класс выбранности
+                            $(this.block + '(catparent)')                                                 // И удалить значение у скрытого поля
+                                .attr('value', '');
+                        }
+                        else {                                                                            // Иначе клик по категории, не являвшейся родителем
 
-							$('input[name="catparent"]')												// Изменение значения скрытого поля
-								.attr('value', $(this).attr('href'));
-						}
-						
-						return false;																	// Отмена перехода по ссылке
-					}
-				}
-			}
-		}
-	}
+                            $(this.block + '(cat){edit}')                                                 // У всех категорий
+                                .bemDelMod('selected');                                                   // удаляется модификатор выбранности
+                            
+                            $category                                                                     // Выбранной категории
+                                .bemSetMod('selected', 'yes');                                            // добавляется модификатор выбранности
+
+                            $(this.block + '(catparent)')                                                 // Изменение значения скрытого поля
+                                .attr('value', $category.attr('href'));
+                        }
+                        
+                        return false;                                                                     // Отмена перехода по ссылке
+                    }
+                }
+            }
+        }
+    }
 });

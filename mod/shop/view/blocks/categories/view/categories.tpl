@@ -7,14 +7,14 @@
 		
 	</ul>
 	<div class="mod-shop-categories__dropdown">
-		<div class="mod-shop-categories__dropdown__item">
-			<a href="" class="mod-shop-categories__dropdown__menu mod-shop-categories__dropdown__menu_add-product">Добавить товар</a>
+		<div class="mod-shop-categories__dropdown-item">
+			<a href="" class="mod-shop-categories__dropdown-menu mod-shop-categories__dropdown-menu_add-product">Добавить товар</a>
 		</div>
-		<div class="mod-shop-categories__dropdown__item">
-			<a href="" class="mod-shop-categories__dropdown__menu mod-shop-categories__dropdown__menu_add-category">Добавить подкатегорию</a>
+		<div class="mod-shop-categories__dropdown-item">
+			<a href="" class="mod-shop-categories__dropdown-menu mod-shop-categories__dropdown-menu_add-category">Добавить подкатегорию</a>
 		</div>
-		<div class="mod-shop-categories__dropdown__item">
-			<a href="" class="mod-shop-categories__dropdown__menu mod-shop-categories__dropdown__menu_edit">Изменить категорию</a>
+		<div class="mod-shop-categories__dropdown-item">
+			<a href="" class="mod-shop-categories__dropdown-menu mod-shop-categories__dropdown-menu_edit">Изменить категорию</a>
 		</div>
 	</div>
 </div>

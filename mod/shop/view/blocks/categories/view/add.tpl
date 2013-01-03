@@ -1,14 +1,14 @@
 <div class="mod-shop-categories">
 	<form action="/{{ $page }}/modshop/categories/{{ $action }}/" method="post" class="mod-shop-categories__addform">
-		<input type="hidden" name="catparent" value="{{ $parent }}">
+		<input type="hidden" name="catparent" value="{{ $parent }}" class="mod-shop-categories__catparent">
 		<ul class="mod-shop-categories__labellist">
 			<li class="mod-shop-categories__labelitem">
 				<label for="mod-shop-categories-catname" class="mod-shop-categories__label">Название</label>
-				<input type="text" value="{{ $name }}" name="catname" placeholder="Телевизоры" id="mod-shop-categories-catname" autofocus class="mod-shop-categories__textinput">
+				<input type="text" value="{{ $name }}" name="catname" placeholder="Телевизоры" id="mod-shop-categories-catname" class="mod-shop-categories__catname" autofocus class="mod-shop-categories__textinput">
 			</li>
 			<li class="mod-shop-categories__labelitem">
 				<label for="mod-shop-categories-catalias" class="mod-shop-categories__label">Алиас</label>
-				<input type="text" value="{{ $alias }}" name="catalias" placeholder="tv" id="mod-shop-categories-catalias" class="mod-shop-categories__textinput">
+				<input type="text" value="{{ $alias }}" name="catalias" placeholder="tv" id="mod-shop-categories-catalias" class="mod-shop-categories__catalias" class="mod-shop-categories__textinput">
 			</li>
 			
 			{{ $edit }}
@@ -20,7 +20,7 @@
 				<ul class="mod-shop-categories__labellist">
 					<li class="mod-shop-categories__labelitem mod-shop-categories__existlist">
 						<label class="mod-shop-categories__label mod-shop-categories__label_long">
-							<select name="existfield[]" class="mod-shop-categories__selectinput mod-shop-categories__selectinput_right-column">
+							<select name="existfield[]" class="mod-shop-categories__selectinput mod-shop-categories__selectinput_right-column mod-shop-categories__selectinput_existfield">
 								<option value="new" class="mod-shop-categories__optioninput">Новое поле</option>
 
 								{{ begin existfields }}
@@ -32,7 +32,7 @@
 					</li>
 					<li class="mod-shop-categories__labelitem">
 						<label class="mod-shop-categories__label">Имя поля</label>
-						<input type="text" name="name[]" placeholder="Цена" class="mod-shop-categories__textinput">
+						<input type="text" name="name[]" placeholder="Цена" class="mod-shop-categories__textinput mod-shop-categories__textinput_name">
 					</li>
 					<li class="mod-shop-categories__labelitem">
 						<label class="mod-shop-categories__label">Тип поля</label>

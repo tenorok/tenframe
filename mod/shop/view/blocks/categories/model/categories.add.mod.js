@@ -2,151 +2,171 @@
 
 core.add({
 
-	mod: {
+    mod: {
 
-		shop: {
+        shop: {
 
-			categories: {
+            categories: {
 
-				add: {
+                add: {
 
-					fieldHtml: null,													// Переменная для хранения html-структуры добавления поля категории
+                    fieldHtml: null,                                                                      // Переменная для хранения html-структуры добавления поля категории
 
-					init: function() {													// Инициализация добавления категории
+                    init: function() {                                                                    // Инициализация добавления категории
 
-						core.mod.shop.categories.add.fieldHtml =
-							$('.mod-shop-categories__fielditem').htmlWithParent();		// Получение html-структуры добавления поля категории
-						
-						$('#mod-shop-categories-catname')								// Событие ввода названия категории
-							.keyup(core.mod.shop.categories.add.setAlias);
-						
-						$('.mod-shop-categories__fielditem')							// Событие изменения значения выпадающего списка "Новое поле" и выбора уже существующих
-							.find('select[name=existfield\\[\\]]')
-							.change(core.mod.shop.categories.add.changeExistList);
+                        var that = this;
+                        
+                        this.block = core.mod.shop.categories.block;
 
-						$('.mod-shop-categories__textinput[name=name\\[\\]]')			// Событие ввода названия поля
-							.keyup(core.mod.shop.categories.add.addField);
+                        this.fieldHtml = $(this.block + '(fielditem)').htmlWithParent();                  // Получение html-структуры добавления поля категории
+                        
+                        $(this.block + '(catname)').keyup(function() {                                    // Событие ввода названия категории
+                            that.setAlias.call(that, this);
+                        });
+                        
+                        $(this.block + '(fielditem)')                                                     // Событие изменения значения выпадающего списка "Новое поле" и выбора уже существующих
+                            .find(this.block + '(selectinput){existfield}')
+                            .change(function() {
+                                that.changeExistList.call(that, this);
+                            });
 
-						$('.mod-shop-categories__checkboxinput')						// Событие изменения флажка "Выпадающий список"
-							.live('change', core.mod.shop.categories.add.changeClassifier);
+                        $(this.block + '(textinput){name}').keyup(function() {                            // Событие ввода названия поля
+                            that.addField.call(that, this);
+                        });
 
-						$('.mod-shop-categories__textinput_right-column')				// Событие ввода значения выпадающего списка
-							.live('keyup', core.mod.shop.categories.add.addClassifierValue);
-					},
+                        $(this.block + '(checkboxinput)').live('change', function() {                     // Событие изменения флажка "Выпадающий список"
+                            that.changeClassifier.call(that, this);
+                        });
 
-					setAlias: function() {												// Генерация алиаса названия категории на транслите
+                        $(this.block + '(textinput){right-column}')                                       // Событие ввода значения выпадающего списка
+                            .live('keyup', function() {
+                                that.addClassifierValue.call(that, this);
+                            });
+                    },
 
-						$('#mod-shop-categories-catalias')
-							.val(core.text($(this).val()).translitUri());
-					},
+                    setAlias: function(input) {                                                           // Генерация алиаса названия категории на транслите
 
-					changeExistList: function() {										// Демонстрация и скрытие полей для ввода при изменении выпадающего списка "Новое поле" и выбора уже существующих полей
+                        $(this.block + '(catalias)')
+                            .val(core.text($(input).val()).translitUri());
+                    },
 
-						var labels =													// Получение всех полей для ввода у данного поля
-							$(this)
-								.parents('.mod-shop-categories__fielditem')
-								.find('.mod-shop-categories__labelitem')
-								.not('.mod-shop-categories__existlist');
+                    changeExistList: function(select) {                                                   // Демонстрация и скрытие полей для ввода при изменении выпадающего списка "Новое поле" и выбора уже существующих полей
 
-						if($(this).val() != 'new') {									// Если выбрана уже существующая категория
-							
-							core.mod.shop.categories.add.addField.apply(this);				// Нужно добавить ещё одну пустую форму для ввода нового поля
+                        var $select = $(select),
+                            labels =                                                                      // Получение всех полей для ввода у данного поля
+                                $select
+                                    .parents(this.block + '(fielditem)')
+                                    .find(this.block + '(labelitem)')
+                                    .not(this.block + '(existlist)');
 
-							labels.css({'display': 'none'});							// Скрыть все поля для ввода информации о текущем поле
-						}
-						else															// Иначе выбрано Новое поле
-							labels.css({'display': 'block'});							// Нужно показать все поля для ввода информации о текущем поле
-					},
+                        if($select.val() != 'new') {                                                      // Если выбрана уже существующая категория
+                            
+                            this.addField.call(this, select);                                             // Нужно добавить ещё одну пустую форму для ввода нового поля
 
-					addField: function() {												// Добавление чистой формы для ввода информации об ещё одном поле
+                            labels.css({'display': 'none'});                                              // Скрыть все поля для ввода информации о текущем поле
+                        }
+                        else                                                                              // Иначе выбрано Новое поле
+                            labels.css({'display': 'block'});                                             // Нужно показать все поля для ввода информации о текущем поле
+                    },
 
-						if($(this).hasClass('mod-shop-categories__field-added'))		// Если по текущему элементу уже добавлялась новая форма
-							return;														// то больше этого делать не нужно
+                    addField: function(field) {                                                           // Добавление чистой формы для ввода информации об ещё одном поле
 
-						var lastField = $('.mod-shop-categories__fielditem').last();	// Получение последней формы ввода информации о поле
+                        if($(field).bemGetMod('field'))                                                   // Если по текущему элементу уже добавлялась новая форма
+                            return;                                                                       // то больше этого делать не нужно
 
-						lastField														// Назначение класса, символизирующего, что данная форма уже добавила после себя новую форму
-							.find('select[name=existfield\\[\\]]')
-							.addClass('mod-shop-categories__field-added');
-						
-						lastField														// Назначение класса, символизирующего, что данная форма уже добавила после себя новую форму
-							.find('.mod-shop-categories__textinput[name=name\\[\\]]')
-							.addClass('mod-shop-categories__field-added');
+                        var lastField = $(this.block + '(fielditem)').last();                             // Получение последней формы ввода информации о поле
 
-						var fieldsCount =												// Количество добавленных полей
-							$('.mod-shop-categories__fieldlist')
-								.children('.mod-shop-categories__fielditem')
-								.length;
-						
-						var newFieldHtml = 												// Изменение имён полей для ввода значений выпадающего списка
-							core.mod.shop.categories.add.fieldHtml
-								.replace(/options_0/g, 'options_' + fieldsCount);
-						
-						var newField = 													// Добавление новой формы
-							$(newFieldHtml)
-								.appendTo('.mod-shop-categories__fieldlist');
-						
-						$(newField)														// Назначение события изменения выпадающего списка "Новое поле" и выбора уже существующих полей в новой форме
-							.find('select[name=existfield\\[\\]]')
-							.change(core.mod.shop.categories.add.changeExistList);
+                        lastField                                                                         // Назначение класса, символизирующего, что данная форма уже добавила после себя новую форму
+                            .find(this.block + '(selectinput){existfield}')
+                            .bemSetMod('field', 'added');
+                        
+                        lastField                                                                         // Назначение класса, символизирующего, что данная форма уже добавила после себя новую форму
+                            .find(this.block + '(textinput){name}')
+                            .bemSetMod('field', 'added');
 
-						$(newField)														// Назначение события ввода названия поля в новой форме
-							.find('.mod-shop-categories__textinput[name=name\\[\\]]')
-							.keyup(core.mod.shop.categories.add.addField);
-					},
+                        var fieldsCount =                                                                 // Количество добавленных полей
+                            $(this.block + '(fieldlist)')
+                                .children(this.block + '(fielditem)')
+                                .length,
 
-					changeClassifier: function() {										// Обработка изменения флажка "Выпадающий список"
+                            newFieldHtml =                                                                // Изменение имён полей для ввода значений выпадающего списка
+                                this.fieldHtml.replace(/options_0/g, 'options_' + fieldsCount),
 
-						var classifier =												// Получение скрытого элемента списка с полями для ввода значений выпадающего списка
-							$(this)
-								.parents('.mod-shop-categories__labellist')
-								.children('.mod-shop-categories__hiddenitem');
+                            newField = $(newFieldHtml).appendTo(this.block + '(fieldlist)'),              // Добавление новой формы
 
-						var hiddenInput = $(this).next();								// Получение скрытого поля-флага, говорящего, является ли поле выпадающим списком
+                            that = this;
+                        
+                        $(newField)                                                                       // Назначение события изменения выпадающего списка "Новое поле" и выбора уже существующих полей в новой форме
+                            .find(this.block + '(selectinput){existfield}')
+                            .change(function() {
+                                that.changeExistList.call(that, this);
+                            });
 
-						if($(this).is(':checked')) {									// Если флажок поставлен
-							
-							$(classifier).css({'display': 'block'});					// Нужно показать поля для ввода значений выпадающего списка
+                        $(newField)                                                                       // Назначение события ввода названия поля в новой форме
+                            .find(this.block + '(textinput){name}')
+                            .keyup(function() {
+                                that.addField.call(that, this);
+                            });
+                    },
 
-							$(classifier)												// Поставить фокус в первое поле
-								.children('.mod-shop-categories__textinput')
-								.focus();
+                    changeClassifier: function(checkbox) {                                                // Обработка изменения флажка "Выпадающий список"
 
-							$(hiddenInput).attr('value', '1');							// Изменение флага, поле является выпадающим списком
-						}
-						else {															// Иначе флажок не поставлен
+                        var $checkbox = $(checkbox),
+                            classifier =                                                                  // Получение скрытого элемента списка с полями для ввода значений выпадающего списка
+                                $checkbox
+                                    .parents(this.block + '(labellist)')
+                                    .children(this.block + '(hiddenitem)');
 
-							$(classifier).css({'display': 'none'});						// И нужно скрыть поля для ввода значений выпадающего списка
+                        var hiddenInput = $checkbox.next();                                               // Получение скрытого поля-флага, говорящего, является ли поле выпадающим списком
 
-							$(hiddenInput).attr('value', '0');							// Изменение флага, поле не является выпадающим списком
-						}
-					},
+                        if($checkbox.is(':checked')) {                                                    // Если флажок поставлен
+                            
+                            $(classifier).css({'display': 'block'});                                      // Нужно показать поля для ввода значений выпадающего списка
 
-					addClassifierValue: function() {									// Добавление чистого поля для ввода значения выпадающего списка
+                            $(classifier)                                                                 // Поставить фокус в первое поле
+                                .children(this.block + '(textinput)')
+                                .focus();
 
-						if($(this).hasClass('mod-shop-categories__classifier-added'))	// Если по текущему элементу уже добавлялось новое поле
-							return;
+                            $(hiddenInput).attr('value', '1');                                            // Изменение флага, поле является выпадающим списком
+                        }
+                        else {                                                                            // Иначе флажок не поставлен
 
-						var parent = $(this).parent('.mod-shop-categories__labelitem');	// Получение родительского тега
+                            $(classifier).css({'display': 'none'});                                       // И нужно скрыть поля для ввода значений выпадающего списка
 
-						var valCount =													// Количество полей для ввода значений выпадающего списка
-							parent
-								.children('.mod-shop-categories__textinput')
-								.length;
+                            $(hiddenInput).attr('value', '0');                                            // Изменение флага, поле не является выпадающим списком
+                        }
+                    },
 
-						var newValueHtml =												// Получение html-структуры нового поля для ввода значения выпадающего списка
-							$($(this).htmlWithParent())
-								.attr('placeholder', 'Значение ' + (++valCount));
+                    addClassifierValue: function(field) {                                                 // Добавление чистого поля для ввода значения выпадающего списка
 
-						var newValue = newValueHtml.appendTo(parent);					// Добавление нового поля
+                        var $field = $(field);
+                        
+                        if($field.bemGetMod('added'))                                                     // Если по текущему элементу уже добавлялось новое поле
+                            return;
 
-						$(this).addClass('mod-shop-categories__classifier-added');		// Назначение класса, символизирующего, что данное поле уже добавляло после себя новое поле
+                        var parent = $field.parent(this.block + '(labelitem)'),                           // Получение родительского тега
 
-						$(newValue)														// Назначение события ввода значения в только что добавленное поле
-							.keyup(core.mod.shop.categories.add.addClassifierValue);
-					}
-				}
-			}
-		}
-	}
+                            valCount =                                                                    // Количество полей для ввода значений выпадающего списка
+                                parent
+                                    .children(this.block + '(textinput)')
+                                    .length,
+
+                            newValueHtml =                                                                // Получение html-структуры нового поля для ввода значения выпадающего списка
+                                $($field.htmlWithParent())
+                                    .attr('placeholder', 'Значение ' + (++valCount)),
+
+                            newValue = newValueHtml.appendTo(parent),                                     // Добавление нового поля
+
+                            that = this;
+
+                        $field.bemSetMod('added', 'yes');                                                 // Назначение класса, символизирующего, что данное поле уже добавляло после себя новое поле
+
+                        $(newValue).keyup(function() {                                                    // Назначение события ввода значения в только что добавленное поле
+                                that.addClassifierValue.call(that, this);
+                            });
+                    }
+                }
+            }
+        }
+    }
 });

@@ -15,9 +15,10 @@ ten_file::include_files(array(							// Markdown для модулей
 ));
 
 ten_file::include_files(array(							// Файлы библиотек и плагинов
-	'jquery-1.7.2.min.js',
-	'jquery-ui-1.8.21.min.js',
+	'jquery-1.8.3.min.js',
+	'jquery-ui-1.9.2.min.js',
 	'modernizr-2.5.3.js',
+	'jquery-bem.js',
 	'jquery.placeholder_ten.js',
 	'jquery.hoverDelay.js',
 	'jquery.maskedinput-1.3.js',
