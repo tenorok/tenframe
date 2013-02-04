@@ -230,6 +230,8 @@ defined('MODEL')      or die('Core error: Model path is not declared!');
 // Класс ядра
 class core {
 	
+	public static $settings;											// Параметры работы фреймворка
+	
 	public static $paths = array(SYS, CONTROLLER, MODEL);				// Массив с директориями классов
 	
 	/**
@@ -261,7 +263,7 @@ class core {
 	public static function parse_urn($urn = null) {
 		
 		if(is_null($urn))
-			$urn = $_SERVER['REQUEST_URI'];
+			$urn = URI;
 			
 		return preg_split('/\//', $urn, -1, PREG_SPLIT_NO_EMPTY);
 	}

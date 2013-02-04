@@ -2,7 +2,7 @@
 RewriteEngine On
 
 # Базовый URL для преобразований в каталоге
-RewriteBase /
+# RewriteBase /
 
 # Защита файлов сервера
 #<Files .*>
