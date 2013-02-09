@@ -1,116 +1,116 @@
 .mod-shop-categories {
-	
+    
 }
-	.mod-shop-categories__add {
-		margin-left: -18px;
-		padding-left: 18px;
+    .mod-shop-categories__add {
+        margin-left: -18px;
+        padding-left: 18px;
 
-		color: #3232FF;
-		background: url(/mod/shop/view/blocks/categories/images/plus.png) 0 4px no-repeat;
-	}
+        color: #3232FF;
+        background: url(/mod/shop/view/blocks/categories/images/plus.png) 0 4px no-repeat;
+    }
 
-	.mod-shop-categories__h2 {
-		margin: 40px 0 20px;
-		font: normal 17px georgia, serif;
-	}
-	
-	@mod_admin_categories__item_margin_top_bottom: 15px;
+    .mod-shop-categories__h2 {
+        margin: 40px 0 20px;
+        font: normal 17px georgia, serif;
+    }
+    
+    @mod_admin_categories__item_margin_top_bottom: 15px;
 
-	.mod-shop-categories__mainlist {
+    .mod-shop-categories__mainlist {
 
-	}
-	.mod-shop-categories__list {
-		margin-top: @mod_admin_categories__item_margin_top_bottom;
-		margin-bottom: @mod_admin_categories__item_margin_top_bottom;
-	}
-		.mod-shop-categories__list ul {
-			margin-left: 30px;
-		}
-		.mod-shop-categories__item {
-			margin-bottom: @mod_admin_categories__item_margin_top_bottom;
-		}
-			.mod-shop-categories__name {
-				
-				margin-left: -20px;
+    }
+    .mod-shop-categories__list {
+        margin-top: @mod_admin_categories__item_margin_top_bottom;
+        margin-bottom: @mod_admin_categories__item_margin_top_bottom;
+    }
+        .mod-shop-categories__list ul {
+            margin-left: 30px;
+        }
+        .mod-shop-categories__item {
+            margin-bottom: @mod_admin_categories__item_margin_top_bottom;
+        }
+            .mod-shop-categories__name {
+                
+                margin-left: -20px;
 
-				&:hover .mod-shop-categories__draggable {
-					opacity: 1;
-				}
-			}
-				.mod-shop-categories__draggable {
-					opacity: 0;
-					display: inline-block;
-					width: 16px;
-					height: 16px;
+                &:hover .mod-shop-categories__draggable {
+                    opacity: 1;
+                }
+            }
+                .mod-shop-categories__draggable {
+                    opacity: 0;
+                    display: inline-block;
+                    width: 16px;
+                    height: 16px;
 
-					background: url(/mod/shop/view/blocks/categories/images/draggable.png) no-repeat;
-					vertical-align: bottom;
-					cursor: url(/mod/shop/view/blocks/categories/images/openhand.cur), move;
+                    background: url(/mod/shop/view/blocks/categories/images/draggable.png) no-repeat;
+                    vertical-align: bottom;
+                    cursor: url(/mod/shop/view/blocks/categories/images/openhand.cur), move;
 
-					.transition(opacity);
-				}
-				.mod-shop-categories__cat {
-					border-bottom: 1px dotted #3232FF;
-					color: #3232FF;
-					text-decoration: none;
-					outline: none;
+                    .transition(opacity);
+                }
+                .mod-shop-categories__cat {
+                    border-bottom: 1px dotted #3232FF;
+                    color: #3232FF;
+                    text-decoration: none;
+                    outline: none;
 
-					&:hover {
-						border-bottom-color: #f00;
-					}
-				}
-				.mod-shop-categories__cat_hided {
-					color: #777;
-					border-bottom-color: #aaa;
-				}
-				.mod-shop-categories__harr {
-					opacity: 0.3;
-					display: inline-block;
-					width: 25px;
+                    &:hover {
+                        border-bottom-color: #f00;
+                    }
+                }
+                .mod-shop-categories__cat_hided {
+                    color: #777;
+                    border-bottom-color: #aaa;
+                }
+                .mod-shop-categories__harr {
+                    opacity: 0.3;
+                    display: inline-block;
+                    width: 25px;
 
-					color: #3232FF;
-					font-size: 10px;
-					text-align: center;
-					text-decoration: none;
-					cursor: pointer;
+                    color: #3232FF;
+                    font-size: 10px;
+                    text-align: center;
+                    text-decoration: none;
+                    cursor: pointer;
 
-					&:hover {
-						color: #f00;
-					}
-				}
+                    &:hover {
+                        color: #f00;
+                    }
+                }
 
 .mod-shop-categories__dropdown {
-	position: absolute;
+    position: absolute;
 
-	display: none;
+    display: none;
 
-	background: #fff;
-	.box-shadow(#C4C4C4, 0 2px 9px rgba(0, 0, 0, 0.6));
+    background: #fff;
+    .box-shadow(#C4C4C4, 0 2px 9px rgba(0, 0, 0, 0.6));
 
-	font-size: 12px;
+    font-size: 12px;
 
-	&:after {
-		position: absolute;
-	    left: 6px;
-	    top: -12px;
-	    content: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAKCAYAAABblxXYAAABK0lEQVR42n2SvUrEQBSFjbvZkM2CoijoWknARRDtrLNFwELyBkltZ2UTa1/Ax0heIFVaTWXhA1ikkASEgE0IZjwDZ5MtMrnwkZn7c2Zy7+wIIZTANDABuxu410brRoO9yNzzvHv53RwyLqoWmwID7Pu+f1dV1Y/rumu5p3+qElcJ6sACJ+Aqy7IPAUvT9E3u6beAPiSsElyw8DIMwydBa9v2LwiCB+lnfDEk3A2EgjMmHoFzcFuW5afYsjzP36Wf8WPmz1ivUa9b6MAEB+AUXCRJ8iwGLIqiR8RXYMl8E+j9BflseJrFpKXjONdN03wPidZ1/WXbtmzBGfMt1k960b6Xc073sCiKV6EwtuGFbdpjXdeCbkDEACamfCMvpBLk0H7jOF7x143t9/sPgoxm6q49Rw0AAAAASUVORK5CYIIA");
-	}
+    &:after {
+        position: absolute;
+        left: 6px;
+        top: -12px;
+        content: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAKCAYAAABblxXYAAABK0lEQVR42n2SvUrEQBSFjbvZkM2CoijoWknARRDtrLNFwELyBkltZ2UTa1/Ax0heIFVaTWXhA1ikkASEgE0IZjwDZ5MtMrnwkZn7c2Zy7+wIIZTANDABuxu410brRoO9yNzzvHv53RwyLqoWmwID7Pu+f1dV1Y/rumu5p3+qElcJ6sACJ+Aqy7IPAUvT9E3u6beAPiSsElyw8DIMwydBa9v2LwiCB+lnfDEk3A2EgjMmHoFzcFuW5afYsjzP36Wf8WPmz1ivUa9b6MAEB+AUXCRJ8iwGLIqiR8RXYMl8E+j9BflseJrFpKXjONdN03wPidZ1/WXbtmzBGfMt1k960b6Xc073sCiKV6EwtuGFbdpjXdeCbkDEACamfCMvpBLk0H7jOF7x143t9/sPgoxm6q49Rw0AAAAASUVORK5CYIIA");
+    }
 }
-	.mod-shop-categories__dropdown-item {
-		
-	}
-		
-		@mod_admin_categories_dropdown__menu_color: #333;
+    .mod-shop-categories__dropdown-item {
+        
+    }
+        
+        @mod_admin_categories_dropdown__menu_color: #333;
 
-		.mod-shop-categories__dropdown-menu {
-			display: block;
-			padding: 4px 8px;
+        .mod-shop-categories__dropdown-menu {
+            display: block;
+            padding: 4px 8px;
 
-			text-decoration: none;
-			color: @mod_admin_categories_dropdown__menu_color;
+            text-decoration: none;
+            color: @mod_admin_categories_dropdown__menu_color;
 
-			&:hover {
-				color: @mod_admin_categories_dropdown__menu_color;
-				.gradient(#D6D6D6, #C4C4C4, #EAEAEA);
-			}
-		}
+            &:hover {
+                color: @mod_admin_categories_dropdown__menu_color;
+                .gradient(#D6D6D6, #C4C4C4, #EAEAEA);
+            }
+        }

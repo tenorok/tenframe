@@ -2,33 +2,33 @@
 
 core.add({
 
-	mod: {
+    mod: {
 
-		shop: {
+        shop: {
 
-			categories: {
+            categories: {
 
-				block: '%mod-shop-categories',
-		
-				controller: {
-					
-					list: function() {
+                block: '%mod-shop-categories',
+        
+                controller: {
+                    
+                    list: function() {
 
-						core.mod.shop.categories.list.init();		// Инициализация работы с категориями
-					},
+                        core.mod.shop.categories.list.init();        // Инициализация работы с категориями
+                    },
 
-					add: function() {
+                    add: function() {
 
-						core.mod.shop.categories.add.init();
-					},
+                        core.mod.shop.categories.add.init();
+                    },
 
-					edit: function() {
+                    edit: function() {
 
-						core.mod.shop.categories.add.init();
-						core.mod.shop.categories.edit.init();
-					}
-				}
-			}
-		}
-	}
+                        core.mod.shop.categories.add.init();
+                        core.mod.shop.categories.edit.init();
+                    }
+                }
+            }
+        }
+    }
 });

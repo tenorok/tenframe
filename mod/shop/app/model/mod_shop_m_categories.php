@@ -3,232 +3,232 @@
 // Работа с категориями магазина
 
 class mod_shop_m_categories {
-	
-	/**
-	 * Получение списка категорий с учётом вложенностей
-	 * 
-	 * @param string $page Адрес главной страницы административной панели
-	 * @return string
-	 */
-	public static function get_categories_list($page) {
 
-		$categories = mod_shop_m_categories::get_categories_query($page);				// Получение списка категорий
+    /**
+     * Получение списка категорий с учётом вложенностей
+     * 
+     * @param string $page Адрес главной страницы административной панели
+     * @return string
+     */
+    public static function get_categories_list($page) {
 
-		$items = '';																	// Переменная для вывода категорий
+        $categories = mod_shop_m_categories::get_categories_query($page);                // Получение списка категорий
 
-		if(!empty($categories)) {														// Если категории существуют
+        $items = '';                                                                     // Переменная для вывода категорий
 
-			foreach($categories as $category) {											// Цикл по списку категорий
+        if(!empty($categories)) {                                                        // Если категории существуют
 
-				if(!$category->tmod_shop_categories_fk) {								// Если категория не имеет родителя
+            foreach($categories as $category) {                                          // Цикл по списку категорий
 
-					$items .= mod_shop_m_categories::parse_category_item(				// Парсинг блока категории
-						$page,
-						$category->tmod_shop_categories_id,
-						$category->name,
-						(isset($category->parent)) ? $category->parent : '',
-						($category->hide) ? 'mod-shop-categories__cat_hided' : '',
-						($category->hide) ? 'Скрытая категория' : ''
-					);
+                if(!$category->tmod_shop_categories_fk) {                                // Если категория не имеет родителя
 
-					$items = mod_shop_m_categories::get_category(						// Получение дочерних категорий
-						$page,
-						$categories,
-						$category->tmod_shop_categories_id,
-						$items
-					);
-				}
-			}
-		}
+                    $items .= mod_shop_m_categories::parse_category_item(                // Парсинг блока категории
+                        $page,
+                        $category->tmod_shop_categories_id,
+                        $category->name,
+                        (isset($category->parent)) ? $category->parent : '',
+                        ($category->hide) ? 'mod-shop-categories__cat_hided' : '',
+                        ($category->hide) ? 'Скрытая категория' : ''
+                    );
 
-		return preg_replace('/\[\[child_\d+\]\]/', '', $items);							// Возвращение результата с удалением переменных шаблона
-	}
+                    $items = mod_shop_m_categories::get_category(                        // Получение дочерних категорий
+                        $page,
+                        $categories,
+                        $category->tmod_shop_categories_id,
+                        $items
+                    );
+                }
+            }
+        }
 
-	/**
-	 * Рекурсивная функция парсинга подкатегорий
-	 * 
-	 * @param string  $page       Адрес главной страницы административной панели
-	 * @param array   $categories Массив всех категорий
-	 * @param integer $current    Идентификатор текущей категории
-	 * @param string  $template   Шаблон для парсинга
-	 * @return string
-	 */
-	private static function get_category($page, $categories, $current, $template) {
+        return preg_replace('/\[\[child_\d+\]\]/', '', $items);                          // Возвращение результата с удалением переменных шаблона
+    }
 
-		foreach($categories as $category) {												// Цикл по списку категорий
+    /**
+     * Рекурсивная функция парсинга подкатегорий
+     * 
+     * @param string  $page       Адрес главной страницы административной панели
+     * @param array   $categories Массив всех категорий
+     * @param integer $current    Идентификатор текущей категории
+     * @param string  $template   Шаблон для парсинга
+     * @return string
+     */
+    private static function get_category($page, $categories, $current, $template) {
 
-			if($category->tmod_shop_categories_fk == $current) {						// Если категория является дочерней для текущей
+        foreach($categories as $category) {                                              // Цикл по списку категорий
 
-				$item = mod_shop_m_categories::parse_category_item(						// Парсинг блока категории
-					$page,
-					$category->tmod_shop_categories_id,
-					$category->name,
-					(isset($category->parent)) ? $category->parent : '',
-					($category->hide) ? 'mod-shop-categories__cat_hided' : '',
-					($category->hide) ? 'Скрытая категория' : ''
-				);
+            if($category->tmod_shop_categories_fk == $current) {                         // Если категория является дочерней для текущей
 
-				$child_tmp = '[[child_' . $current . ']]';								// Генерация переменной шаблона
+                $item = mod_shop_m_categories::parse_category_item(                      // Парсинг блока категории
+                    $page,
+                    $category->tmod_shop_categories_id,
+                    $category->name,
+                    (isset($category->parent)) ? $category->parent : '',
+                    ($category->hide) ? 'mod-shop-categories__cat_hided' : '',
+                    ($category->hide) ? 'Скрытая категория' : ''
+                );
 
-				$template = str_replace($child_tmp, $item . $child_tmp, $template);		// Замена переменной шаблона на дочерний блок категории
+                $child_tmp = '[[child_' . $current . ']]';                               // Генерация переменной шаблона
 
-				$template = mod_shop_m_categories::get_category(						// Рекурсивный вызов функции для получения дочерних категорий
-					$page,
-					$categories,
-					$category->tmod_shop_categories_id,
-					$template
-				);
-			}
-		}
+                $template = str_replace($child_tmp, $item . $child_tmp, $template);      // Замена переменной шаблона на дочерний блок категории
 
-		return $template;																// Возвращение готового шаблона
-	}
+                $template = mod_shop_m_categories::get_category(                         // Рекурсивный вызов функции для получения дочерних категорий
+                    $page,
+                    $categories,
+                    $category->tmod_shop_categories_id,
+                    $template
+                );
+            }
+        }
 
-	/**
-	 * Парсинг шаблона элемента категории
-	 * 
-	 * @param string  $page   Имя главной страницы административной панели
-	 * @param integer $id     Идентификатор категории
-	 * @param string  $name   Название категории
-	 * @param string  $parent Имя класса для выделения родительской категории
-	 * @param string  $hided  Класс скрытой категории
-	 * @param string  $title  Значение атрибута title для скрытой категории
-	 * @return string
-	 */
-	private static function parse_category_item($page, $id, $name, $parent, $hided, $title) {
+        return $template;                                                                // Возвращение готового шаблона
+    }
 
-		if((int) $page > 0)																// Если вместо адреса страницы админки передан идентификатор категории
-			return core::block(array(													// Значит нужно парсить список категорий для изменения родительской категории
+    /**
+     * Парсинг шаблона элемента категории
+     * 
+     * @param string  $page   Имя главной страницы административной панели
+     * @param integer $id     Идентификатор категории
+     * @param string  $name   Название категории
+     * @param string  $parent Имя класса для выделения родительской категории
+     * @param string  $hided  Класс скрытой категории
+     * @param string  $title  Значение атрибута title для скрытой категории
+     * @return string
+     */
+    private static function parse_category_item($page, $id, $name, $parent, $hided, $title) {
 
-				'mod'   => 'shop',
-				'block' => 'categories',
-				'view'  => 'parent',
+        if((int) $page > 0)                                                              // Если вместо адреса страницы админки передан идентификатор категории
+            return core::block(array(                                                    // Значит нужно парсить список категорий для изменения родительской категории
 
-				'parse' => array(
+                'mod'   => 'shop',
+                'block' => 'categories',
+                'view'  => 'parent',
 
-					'id'       => $id,
-					'name'     => $name,
-					'selected' => $parent
-				)
-			));
-		else																			// Иначе нужно парсить список категорий для главной страницы категорий
-			return core::block(array(
+                'parse' => array(
 
-				'mod'   => 'shop',
-				'block' => 'categories',
-				'view'  => 'item',
+                    'id'       => $id,
+                    'name'     => $name,
+                    'selected' => $parent
+                )
+            ));
+        else                                                                             // Иначе нужно парсить список категорий для главной страницы категорий
+            return core::block(array(
 
-				'parse' => array(
+                'mod'   => 'shop',
+                'block' => 'categories',
+                'view'  => 'item',
 
-					'page'   => $page,
-					'id'     => $id,
-					'name'   => $name,
-					'hided'  => $hided,
-					'title'  => $title
-				)
-			));
-	}
+                'parse' => array(
 
-	/**
-	 * Формирование массива данных для парсинга формы работы с категорией
-	 * 
-	 */
-	public static function get_info() {
+                    'page'   => $page,
+                    'id'     => $id,
+                    'name'   => $name,
+                    'hided'  => $hided,
+                    'title'  => $title
+                )
+            ));
+    }
 
-		$categoryid = (isset(get::$arg->categoryid)) ? get::$arg->categoryid : null;	// Если в адресной строке есть идентификатор категории
-		$parentid   = (isset(get::$arg->parentid))   ? get::$arg->parentid   : null;	// Если в адресной строке есть идентификатор родительской категории
+    /**
+     * Формирование массива данных для парсинга формы работы с категорией
+     * 
+     */
+    public static function get_info() {
 
-		$info = array(																	// Массив возможных полей с дефолтными значениями
-			'title'    => '',
-			'parentid' => '',
-			'action'   => '',
-			'name'     => '',
-			'alias'    => '',
-			'hided'    => ''
-		);
+        $categoryid = (isset(get::$arg->categoryid)) ? get::$arg->categoryid : null;     // Если в адресной строке есть идентификатор категории
+        $parentid   = (isset(get::$arg->parentid))   ? get::$arg->parentid   : null;     // Если в адресной строке есть идентификатор родительской категории
 
-		if(!is_null($parentid)) {														// Если задана родительская категория
-			
-			$info['title']    = 'Добавление подкатегории в &laquo;' . orm::select('tmod_shop_categories')->where($parentid)->name . '&raquo;';
-			$info['parentid'] = $parentid;
-			$info['action']   = 'insert';
-		}
-		else if(!is_null($categoryid)) {												// Если задана конкретная категория на изменение
-			
-			$catinfo = orm::select('tmod_shop_categories')->where($categoryid);
+        $info = array(                                                                   // Массив возможных полей с дефолтными значениями
+            'title'    => '',
+            'parentid' => '',
+            'action'   => '',
+            'name'     => '',
+            'alias'    => '',
+            'hided'    => ''
+        );
 
-			$info['title']  = 'Изменение категории &laquo;' . $catinfo->name . '&raquo;';
-			$info['action'] = 'edit/' . $categoryid;
-			$info['name']   = $catinfo->name;
-			$info['alias']  = $catinfo->alias;
-			$info['hided']  = ($catinfo->hide == 1) ? 'checked' : '';
-		}
-		else {																			// Иначе просто добавление категории в корень
-			
-			$info['title']  = 'Добавление новой категории';
-			$info['action'] = 'insert';
-		}
+        if(!is_null($parentid)) {                                                        // Если задана родительская категория
+            
+            $info['title']    = 'Добавление подкатегории в &laquo;' . orm::select('tmod_shop_categories')->where($parentid)->name . '&raquo;';
+            $info['parentid'] = $parentid;
+            $info['action']   = 'insert';
+        }
+        else if(!is_null($categoryid)) {                                                 // Если задана конкретная категория на изменение
+            
+            $catinfo = orm::select('tmod_shop_categories')->where($categoryid);
 
-		return $info;																	// Возврат сформированного массива
-	}
+            $info['title']  = 'Изменение категории &laquo;' . $catinfo->name . '&raquo;';
+            $info['action'] = 'edit/' . $categoryid;
+            $info['name']   = $catinfo->name;
+            $info['alias']  = $catinfo->alias;
+            $info['hided']  = ($catinfo->hide == 1) ? 'checked' : '';
+        }
+        else {                                                                           // Иначе просто добавление категории в корень
+            
+            $info['title']  = 'Добавление новой категории';
+            $info['action'] = 'insert';
+        }
 
-	/**
-	 * Получение списка категорий
-	 * 
-	 * @param string $category_id Номер текущей категории
-	 * @return array
-	 */
-	private static function get_categories_query($category_id) {
+        return $info;                                                                    // Возврат сформированного массива
+    }
 
-		if((int) $category_id > 0) {													// Если вместо адреса страницы админки передан идентификатор категории
+    /**
+     * Получение списка категорий
+     * 
+     * @param string $category_id Номер текущей категории
+     * @return array
+     */
+    private static function get_categories_query($category_id) {
 
-			$categories =
-				orm::select('tmod_shop_categories')										// Запрос на получение всех категорий с подзапросом на определение родителя текущей категории
-					->sub(array(
-						'select tmod_shop_categories_fk from tmod_shop_categories where tmod_shop_categories_id = ' . $category_id => 'parent'
-					))
-					->order('serial')
-					->where('tmod_shop_categories_id <> ' . $category_id);
+        if((int) $category_id > 0) {                                                     // Если вместо адреса страницы админки передан идентификатор категории
 
-			foreach($categories as $category) {											// Цикл по полученным категориям
-				
-				if($category->tmod_shop_categories_id != $category->parent)				// Если категория не является родительской для текущей
-					$category->parent = '';
-				else																	// Иначе категория является родительской для текущей
-					$category->parent = 'mod-shop-categories__cat_selected_yes';
-			}
-			
-			return $categories;															// Возврат обработанных результатов выборки
-		}
-		else																			// Иначе передан адрес страницы админки (значит сейчас не страница редактирования категории)
-			return 
-				$categories =
-					orm::select('tmod_shop_categories')									// Получение списка существующих категорий
-						->order('serial')
-						->where('all');
-	}
+            $categories =
+                orm::select('tmod_shop_categories')                                      // Запрос на получение всех категорий с подзапросом на определение родителя текущей категории
+                    ->sub(array(
+                        'select tmod_shop_categories_fk from tmod_shop_categories where tmod_shop_categories_id = ' . $category_id => 'parent'
+                    ))
+                    ->order('serial')
+                    ->where('tmod_shop_categories_id <> ' . $category_id);
 
-	/**
-	 * Формирование массива полей категории
-	 * 
-	 * @param string $category_id Номер текущей категории
-	 * @return array
-	 */
-	public static function get_fields($category_id) {
+            foreach($categories as $category) {                                          // Цикл по полученным категориям
+                
+                if($category->tmod_shop_categories_id != $category->parent)              // Если категория не является родительской для текущей
+                    $category->parent = '';
+                else                                                                     // Иначе категория является родительской для текущей
+                    $category->parent = 'mod-shop-categories__cat_selected_yes';
+            }
+            
+            return $categories;                                                          // Возврат обработанных результатов выборки
+        }
+        else                                                                             // Иначе передан адрес страницы админки (значит сейчас не страница редактирования категории)
+            return 
+                $categories =
+                    orm::select('tmod_shop_categories')                                  // Получение списка существующих категорий
+                        ->order('serial')
+                        ->where('all');
+    }
 
-		$fields = 
-			orm::join('tmod_shop_fields', array(
-				array(
-					'table' => 'tmod_shop_values',
-					'join'  => 'left',
-					'on'    => 'tmod_shop_fields.list = 1'
-				)
-			))
-			->where('tmod_shop_fields.tmod_shop_categories_fk = ' . $category_id);
-		
-		echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
-		print_r($fields);
+    /**
+     * Формирование массива полей категории
+     * 
+     * @param string $category_id Номер текущей категории
+     * @return array
+     */
+    public static function get_fields($category_id) {
 
-		orm::debug();
-	}
+        $fields = 
+            orm::join('tmod_shop_fields', array(
+                array(
+                    'table' => 'tmod_shop_values',
+                    'join'  => 'left',
+                    'on'    => 'tmod_shop_fields.list = 1'
+                )
+            ))
+            ->where('tmod_shop_fields.tmod_shop_categories_fk = ' . $category_id);
+        
+        echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
+        print_r($fields);
+
+        orm::debug();
+    }
 }
