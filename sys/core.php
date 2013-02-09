@@ -470,7 +470,14 @@ class core {
         if(!isset($parse))                                                              // Если не задан элемент parse
             $parse = array();                                                           // нужно его присвоить
 
-        return $tpl->parse($parse);                                                     // Возвращение отпарсиного шаблона
+        $html = $tpl->parse($parse);                                                    // Получение отпарсиного шаблона
+
+        if($block == 'html' && core::$settings['compressHTML']) {
+            return preg_replace('#(?ix)(?>[^\S ]\s*|\s{2,})(?=(?:(?:[^<]++|<(?!/?(?:textarea|pre)\b))*+)(?:<(?>textarea|pre)\b|\z))#', '', $html);
+        }
+        else {
+            return $html;
+        }
     }
 
     private static $ctx_reserve = array(                                                // Зарезервированные переменные, именами которых не могут называться контексты
