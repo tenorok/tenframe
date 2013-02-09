@@ -19,5 +19,5 @@ Fotorama
 Pictos
 <link type="text/css" rel="stylesheet" href="/assets/fonts/pictos/pictos.css">
 Использование:
-	<span class="pictos">3</span>
-	/assets/fonts/pictos/readme.jpg
+    <span class="pictos">3</span>
+    /assets/fonts/pictos/readme.jpg

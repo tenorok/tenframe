@@ -3,22 +3,22 @@
 // Контроллер работы с главной страницей
 
 class index {
-	
-	/**
-	 * Отображение главной страницы
-	 *
-	 */
-	public static function page() {
-		
-		echo core::block(array(
-			
-			'block' => 'html',
 
-			'parse' => array(
-				'title' => 'Заголовок',
-				'files' => core::includes('libs, developer, require', '__autogen__'),
-				'body'  => 'Контент'
-			)
-		));
-	}
+    /**
+     * Отображение главной страницы
+     *
+     */
+    public static function page() {
+
+        echo core::block(array(
+
+            'block' => 'html',
+
+            'parse' => array(
+                'title' => 'Заголовок',
+                'files' => core::includes('libs, developer, require', '__autogen__'),
+                'body'  => 'Контент'
+            )
+        ));
+    }
 }

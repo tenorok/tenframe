@@ -4,63 +4,63 @@
 
 class mod_admin_m_content {
 
-	/**
-	 * Получение массива контента
-	 * 
-	 * @param  string $page Адрес страницы
-	 * @param  string $tab  Адрес подстраницы
-	 * @return array
-	 */
-	public static function get_content($page, $tab) {
+    /**
+     * Получение массива контента
+     * 
+     * @param  string $page Адрес страницы
+     * @param  string $tab  Адрес подстраницы
+     * @return array
+     */
+    public static function get_content($page, $tab) {
 
-		require ROOT . '/mod/admin/conf/settings.php';
-		
-		$menu = mod_admin_m_menu::get_menu_conf();
+        require ROOT . '/mod/admin/conf/settings.php';
+        
+        $menu = mod_admin_m_menu::get_menu_conf();
 
-		$content = array();																// Итоговый массив
+        $content = array();                                                              // Итоговый массив
 
-		foreach($menu as $key => $item) {												// Цикл по элементам меню
+        foreach($menu as $key => $item) {                                                // Цикл по элементам меню
 
-			$main_url = ten_text::rgum($settings['urls']['page'], '/');					// Адрес главной страницы административной панели
+            $main_url = ten_text::rgum($settings['urls']['page'], '/');                  // Адрес главной страницы административной панели
 
-			$menuInfo = $menu[$key];													// Заведение информационной переменной для удобства
+            $menuInfo = $menu[$key];                                                     // Заведение информационной переменной для удобства
 
-			if($menuInfo['name'] == $page) {											// Если найдена искомая страница
+            if($menuInfo['name'] == $page) {                                             // Если найдена искомая страница
 
-				if(!mod_admin_m_menu::get_access($menuInfo['name']))					// Если администратор не имеет доступ к текущей странице
-					break;
+                if(!mod_admin_m_menu::get_access($menuInfo['name']))                     // Если администратор не имеет доступ к текущей странице
+                    break;
 
-				$content['title'] = $menuInfo['title'];									// Присваивание заголовка страницы
+                $content['title'] = $menuInfo['title'];                                  // Присваивание заголовка страницы
 
-				if(!empty($tab)) {														// Если требуется отобразить подстраницу
+                if(!empty($tab)) {                                                       // Если требуется отобразить подстраницу
 
-					foreach($menuInfo['tabs'] as $i => $curTab) {						// Цикл по подстраницам
+                    foreach($menuInfo['tabs'] as $i => $curTab) {                        // Цикл по подстраницам
 
-						$tabInfo = $menuInfo['tabs'][$i];								// Заведение информационной переменной для удобства
+                        $tabInfo = $menuInfo['tabs'][$i];                                // Заведение информационной переменной для удобства
 
-						if($tabInfo['name'] == $tab) {									// Если найдена искомая подстраница
+                        if($tabInfo['name'] == $tab) {                                   // Если найдена искомая подстраница
 
-							if(!mod_admin_m_menu::get_access(							// Если администратор не имеет доступа к текущей подстранице
-								$menuInfo['name'], $tabInfo['name']
-							))
-								break 2;
+                            if(!mod_admin_m_menu::get_access(                            // Если администратор не имеет доступа к текущей подстранице
+                                $menuInfo['name'], $tabInfo['name']
+                            ))
+                                break 2;
 
-							$content['title']   .= ' &mdash; ' . $tabInfo['title'];		// Добавление заголовка подстраницы
-							$content['content']  =               $tabInfo['content'];	// Присваивание контента подстраницы
+                            $content['title']   .= ' &mdash; ' . $tabInfo['title'];      // Добавление заголовка подстраницы
+                            $content['content']  =               $tabInfo['content'];    // Присваивание контента подстраницы
 
-							return $content;
-						}
-					}
+                            return $content;
+                        }
+                    }
 
-					core::not_found();													// Если не найдена подстраница
-				}
+                    core::not_found();                                                   // Если не найдена подстраница
+                }
 
-				$content['content'] = $menuInfo['content'];								// Присваивание контента страницы
+                $content['content'] = $menuInfo['content'];                              // Присваивание контента страницы
 
-				return $content;
-			}
-		}
+                return $content;
+            }
+        }
 
-		core::not_found();																// Если не найдено соответствие или нет прав
-	}
+        core::not_found();                                                               // Если не найдено соответствие или нет прав
+    }
 }

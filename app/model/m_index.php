@@ -2,7 +2,9 @@
 
 // Модель работы с главной страницей
 
-class m_steps {
+class m_index {
 
-	
+    public static function getData() {
+        return array();
+    }
 }

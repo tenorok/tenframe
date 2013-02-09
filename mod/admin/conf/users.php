@@ -2,9 +2,9 @@
 
 $users = array(
 
-	array(
-		'role'     => 'admin',
-		'login'    => 'admin',
-		'password' => 'admin'
-	)
+    array(
+        'role'     => 'admin',
+        'login'    => 'admin',
+        'password' => 'admin'
+    )
 );

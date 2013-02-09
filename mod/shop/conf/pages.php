@@ -2,5 +2,5 @@
 
 $pages = array(
 
-	'categories' => 'categories'
+    'categories' => 'categories'
 );

@@ -8,8 +8,8 @@
  * @param array  $asserts  Массив регулярных выражений для проверки {переменных}
  */
 function get($path, $callback, $asserts = array()) {
-	
-	core::request('GET', $path, $callback, $asserts);
+    
+    core::request('GET', $path, $callback, $asserts);
 }
 
 /**
@@ -20,6 +20,6 @@ function get($path, $callback, $asserts = array()) {
  * @param array  $asserts  Массив регулярных выражений для проверки {переменных}
  */
 function post($path, $callback, $asserts = array()) {
-	
-	core::request('POST', $path, $callback, $asserts);
+    
+    core::request('POST', $path, $callback, $asserts);
 }

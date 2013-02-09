@@ -1,5 +1,5 @@
 <div class="mod-admin-page">
-	{{ $header  }}
-	{{ $menu    }}
-	{{ $content }}
+    {{ $header  }}
+    {{ $menu    }}
+    {{ $content }}
 </div>

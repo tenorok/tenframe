@@ -2,7 +2,7 @@
 
 $roles = array(
 
-	array(
-		'name'  => 'admin'
-	)
+    array(
+        'name'  => 'admin'
+    )
 );
