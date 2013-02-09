@@ -445,6 +445,8 @@ class core {
         return $ret;
     }
 
+    private static $compressTplFolder = '/assets/__autogen__templates';
+
     /**
      * Функция парсинга блоков
      * 
@@ -459,9 +461,25 @@ class core {
         if(!isset($view))                                                               // Если представление не указано
             $view = $block;                                                             // его имя соответствует имени блока
 
-        $blocks = (isset($mod)) ? ROOT . '/mod/' . $mod . '/view/blocks/' : BLOCKS;		// Изменение начального пути, если указан модуль
+        $blocks = (isset($mod)) ? ROOT . '/mod/' . $mod . '/view/blocks/' : BLOCKS;     // Изменение начального пути, если указан модуль
+        $file = $blocks . $block . '/view/' . $view . '.tpl';                           // Полный путь к шаблону
 
-        $tpl = new Blitz($blocks . $block . '/view/' . $view . '.tpl');                 // Получение шаблона
+        if(DEV && core::$settings['compressHTML']) {                                    // Если включен режим разработчика и HTML нужно сжимать
+
+            ten_file::autogen(                                                          // Сохранение сжатого шаблона
+                core::$compressTplFolder . ten_text::ldel($file, ROOT),
+                core::compressHTML(file_get_contents($file)),
+                false
+            );
+
+            $blocks = (isset($mod)) ?
+                ROOT . core::$compressTplFolder . '/mod/' . $mod . '/view/blocks/' :
+                ROOT . core::$compressTplFolder . '/view/blocks/';
+
+            $file = $blocks . $block . '/view/' . $view . '.tpl';                       // Полный путь к сжатому шаблону
+        }
+
+        $tpl = new Blitz($file);                                                        // Получение шаблона
 
         if(isset($context))                                                             // Если требуется контекст begin-end
             foreach($context as $ctx => $val)                                           // Цикл по контекстам
@@ -470,14 +488,18 @@ class core {
         if(!isset($parse))                                                              // Если не задан элемент parse
             $parse = array();                                                           // нужно его присвоить
 
-        $html = $tpl->parse($parse);                                                    // Получение отпарсиного шаблона
+        return $tpl->parse($parse);                                                     // Получение отпарсиного шаблона
+    }
 
-        if($block == 'html' && core::$settings['compressHTML']) {
-            return preg_replace('#(?ix)(?>[^\S ]\s*|\s{2,})(?=(?:(?:[^<]++|<(?!/?(?:textarea|pre)\b))*+)(?:<(?>textarea|pre)\b|\z))#', '', $html);
-        }
-        else {
-            return $html;
-        }
+    /**
+     * Компрессирует HTML
+     * 
+     * @param  string $html HTML-строка
+     * @return string       Сжатая HTML-строка
+     */
+    public static function compressHTML($html) {
+
+        return preg_replace('#(?ix)(?>[^\S ]\s*|\s{2,})(?=(?:(?:[^<]++|<(?!/?(?:textarea|pre)\b))*+)(?:<(?>textarea|pre)\b|\z))#', '', $html);
     }
 
     private static $ctx_reserve = array(                                                // Зарезервированные переменные, именами которых не могут называться контексты

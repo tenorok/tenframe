@@ -784,7 +784,7 @@ class ten_file {
             
             $output_file = ten_file::autogen(                                        // Сохранение файла
                 $options['output_file'],
-                $included,
+                (core::$settings['compressHTML']) ? core::compressHTML($included) : $included,
                 (!empty($options['prefix'])) ? $options['prefix'] : ''               // Префикс для сохраняемого файла
             );
             
