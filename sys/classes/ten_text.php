@@ -40,17 +40,17 @@
         Добавление символа в конец строки, если его там ещё нет:
             $text = ten_text::rgum($text, 'symbol');
 
-    Удаление символов:
-        $symbol = string || array;                                           // Можно передать одну строку или массив строк
+    Удаление подстрок:
+        $substr = string || array;                                           // Можно передать одну строку или массив строк
         
-        Удаление символа из начала и конца строки, если он там есть
-            $text = ten_text::del($text,  $symbol);
-        Удаление символа из начала строки, если он там есть
-            $text = ten_text::ldel($text, $symbol);
-        Удаление символа из конца строки, если он там есть
-            $text = ten_text::rdel($text, $symbol);
+        Удаление подстроки из начала и конца строки, если она там есть
+            $text = ten_text::del($text,  $substr);
+        Удаление подстроки из начала строки, если она там есть
+            $text = ten_text::ldel($text, $substr);
+        Удаление подстроки из конца строки, если она там есть
+            $text = ten_text::rdel($text, $substr);
 
-        Рекурсивное удаление символов:
+        Рекурсивное удаление подстрок:
             Те же самые функции с приставкой all: delall, ldelall, rdelall
 */
 
@@ -328,91 +328,91 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
     }
 
     /**
-     * Удаление символов из начала и конца строки, если он там есть
+     * Удаление подстрок из начала и конца строки, если они там есть
      * 
      * @param  string         $string Строка
-     * @param  string | array $char   Символ
+     * @param  string | array $substr Подстрока или массив подстрок
      * @return string
      */
-    public static function del($string, $char) {
+    public static function del($string, $substr) {
 
-        $string = ten_text::ldel($string, $char);
-        return    ten_text::rdel($string, $char);
+        $string = ten_text::ldel($string, $substr);
+        return    ten_text::rdel($string, $substr);
     }
 
     /**
-     * Рекурсивное удаление символов из начала и конца строки
+     * Рекурсивное удаление подстрок из начала и конца строки
      * 
      * @param  string         $string Строка
-     * @param  string | array $char   Символ
+     * @param  string | array $substr Подстрока или массив подстрок
      * @return string
      */
-    public static function delall($string, $char) {
+    public static function delall($string, $substr) {
 
-        $string = ten_text::ldelall($string, $char);
-        return    ten_text::rdelall($string, $char);
+        $string = ten_text::ldelall($string, $substr);
+        return    ten_text::rdelall($string, $substr);
     }
 
     /**
-     * Удаление символов из начала строки, если он там есть
+     * Удаление подстрок из начала строки, если они там есть
      * 
      * @param  string         $string Строка
-     * @param  string | array $char   Символ
+     * @param  string | array $substr Подстрока или массив подстрок
      * @return string
      */
-    public static function ldel($string, $char) {
+    public static function ldel($string, $substr) {
 
-        return ten_text::delChar($string, $char, 'left');
+        return ten_text::delChar($string, $substr, 'left');
     }
 
     /**
-     * Рекурсивное удаление символов из начала строки
+     * Рекурсивное удаление подстрок из начала строки
      * 
      * @param  string         $string Строка
-     * @param  string | array $char   Символ
+     * @param  string | array $substr Подстрока или массив подстрок
      * @return string
      */
-    public static function ldelall($string, $char) {
+    public static function ldelall($string, $substr) {
 
-        return ten_text::delChar($string, $char, 'left', true);
+        return ten_text::delChar($string, $substr, 'left', true);
     }
 
     /**
-     * Удаление символов из конца строки, если он там есть
+     * Удаление подстрок из конца строки, если он там есть
      * 
      * @param  string         $string Строка
-     * @param  string | array $char   Символ
+     * @param  string | array $substr Подстрока или массив подстрок
      * @return string
      */
-    public static function rdel($string, $char) {
+    public static function rdel($string, $substr) {
 
-        return ten_text::delChar($string, $char, 'right');
+        return ten_text::delChar($string, $substr, 'right');
     }
 
     /**
-     * Рекурсивное удаление символов из конца строки
+     * Рекурсивное удаление подстрок из конца строки
      * 
      * @param  string         $string Строка
-     * @param  string | array $char   Символ
+     * @param  string | array $substr Подстрока или массив подстрок
      * @return string
      */
-    public static function rdelall($string, $char) {
+    public static function rdelall($string, $substr) {
 
-        return ten_text::delChar($string, $char, 'right', true);
+        return ten_text::delChar($string, $substr, 'right', true);
     }
 
     /**
-     * Возвращение массива символов для функций с неоднозначным типом данных параметра
+     * Возвращение массива подстрок для функций с неоднозначным типом данных параметра
      * 
-     * @param  string | array $char Символ или массив символов
+     * @param  string | array $substr Подстрока или массив подстрок
      * @return array
      */
-    private static function getCharArr($char) {
+    private static function getCharArr($substr) {
 
-        if(gettype($char) == 'string')
-            $charArr[0] = $char;
+        if(gettype($substr) == 'string')
+            $charArr[0] = $substr;
         else
-            $charArr    = $char;
+            $charArr    = $substr;
 
         return $charArr;
     }
@@ -421,14 +421,14 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
      * Выполнение операции удаления символов
      * 
      * @param  string         $string   Строка
-     * @param  string | array $char     Символ
+     * @param  string | array $substr   Подстрока или массив подстрок
      * @param  string         $position Откуда удалять символ
      * @param  boolean        $all      Флаг удаления всех символов
      * @return string
      */
-    private static function delChar($string, $char, $position, $all = false) {
+    private static function delChar($string, $substr, $position, $all = false) {
 
-        foreach(ten_text::getCharArr($char) as $charCur) {
+        foreach(ten_text::getCharArr($substr) as $charCur) {
 
             switch($position) {
 
@@ -447,7 +447,7 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
                 if(!$all)
                     return $ret;
                 else
-                    return ten_text::delChar($ret, $char, $position, $all);
+                    return ten_text::delChar($ret, $substr, $position, $all);
         }
 
         return $string;
