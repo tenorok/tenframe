@@ -1,7 +1,7 @@
 <?php
 
-// Version 1.1.0
-// From 09.09.2012
+// Version 1.1.1
+// From 09.02.2013
 
 // Класс работы с текстом
 
@@ -32,13 +32,13 @@
     Экранирование:
         $text = ten_text::strip($text);
 
-    Добавление символов:
-        Добавление символа в начало и конец строки, если его там ещё нет:
-            $text = ten_text::gum($text,  'symbol');
-        Добавление символа в начало строки, если его там ещё нет:
-            $text = ten_text::lgum($text, 'symbol');
-        Добавление символа в конец строки, если его там ещё нет:
-            $text = ten_text::rgum($text, 'symbol');
+    Добавление подстрок:
+        Добавление подстроки в начало и конец строки, если её там ещё нет:
+            $text = ten_text::gum($text,  'substr');
+        Добавление подстроки в начало строки, если её там ещё нет:
+            $text = ten_text::lgum($text, 'substr');
+        Добавление подстроки в конец строки, если её там ещё нет:
+            $text = ten_text::rgum($text, 'substr');
 
     Удаление подстрок:
         $substr = string || array;                                           // Можно передать одну строку или массив строк
@@ -291,40 +291,40 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
      }
 
      /**
-     * Добавление символа в начало и конец строки, если его там нет
+     * Добавление подстроки в начало и конец строки, если её там нет
      * 
      * @param  string $string Строка
-     * @param  string $char   Символ
+     * @param  string $substr Подстрока
      * @return string
      */
-    public static function gum($string, $char) {
+    public static function gum($string, $substr) {
 
-        $string = ten_text::lgum($string, $char);
-        return    ten_text::rgum($string, $char);
+        $string = ten_text::lgum($string, $substr);
+        return    ten_text::rgum($string, $substr);
     }
 
     /**
-     * Добавление символа в начало строки, если его там нет
+     * Добавление подстроки в начало строки, если её там нет
      * 
      * @param  string $string Строка
-     * @param  string $char   Символ
+     * @param  string $substr Подстрока
      * @return string
      */
-    public static function lgum($string, $char) {
+    public static function lgum($string, $substr) {
 
-        return (substr($string, 0, strlen($char)) != $char) ? $char . $string : $string;
+        return (substr($string, 0, strlen($substr)) != $substr) ? $substr . $string : $string;
     }
 
     /**
-     * Добавление символа в конец строки, если его там нет
+     * Добавление подстроки в конец строки, если её там нет
      * 
      * @param  string $string Строка
-     * @param  string $char   Символ
+     * @param  string $substr Подстрока
      * @return string
      */
-    public static function rgum($string, $char) {
+    public static function rgum($string, $substr) {
 
-        return (substr($string, -strlen($char)) != $char) ? $string . $char : $string;
+        return (substr($string, -strlen($substr)) != $substr) ? $string . $substr : $string;
     }
 
     /**
@@ -418,12 +418,12 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
     }
 
     /**
-     * Выполнение операции удаления символов
+     * Выполнение операции удаления подстрок
      * 
      * @param  string         $string   Строка
      * @param  string | array $substr   Подстрока или массив подстрок
-     * @param  string         $position Откуда удалять символ
-     * @param  boolean        $all      Флаг удаления всех символов
+     * @param  string         $position Откуда удалять подстроку
+     * @param  boolean        $all      Флаг удаления всех подстрок
      * @return string
      */
     private static function delChar($string, $substr, $position, $all = false) {
