@@ -1,7 +1,7 @@
 <?php
 
-// Version 1.5.8
-// From 09.09.2012
+// Version 1.5.9
+// From 09.02.2013
 
 /*    core
     
