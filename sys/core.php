@@ -465,19 +465,25 @@ class core {
         $blocks = (isset($mod)) ? ROOT . '/mod/' . $mod . '/view/blocks/' : BLOCKS;     // Изменение начального пути, если указан модуль
         $file = $blocks . $block . '/view/' . $view . '.tpl';                           // Полный путь к шаблону
 
-        if(DEV && core::$settings['compressHTML']) {                                    // Если включен режим разработчика и HTML нужно сжимать
+        if(core::$settings['compressHTML']) {                                           // Если HTML нужно сжимать
 
-            ten_file::autogen(                                                          // Сохранение сжатого шаблона
-                core::$compressTplFolder . ten_text::ldel($file, ROOT),
-                core::compressHTML(file_get_contents($file)),
-                false
-            );
+            if(DEV) {                                                                   // Если включен режим разработчика
+                ten_file::autogen(                                                      // Сохранение сжатого шаблона
+                    core::$compressTplFolder . ten_text::ldel($file, ROOT),
+                    core::compressHTML(file_get_contents($file)),
+                    false
+                );
+            }
 
             $blocks = (isset($mod)) ?
                 ROOT . core::$compressTplFolder . '/mod/' . $mod . '/view/blocks/' :
                 ROOT . core::$compressTplFolder . '/view/blocks/';
 
-            $file = $blocks . $block . '/view/' . $view . '.tpl';                       // Полный путь к сжатому шаблону
+            $compressedFile = $blocks . $block . '/view/' . $view . '.tpl';             // Полный путь к сжатому шаблону
+
+            if(file_exists($compressedFile)) {
+                $file = $compressedFile;
+            }
         }
 
         $tpl = new Blitz($file);                                                        // Получение шаблона
