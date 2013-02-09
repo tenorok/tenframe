@@ -433,13 +433,13 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
             switch($position) {
 
                 case 'left':
-                    $sub = substr($string, 0, 1);
-                    $ret = substr($string, 1);
+                    $sub = substr($string, 0, strlen($charCur));
+                    $ret = substr($string,    strlen($charCur));
                     break;
 
                 case 'right':
-                    $sub = substr($string, -1);
-                    $ret = substr($string, 0, -1);
+                    $sub = substr($string,    -strlen($charCur));
+                    $ret = substr($string, 0, -strlen($charCur));
                     break;
             }
 
