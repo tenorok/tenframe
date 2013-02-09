@@ -312,7 +312,7 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
      */
     public static function lgum($string, $char) {
 
-        return (substr($string, 0, 1) != $char) ? $char . $string : $string;
+        return (substr($string, 0, strlen($char)) != $char) ? $char . $string : $string;
     }
 
     /**
@@ -324,7 +324,7 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
      */
     public static function rgum($string, $char) {
 
-        return (substr($string, -1) != $char) ? $string . $char : $string;
+        return (substr($string, -strlen($char)) != $char) ? $string . $char : $string;
     }
 
     /**
