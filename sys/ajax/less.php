@@ -2,7 +2,7 @@
 
 // Сохранение LESSCSS
 
-require $_SERVER['DOCUMENT_ROOT'] . '/sys/require.php';
+require '../define.php';
 
 switch($_POST['event']) {
     

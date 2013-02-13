@@ -1,6 +1,6 @@
 <?php
 
-require $_SERVER['DOCUMENT_ROOT'] . '/sys/require.php';
+require '../../sys/define.php';
 
 switch($_GET['event']) {
 

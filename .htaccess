@@ -5,7 +5,7 @@ RewriteEngine On
 DirectoryIndex sys/index.php
 
 # Защита папок "app/controller", "app/model", "sys" от просмотра
-RewriteRule ^(?:app/controller|app/model|sys/classes|sys/core.php|sys/require.php)\b.* sys/index.php/$0 [L]
+RewriteRule ^(?:app/controller|app/model|sys/classes|sys/core.php|sys/define.php)\b.* sys/index.php/$0 [L]
 
 # Преобразование всех URL в sys/index.php/URL
 RewriteCond %{REQUEST_FILENAME} !-f
