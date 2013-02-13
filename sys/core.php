@@ -275,7 +275,7 @@ class core {
      * Функция обработки маршрутов, отправленных методами GET и POST
      *
      * @param string $type     Тип запроса [GET || POST]
-     * @param string $path     Путь, указанный в роуте
+     * @param string $url      Путь, указанный в роуте
      * @param string $callback Класс->Метод для вызова
      * @param array  $asserts  Массив регулярных выражений для проверки {переменных}
      * @return boolean

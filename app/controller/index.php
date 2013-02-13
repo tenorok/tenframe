@@ -15,9 +15,9 @@ class index {
             'block' => 'html',
 
             'parse' => array(
-                'title' => 'Заголовок',
+                'title' => 'Готов?',
                 'files' => core::includes('libs, developer, require', '__autogen__'),
-                'body'  => 'Контент'
+                'body'  => 'Поехали!'
             )
         ));
     }
