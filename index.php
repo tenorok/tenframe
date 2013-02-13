@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Tenframe - PHP framework: github.com/tenorok/tenframe
+ * @copyright 2012–2013 Artem Kurbatov, tenorok.ru
+ * @license MIT license
+ */
+
 require 'sys/require.php';                                  // Общие подключения
 
 if(core::dev(DEV)) {                                        // Если включен режим разработчика
