@@ -1,6 +1,8 @@
 # Включение механизма преобразования
 RewriteEngine On
 
+DirectoryIndex sys/index.php
+
 # Базовый URL для преобразований в каталоге
 # RewriteBase /
 
@@ -11,12 +13,12 @@ RewriteEngine On
 #</Files>
  
 # Защита папок "app/controller", "app/model", "sys" от просмотра
-RewriteRule ^(?:app/controller|app/model|sys/classes|sys/core.php|sys/require.php)\b.* index.php/$0 [L]
+RewriteRule ^(?:app/controller|app/model|sys/classes|sys/core.php|sys/require.php)\b.* sys/index.php/$0 [L]
 
 # Преобразование всех URL в index.php/URL
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule .* index.php/$0 [PT]
+RewriteRule .* sys/index.php/$0 [PT]
 
 # Включение логирования ошибок при отключении вывода ошибок в php: error_reporting(0);
 # php_value log_errors "on"

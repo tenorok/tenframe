@@ -2,7 +2,7 @@
 
 session_start();
 
-list($root, $query) = explode('index.php', $_SERVER['PHP_SELF']);
+list($root, $query) = explode('sys/index.php', $_SERVER['PHP_SELF']);
 
 define('ROOT', $_SERVER['DOCUMENT_ROOT'] . $root);              // Константа корневого пути
 
@@ -37,7 +37,7 @@ else
 register_shutdown_function(array('core', 'shutdown'));          // Указание метода, который будет вызван по окончании выполнения всего скрипта
 
 if(
-    $_SERVER['PHP_SELF'] != '/index.php'         &&             // Если текущий адрес не index.php
+    $_SERVER['PHP_SELF'] != '/sys/index.php'     &&             // Если текущий адрес не index.php
     preg_match('/\.php$/', $_SERVER['PHP_SELF']) &&             // а какой-то другой php-файл
     file_exists(ROOT .     $_SERVER['PHP_SELF'])                // и он существует
 ) {
