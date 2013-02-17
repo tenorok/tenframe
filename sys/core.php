@@ -628,6 +628,12 @@ class core {
 
     private static $tenhtmlFolder = '/assets/__autogen__tenhtml';                       // Директория для хранения шаблонов, сгенерированных из tenhtml
 
+    private static $spec = array(                                                       // Массив зарезервированных специальных символов
+        'block'   => '%',                                                               // Блок
+        'elemmod' => '.',                                                               // Элемент или модификатор
+        'mix'     => '&'                                                                // Миксованное значение
+    );
+
     /**
      * Генерирования шаблона из tenhtml
      *
@@ -637,12 +643,19 @@ class core {
     private static function savetenhtml($file) {
 
         $tenhtml = preg_replace(                                                        // Заключение ключей в кавычки
-            '/'                               .
-                '('                           .
-                    '[%.&a-z0-9_\-\/]'        .
-                    '[\t\s\n%.&a-z0-9_\-\/]+' .
-                ')'                           .
-                '(?=:\s+[\{|\[|\'|\"])'       .
+            '/'                                  .
+                '('                              .
+                    '['                          .
+                        implode('', core::$spec) .
+                        'a-z0-9_\-\/'            .
+                    ']'                          .
+                    '['                          .
+                        '\t\s\n'                 .
+                        implode('', core::$spec) .
+                        'a-z0-9_\-\/'            .
+                    ']+'                         .
+                ')'                              .
+                '(?=:\s+[\{|\[|\'|\"])'          .
             '/i',
             '"$1"', file_get_contents($file));
 
@@ -662,12 +675,88 @@ class core {
 
     /**
      * Рекурсивный парсинг tenhtml-блоков
-     * @param  string              $block   Ключ блока
+     * @param  string              $key     Ключ селектора
      * @param  string|object|array $content Содержимое блока
      * @return string                       Сгенерированный шаблон
      */
-    private static function parsetenhtml($block, $content) {
+    private static function parsetenhtml($key, $content) {
+
+        $contentType = gettype($content);
+
+        $keyInfo = core::parsetenhtmlKey($key);
+
+        print_r($keyInfo);
+
+        switch($contentType) {
+
+            case 'string':
+
+                break;
+        }
+
         return $gentpl;
+    }
+
+    private static function parsetenhtmlKey($key) {
+
+        $info = preg_split(                                                             // Разбор ключа на массив
+            '/([' . implode('', core::$spec) . '])/',
+            str_replace(' ', '', $key),                                                 // Удаление всех пробелов из ключа
+            -1,
+            PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
+        );
+
+        if(!in_array($info[0], core::$spec)) {                                          // Если первый элемент не является одним из зарезервированных спецсимволов
+            $tag = $info[0];                                                            // то это явно указанное имя тега
+            array_shift($info);
+        }
+        else {                                                                          // Иначе имя тега не указано
+            $tag = 'div';                                                               // и проставляется дефолтный тег
+        }
+
+        $block = false;                                                                 // По умолчанию считается, что блок не указан
+        $elems = array();                                                               // Массив для элементов
+        $mods  = array();                                                               // Массив для модификаторов
+        $mix   = array();                                                               // Массив для миксов
+
+        if(count($info) > 0) {                                                          // Если для узла заданы элементы, модификаторы и миксы
+
+            for($p = 0; $p < count($info); $p++) {                                      // Цикл по массиву селектора
+
+                switch($info[$p]) {                                                     // Если текущий элемент
+
+                    case core::$spec['block']:                                          // имя блока
+                        $p++;
+                        $block = $info[$p];
+                        continue;
+
+                    case core::$spec['elemmod']:                                        // имя элемента или модификатора
+                        $p++;
+
+                        if(substr($info[$p], 0, 2) == '__') {                           // элемент
+                            array_push($elems, $info[$p]);
+                        }
+                        else if($info[$p][0] == '_') {                                  // модификатор
+                            array_push($mods, $info[$p]);
+                        }
+
+                        continue;
+
+                    case core::$spec['mix']:                                            // микс
+                        $p++;
+                        array_push($mix, $info[$p]);
+                        continue;
+                }
+            }
+        }
+
+        return array(                                                                   // возврат информационного массива
+            'tag'   => $tag,
+            'block' => $block,
+            'elems' => $elems,
+            'mods'  => $mods,
+            'mix'   => $mix
+        );
     }
 
     private static $include_dev = array('developer', 'dev');                                        // Массив имён файлов, которые подключаются только при включенном режиме разработчика
