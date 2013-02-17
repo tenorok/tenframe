@@ -714,9 +714,15 @@ class core {
             case 'object':
                 foreach($content as $key => $content) {
 
+                    $attributes = '';
+
                     switch($key) {
 
                         case 'attr':
+                            foreach($content as $attr => $val) {
+                                $attributes .= ' ' . $attr . '="' . $val . '"';
+                            }
+                            $inner = substr_replace($inner, $attributes, strlen($inner) -1, 0);
                             break;
 
                         case 'content':
