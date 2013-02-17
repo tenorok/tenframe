@@ -670,8 +670,13 @@ class core {
             $gentpl .= core::parsetenhtml($key, $content);
         }
         echo $gentpl . "\n";
-        return $gentpl;
+        // return $gentpl;
     }
+
+    private static $singleTags = array(                                                 // Список непарных html-тегов
+        'area', 'base',  'br',   'col',  'hr',
+        'img',  'input', 'link', 'meta', 'param'
+    );
 
     /**
      * Рекурсивный парсинг tenhtml-блоков
@@ -692,22 +697,43 @@ class core {
             error::print_error('Undefined block name');
         }
 
-        $node = core::genTagClass($block, $keyInfo) . '>' . "\n";                       // Формирование тега и атрибута class
+        $class = core::genClass($block, $keyInfo);
+
+        $inner =
+            '<' .
+                $keyInfo['tag'] .
+                ((!empty($class)) ? ' class="' . $class . '"' : '') .
+            '>';
 
         switch(gettype($content)) {
 
             case 'string':
-                $node .= $content;
+                $inner .= $content;
                 break;
 
             case 'object':
                 foreach($content as $key => $content) {
-                    $node .= core::parsetenhtml($key, $content, $block);
+
+                    switch($key) {
+
+                        case 'attr':
+                            break;
+
+                        case 'content':
+                            break;
+
+                        default:
+                            $inner .= core::parsetenhtml($key, $content, $block);
+                    }
                 }
                 break;
         }
 
-        return $node .= '</' . $keyInfo['tag'] . '>';
+        if(!in_array($keyInfo['tag'], core::$singleTags) && !$keyInfo['single']) {
+            $inner .= '</' . $keyInfo['tag'] . '>';
+        }
+
+        return $inner;
 
         // return $gentpl;
     }
@@ -727,8 +753,18 @@ class core {
             PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
         );
 
+        $single = false;                                                                // По умолчанию считается, что тег парный
+
         if(!in_array($info[0], core::$spec)) {                                          // Если первый элемент не является одним из зарезервированных спецсимволов
-            $tag = $info[0];                                                            // то это явно указанное имя тега
+
+            if(substr($info[0], -1) == '/') {                                           // Если указано принудительное закрытие тега
+                $tag = substr($info[0], 0, -1);
+                $single = true;                                                         // Тег является непарным
+            }
+            else {                                                                      // Иначе принудительное закрытие тега не указано
+                $tag = $info[0];                                                        // то это явно указанное имя тега
+            }
+
             array_shift($info);
         }
         else {                                                                          // Иначе имя тега не указано
@@ -765,6 +801,7 @@ class core {
 
         return array(                                                                   // возврат информационного массива
             'tag'     => $tag,
+            'single'  => $single,
             'block'   => $block,
             'elemmod' => $elemmod,
             'mix'     => $mix
@@ -772,13 +809,13 @@ class core {
     }
 
     /**
-     * Генерация тега и его атрибута class
+     * Генерация атрибута class
      *
      * @param  string $block Имя текущего блока
      * @param  array  $info  Массив информации по ключу
      * @return string        Строка с открытым тегом и атрибутом class
      */
-    private static function genTagClass($block, $info) {
+    private static function genClass($block, $info) {
 
         $blockElems = array($block);                                                    // Массив для хранения имени блока и его элементов
         $class      = array();                                                          // Массив атрибута class
@@ -802,7 +839,7 @@ class core {
             array_push($class, $mix);
         }
 
-        return '<' . $info['tag'] . ' class="' . implode(' ', $class) . '"';
+        return implode(' ', $class);
     }
 
     private static $include_dev = array('developer', 'dev');                                        // Массив имён файлов, которые подключаются только при включенном режиме разработчика
