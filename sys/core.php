@@ -635,7 +635,39 @@ class core {
      * @return string       Путь до сгенерированного шаблона
      */
     private static function savetenhtml($file) {
-        return $file;
+
+        $tenhtml = preg_replace(                                                        // Заключение ключей в кавычки
+            '/'                               .
+                '('                           .
+                    '[%.&a-z0-9_\-\/]'        .
+                    '[\t\s\n%.&a-z0-9_\-\/]+' .
+                ')'                           .
+                '(?=:\s+[\{|\[|\'|\"])'       .
+            '/i',
+            '"$1"', file_get_contents($file));
+
+        $tenhtml = json_decode(                                                         // Декодирование в JSON-дерево
+            '{' .                                                                       // Обрамление в фигурные скобики для валидного JSON
+                str_replace(array('\'', "\n"), array('"', ''), $tenhtml) .              // Замена экранированных одинарных кавычек в двойные и удаление переносов строк
+            '}');
+
+        $gentpl = '';
+
+        foreach($tenhtml as $block => $content) {
+            $gentpl .= core::parsetenhtml($block, $content);
+        }
+
+        return $gentpl;
+    }
+
+    /**
+     * Рекурсивный парсинг tenhtml-блоков
+     * @param  string              $block   Ключ блока
+     * @param  string|object|array $content Содержимое блока
+     * @return string                       Сгенерированный шаблон
+     */
+    private static function parsetenhtml($block, $content) {
+        return $gentpl;
     }
 
     private static $include_dev = array('developer', 'dev');                                        // Массив имён файлов, которые подключаются только при включенном режиме разработчика
