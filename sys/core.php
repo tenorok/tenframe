@@ -666,37 +666,58 @@ class core {
 
         $gentpl = '';
 
-        foreach($tenhtml as $block => $content) {
-            $gentpl .= core::parsetenhtml($block, $content);
+        foreach($tenhtml as $key => $content) {                                         // Цикл по корневым элементам шаблона
+            $gentpl .= core::parsetenhtml($key, $content);
         }
-
+        echo $gentpl . "\n";
         return $gentpl;
     }
 
     /**
      * Рекурсивный парсинг tenhtml-блоков
+     *
      * @param  string              $key     Ключ селектора
      * @param  string|object|array $content Содержимое блока
+     * @param  string|boolean      $block   Имя блока, в контексте которого назначаются элементы и модификаторы
      * @return string                       Сгенерированный шаблон
      */
-    private static function parsetenhtml($key, $content) {
+    private static function parsetenhtml($key, $content, $block = false) {
 
-        $contentType = gettype($content);
+        $keyInfo = core::parsetenhtmlKey($key);                                         // Получение массива информации по ключу
 
-        $keyInfo = core::parsetenhtmlKey($key);
+        if($keyInfo['block']) {                                                         // Если в ключе указан блок
+            $block = $keyInfo['block'];                                                 // Текущий блок нужно переназначить
+        }
+        else if(!$block) {                                                              // Иначе если текущий блок не имеется
+            error::print_error('Undefined block name');
+        }
 
-        print_r($keyInfo);
+        $node = core::genTagClass($block, $keyInfo) . '>' . "\n";                       // Формирование тега и атрибута class
 
-        switch($contentType) {
+        switch(gettype($content)) {
 
             case 'string':
+                $node .= $content;
+                break;
 
+            case 'object':
+                foreach($content as $key => $content) {
+                    $node .= core::parsetenhtml($key, $content, $block);
+                }
                 break;
         }
 
-        return $gentpl;
+        return $node .= '</' . $keyInfo['tag'] . '>';
+
+        // return $gentpl;
     }
 
+    /**
+     * Формирование массива с информацией по ключу tenhtml-шаблона
+     *
+     * @param  string $key Ключ tenhtml-шаблона
+     * @return array       Массив информации по ключу
+     */
     private static function parsetenhtmlKey($key) {
 
         $info = preg_split(                                                             // Разбор ключа на массив
@@ -714,10 +735,9 @@ class core {
             $tag = 'div';                                                               // и проставляется дефолтный тег
         }
 
-        $block = false;                                                                 // По умолчанию считается, что блок не указан
-        $elems = array();                                                               // Массив для элементов
-        $mods  = array();                                                               // Массив для модификаторов
-        $mix   = array();                                                               // Массив для миксов
+        $block   = false;                                                               // По умолчанию считается, что блок не указан
+        $elemmod = array();                                                             // Массив для элементов и модификаторов
+        $mix     = array();                                                             // Массив для миксов
 
         if(count($info) > 0) {                                                          // Если для узла заданы элементы, модификаторы и миксы
 
@@ -732,14 +752,7 @@ class core {
 
                     case core::$spec['elemmod']:                                        // имя элемента или модификатора
                         $p++;
-
-                        if(substr($info[$p], 0, 2) == '__') {                           // элемент
-                            array_push($elems, $info[$p]);
-                        }
-                        else if($info[$p][0] == '_') {                                  // модификатор
-                            array_push($mods, $info[$p]);
-                        }
-
+                        array_push($elemmod, $info[$p]);
                         continue;
 
                     case core::$spec['mix']:                                            // микс
@@ -751,12 +764,45 @@ class core {
         }
 
         return array(                                                                   // возврат информационного массива
-            'tag'   => $tag,
-            'block' => $block,
-            'elems' => $elems,
-            'mods'  => $mods,
-            'mix'   => $mix
+            'tag'     => $tag,
+            'block'   => $block,
+            'elemmod' => $elemmod,
+            'mix'     => $mix
         );
+    }
+
+    /**
+     * Генерация тега и его атрибута class
+     *
+     * @param  string $block Имя текущего блока
+     * @param  array  $info  Массив информации по ключу
+     * @return string        Строка с открытым тегом и атрибутом class
+     */
+    private static function genTagClass($block, $info) {
+
+        $blockElems = array($block);                                                    // Массив для хранения имени блока и его элементов
+        $class      = array();                                                          // Массив атрибута class
+
+        if($info['block']) {
+            array_push($class, $info['block']);
+        }
+
+        foreach($info['elemmod'] as $elemmod) {
+
+            if(substr($elemmod, 0, 2) == '__') {                                        // элемент
+                array_push($blockElems, $elemmod);
+                array_push($class, $block . $elemmod);
+            }
+            else if($elemmod[0] == '_') {                                               // модификатор
+                
+            }
+        }
+
+        foreach($info['mix'] as $mix) {
+            array_push($class, $mix);
+        }
+
+        return '<' . $info['tag'] . ' class="' . implode(' ', $class) . '"';
     }
 
     private static $include_dev = array('developer', 'dev');                                        // Массив имён файлов, которые подключаются только при включенном режиме разработчика
