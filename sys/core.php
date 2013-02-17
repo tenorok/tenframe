@@ -446,7 +446,7 @@ class core {
         return $ret;
     }
 
-    private static $compressTplFolder = '/assets/__autogen__templates';
+    private static $compressTplFolder = '/assets/__autogen__comressed';                 // Директория для хранения сжатых шаблонов
 
     /**
      * Функция парсинга блоков
@@ -463,7 +463,20 @@ class core {
             $view = $block;                                                             // его имя соответствует имени блока
 
         $blocks = (isset($mod)) ? ROOT . '/mod/' . $mod . '/view/blocks/' : BLOCKS;     // Изменение начального пути, если указан модуль
-        $file = $blocks . $block . '/view/' . $view . '.tpl';                           // Полный путь к шаблону
+
+        $extensions = array('tenhtml', 'tpl');                                          // Расширения файлов шаблонов в порядке приоритета
+
+        foreach($extensions as $ext) {                                                  // Поиск существующих шаблонов
+
+            $file = $blocks . $block . '/view/' . $view . '.' . $ext;                   // Полный путь к шаблону
+
+            if(file_exists($file)) {
+                if($ext == 'tenhtml') {
+                    $file = core::savetenhtml($file);
+                }
+                break;
+            }
+        }
 
         if(core::$settings['compressHTML']) {                                           // Если HTML нужно сжимать
 
@@ -611,6 +624,18 @@ class core {
         }
         else                                                                     // Иначе контекст нужно просто активировать
             $tpl->iterate($val);                                                 // Активация контекста
+    }
+
+    private static $tenhtmlFolder = '/assets/__autogen__tenhtml';                       // Директория для хранения шаблонов, сгенерированных из tenhtml
+
+    /**
+     * Генерирования шаблона из tenhtml
+     *
+     * @param  string $file Путь до tenhtml-шаблона
+     * @return string       Путь до сгенерированного шаблона
+     */
+    private static function savetenhtml($file) {
+        return $file;
     }
 
     private static $include_dev = array('developer', 'dev');                                        // Массив имён файлов, которые подключаются только при включенном режиме разработчика
