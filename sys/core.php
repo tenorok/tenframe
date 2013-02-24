@@ -708,7 +708,7 @@ class core {
         switch(gettype($content)) {
 
             case 'string':
-                $inner .= $content;
+                $inner .= core::setVar($content);
                 break;
 
             case 'object':
@@ -846,6 +846,17 @@ class core {
         }
 
         return implode(' ', $class);
+    }
+
+    /**
+     * Установка переменных
+     *
+     * @param string $string Строка контента
+     * @return               Изменённая строка
+     */
+    private static function setVar($string) {
+        $string = str_replace(array('\{', '\}'), array('{', '}'), $string);             // Замена экранированных фигурных скобок
+        return preg_replace('/{\s*([a-z0-9_\-]*)\s*}/i', '{{ $$1 }}', $string);         // Замена переменных
     }
 
     private static $include_dev = array('developer', 'dev');                                        // Массив имён файлов, которые подключаются только при включенном режиме разработчика
