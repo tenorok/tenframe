@@ -705,33 +705,38 @@ class core {
                 ((!empty($class)) ? ' class="' . $class . '"' : '') .
             '>';
 
-        switch(gettype($content)) {
+        switch(gettype($content)) {                                                     // Способ разбора зависит от типа данных
 
-            case 'string':
+            case 'string':                                                              // Обычной строке надо только проставить переменные
                 $inner .= core::setVar($content);
                 break;
 
-            case 'object':
+            case 'object':                                                              // По объекту нужно пробежаться
                 foreach($content as $key => $content) {
 
                     $attributes = '';
 
-                    switch($key) {
+                    switch($key) {                                                      // Способ разбора зависит от ключа объекта
 
-                        case 'attr':
+                        case 'attr':                                                    // Объект атрибутов
                             foreach($content as $attr => $val) {
-                                $attributes .= ' ' . $attr . '="' . $val . '"';
+                                $attributes .= ' ' . $attr . '="' . core::setVar($val) . '"';       // Формирование строки атрибутов
                             }
-                            $inner = substr_replace($inner, $attributes, strlen($inner) -1, 0);
+                            $inner = substr_replace($inner, $attributes, strlen($inner) -1, 0);     // Вставка сформированной строки перед закрывающей скобкой
                             break;
 
-                        case 'content':
+                        case 'content':                                                 // Массив контента
+                            $inner .= core::parseArray($content, $block);
                             break;
 
-                        default:
+                        default:                                                        // Произвольный ключ (селектор)
                             $inner .= core::parsetenhtml($key, $content, $block);
                     }
                 }
+                break;
+
+            case 'array':                                                               // Нужно разобрать массив
+                $inner .= core::parseArray($content, $block);
                 break;
         }
 
@@ -857,6 +862,36 @@ class core {
     private static function setVar($string) {
         $string = str_replace(array('\{', '\}'), array('{', '}'), $string);             // Замена экранированных фигурных скобок
         return preg_replace('/{\s*([a-z0-9_\-]*)\s*}/i', '{{ $$1 }}', $string);         // Замена переменных
+    }
+
+    /**
+     * Парсинг  tenhtml-массивов
+     *
+     * @param  array  $array Массив к парсингу
+     * @param  string $block Имя текущего блока
+     * @return string        Результирующая строка
+     */
+    private static function parseArray($array, $block) {
+
+        $string = '';
+
+        foreach($array as $elem) {
+
+            switch(gettype($elem)) {
+
+                case 'string':
+                    $string .= core::setVar($elem);
+                    break;
+
+                case 'object':
+                    foreach($elem as $key => $content) {
+                        $string .= core::parsetenhtml($key, $content, $block);
+                    }
+                    break;
+            }
+        }
+
+        return $string;
     }
 
     private static $include_dev = array('developer', 'dev');                                        // Массив имён файлов, которые подключаются только при включенном режиме разработчика
