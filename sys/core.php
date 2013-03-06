@@ -745,8 +745,7 @@ class core {
         switch(gettype($content)) {                                                     // Способ разбора зависит от типа данных
 
             case 'string':                                                              // Обычной строке надо только проставить переменные
-                $inner .= core::setVar($content);
-                break;
+                return $inner . core::setVar($content);
 
             case 'object':                                                              // По объекту нужно пробежаться
                 foreach($content as $key => $content) {
@@ -770,13 +769,11 @@ class core {
                             $inner .= core::parsetenhtml($key, $content, $block);
                     }
                 }
-                break;
+                return $inner;
 
             case 'array':                                                               // Нужно разобрать массив
-                $inner .= core::parseArray($content, $block);
+                return $inner . core::parseArray($content, $block);
         }
-
-        return $inner;
     }
 
     private static $keywords = array('for');                                            // Массив ключевых слов tenhtml
