@@ -446,7 +446,7 @@ class core {
         return $ret;
     }
 
-    private static $compressTplFolder = '/assets/__autogen__comressed';                 // Директория для хранения сжатых шаблонов
+    private static $compressTplFolder = '/assets/__autogen__compressed';                // Директория для хранения сжатых шаблонов
 
     /**
      * Функция парсинга блоков
@@ -697,13 +697,50 @@ class core {
             error::print_error('Undefined block name');
         }
 
-        $class = core::genClass($block, $keyInfo);
+        switch($keyInfo['keyword']) {
 
-        $inner =
-            '<' .
-                $keyInfo['tag'] .
-                ((!empty($class)) ? ' class="' . $class . '"' : '') .
-            '>';
+            case 'for':
+                $inner = '{{ begin ' . $keyInfo['elemmod'][0] . ' }}';
+                break;
+
+            default:
+                $class = core::genClass($block, $keyInfo);
+
+                $inner =
+                    '<' .
+                        $keyInfo['tag'] .
+                        ((!empty($class)) ? ' class="' . $class . '"' : '') .
+                    '>';
+        }
+
+        $inner = core::parseContent($inner, $content, $block);
+
+        switch($keyInfo['keyword']) {
+
+            case 'for':
+                $inner .= '{{ end }}';
+                break;
+
+            default:
+                if(!in_array($keyInfo['tag'], core::$singleTags) && !$keyInfo['single']) { // Если тег нужно закрыть
+                    $inner .= '</' . $keyInfo['tag'] . '>';
+                }
+        }
+
+        return $inner;
+
+        // return $gentpl;
+    }
+
+    /**
+     * Рекурсивный парсинг контента
+     *
+     * @param  string              $inner   Строка, предваряющая парсингуемый контент
+     * @param  string|object|array $content Содержимое блока
+     * @param  string              $block   Имя контекстного блока
+     * @return string                       Пропарсенный контент
+     */
+    private static function parseContent($inner, $content, $block) {
 
         switch(gettype($content)) {                                                     // Способ разбора зависит от типа данных
 
@@ -737,17 +774,12 @@ class core {
 
             case 'array':                                                               // Нужно разобрать массив
                 $inner .= core::parseArray($content, $block);
-                break;
-        }
-
-        if(!in_array($keyInfo['tag'], core::$singleTags) && !$keyInfo['single']) {
-            $inner .= '</' . $keyInfo['tag'] . '>';
         }
 
         return $inner;
-
-        // return $gentpl;
     }
+
+    private static $keywords = array('for');                                            // Массив ключевых слов tenhtml
 
     /**
      * Формирование массива с информацией по ключу tenhtml-шаблона
@@ -764,7 +796,8 @@ class core {
             PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
         );
 
-        $single = false;                                                                // По умолчанию считается, что тег парный
+        $single  = false;                                                               // По умолчанию считается, что тег парный
+        $keyword = false;                                                               // По умолчанию считается, что ключевого слова нет
 
         if(!in_array($info[0], core::$spec)) {                                          // Если первый элемент не является одним из зарезервированных спецсимволов
 
@@ -780,6 +813,11 @@ class core {
         }
         else {                                                                          // Иначе имя тега не указано
             $tag = 'div';                                                               // и проставляется дефолтный тег
+        }
+
+        if(in_array($tag, core::$keywords)) {                                           // Если полученный тег является ключевым словом
+            $keyword = $tag;                                                            // Нужно его сохранить
+            $tag = false;                                                               // и удалить тег
         }
 
         $block   = false;                                                               // По умолчанию считается, что блок не указан
@@ -811,6 +849,7 @@ class core {
         }
 
         return array(                                                                   // возврат информационного массива
+            'keyword' => $keyword,
             'tag'     => $tag,
             'single'  => $single,
             'block'   => $block,
@@ -860,8 +899,8 @@ class core {
      * @return               Изменённая строка
      */
     private static function setVar($string) {
-        $string = str_replace(array('\{', '\}'), array('{', '}'), $string);             // Замена экранированных фигурных скобок
-        return preg_replace('/{\s*([a-z0-9_\-]*)\s*}/i', '{{ $$1 }}', $string);         // Замена переменных
+        $string = preg_replace('/{\s*([a-z0-9_\-]*)\s*}/i', '{{ $$1 }}', $string);      // Замена переменных
+        return str_replace(array('\{', '\}'), array('{', '}'), $string);                // Замена экранированных фигурных скобок
     }
 
     /**
