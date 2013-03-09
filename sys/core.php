@@ -700,31 +700,31 @@ class core {
         switch($keyInfo['keyword']) {
 
             case 'for':
-                $inner = '{{ begin ' . $keyInfo['elemmod'][0] . ' }}';
+                $inner =
+                    core::parseContent(
+                        '{{ begin ' . $keyInfo['elemmod'][0] . ' }}',
+                        $content,
+                        $block
+                    ) .
+                    '{{ end }}';
                 break;
 
             default:
                 $class = core::genClass($block, $keyInfo);
 
                 $inner =
-                    '<' .
-                        $keyInfo['tag'] .
-                        ((!empty($class)) ? ' class="' . $class . '"' : '') .
-                    '>';
-        }
-
-        $inner = core::parseContent($inner, $content, $block);
-
-        switch($keyInfo['keyword']) {
-
-            case 'for':
-                $inner .= '{{ end }}';
-                break;
-
-            default:
-                if(!in_array($keyInfo['tag'], core::$singleTags) && !$keyInfo['single']) { // Если тег нужно закрыть
-                    $inner .= '</' . $keyInfo['tag'] . '>';
-                }
+                    core::parseContent(
+                        '<' .
+                            $keyInfo['tag'] .
+                            ((!empty($class)) ? ' class="' . $class . '"' : '') .
+                        '>',
+                        $content,
+                        $block
+                    ) . (
+                        (!in_array($keyInfo['tag'], core::$singleTags) && !$keyInfo['single']) ?
+                            '</' . $keyInfo['tag'] . '>' :
+                            ''
+                    );
         }
 
         return $inner;
