@@ -50,11 +50,11 @@
             
             'mod'   => 'modulename',                                   // Имя модуля. Если шаблон находится в модуле
             'block' => 'blockname',                                    // Обязательный. Имя блока
-             'view'  => 'viewname',                                    // Имя шаблона. (По умолчанию: имя блока)
+            'view'  => 'viewname',                                     // Имя шаблона. (По умолчанию: имя блока)
              
-             'parse' => array(                                         // Массив парсинга
-                 'tplvar1' => 'val',                                   // Имя_переменной_в_шаблоне => значение
-                 'tplvar2' => core::block(array(...))                  // В качестве значения может быть другой блок. Вложенность не ограничена
+            'parse' => array(                                          // Массив парсинга
+                'tplvar1' => 'val',                                    // Имя_переменной_в_шаблоне => значение
+                'tplvar2' => core::block(array(...))                   // В качестве значения может быть другой блок. Вложенность не ограничена
             ),
 
             'context' => array(                                        // Массив контекстов begin-end
@@ -90,6 +90,61 @@
                 'context5' => array(...)                               // Количество контекстов не ограничено
             )
         ));
+
+    Синтаксис tenhtml-шаблонов:
+        Типовые имена файлов: <view_name>.tenhtml
+
+        Специальные символы:
+            "%" - блок
+            "." - элемент или модификатор
+            "&" - микс
+
+        В tenhtml JSON-подобный синтаксис:
+            %page: {                                                // <div class="page">
+
+                .__header: 'Content in header.',                        // <div class="page__header">Content in header.</div>
+
+                section.__body: {                                       // <section class="page__body">
+                    h1: 'Title of page',                                //     <h1>Title of page</h1>
+                    ul%menu._side_left: {                               //     <ul class="menu menu_side_left">
+                        for.items: {                                    //         {{ begin items}}
+                            li                                          //         <li class="menu__item menu__item_selected">{{ $name }}</li>
+                                .__item
+                                ._selected: '{name}'
+                        }                                               //         {{ end }}
+                    }                                                   //     </ul>
+                },                                                      // </section>
+
+                .__footer: [                                            // <div class="page__footer">
+                    'First paragraph.',                                 //     First paragraph.
+                    {
+                        a.__contact: {                                  //     <a href="/" class="page__contact">Link text.</a>
+                            attr: {
+                                href: "/"
+                            },
+                            content: 'Link text.'
+                        },
+                        img: {                                          //     <img src="image.png" alt="{logo}">
+                            attr: {
+                                src: 'image.png',
+                                alt: '\\{logo\\}'
+                            }
+                        },
+                        mytag/                                          //     <mytag class="
+                            .__logo                                     //                   page__logo
+                            ._size_xl                                   //                   page__logo_size_xl
+                            ._color_red                                 //                   page__logo_color_red
+                            .__link                                     //                   page__link
+                            ._align_right                               //                   page__logo_align_right page__link_align_right
+                            &mytag__class: {                            //                   mytag__class"
+                            attr: {                                     //            data-num="100">
+                                data-num: 100
+                            }
+                        }
+                    },
+                    'Second paragraph.'                                 //     Second paragraph.
+                ]                                                       // </div>
+            }                                                       // </div>
 
     Подключение include-файлов:
         echo core::includes(
@@ -485,7 +540,7 @@ class core {
             }
         }
 
-        if(core::$settings['compressHTML'] && $ext != 'tenhtml') {                                           // Если HTML нужно сжимать
+        if(core::$settings['compressHTML'] && $ext != 'tenhtml') {                      // Если HTML нужно сжимать
 
             if(DEV) {                                                                   // Если включен режим разработчика
                 ten_file::autogen(                                                      // Сохранение сжатого шаблона
@@ -708,9 +763,9 @@ class core {
             error::print_error('Undefined block name');
         }
 
-        switch($keyInfo['keyword']) {
+        switch($keyInfo['keyword']) {                                                   // Селектор может являться ключевым словом
 
-            case 'for':
+            case 'for':                                                                 // Ключевое слово for
                 $inner =
                     core::parseContent(
                         '{{ begin ' . $keyInfo['elemmod'][0] . ' }}',
@@ -720,7 +775,7 @@ class core {
                     '{{ end }}';
                 break;
 
-            default:
+            default:                                                                    // Обычный селектор без ключевого слова
                 $class = core::genClass($block, $keyInfo);
 
                 $inner =
@@ -731,7 +786,7 @@ class core {
                         '>',
                         $content,
                         $block
-                    ) . (
+                    ) . (                                                               // Если тег требуется закрыть
                         (!in_array($keyInfo['tag'], core::$singleTags) && !$keyInfo['single']) ?
                             '</' . $keyInfo['tag'] . '>' :
                             ''
