@@ -470,15 +470,22 @@ class core {
 
             $file = $blocks . $block . '/view/' . $view . '.' . $ext;                   // Полный путь к шаблону
 
-            if(file_exists($file)) {
-                if($ext == 'tenhtml') {
-                    $file = core::savetenhtml($file);
+            if($ext == 'tenhtml' && core::$settings['tenhtml']) {                       // Если рассматриваемое расширение tenhtml и включена его настройка
+
+                if(DEV && file_exists($file)) {                                         // Если включен режим разработчика и шаблон существует
+                    $file = core::savetenhtml($file);                                   // то его нужно преобразовать в простой шаблон
                 }
-                break;
+                else {                                                                  // Иначе нужно просто взять уже сгенерированный простой шаблон
+                    $file = ROOT . core::$compressTplFolder . ten_text::ldel($file, ROOT);
+                }
+
+                if(file_exists($file)) {                                                // Если этот уже сгенерированный простой шаблон существует
+                    break;                                                              // то рассматривать менее приоритетные расширения не нужно
+                }
             }
         }
 
-        if(core::$settings['compressHTML']) {                                           // Если HTML нужно сжимать
+        if(core::$settings['compressHTML'] && $ext != 'tenhtml') {                                           // Если HTML нужно сжимать
 
             if(DEV) {                                                                   // Если включен режим разработчика
                 ten_file::autogen(                                                      // Сохранение сжатого шаблона
@@ -669,8 +676,12 @@ class core {
         foreach($tenhtml as $key => $content) {                                         // Цикл по корневым элементам шаблона
             $gentpl .= core::parsetenhtml($key, $content);
         }
-        echo $gentpl . "\n";
-        // return $gentpl;
+
+        return ten_file::autogen(
+            core::$tenhtmlFolder . ten_text::ldel($file, ROOT),
+            $gentpl,
+            ''
+        );
     }
 
     private static $singleTags = array(                                                 // Список непарных html-тегов
@@ -728,8 +739,6 @@ class core {
         }
 
         return $inner;
-
-        // return $gentpl;
     }
 
     /**
