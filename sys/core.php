@@ -867,18 +867,25 @@ class core {
         $blockElems = array($block);                                                    // Массив для хранения имени блока и его элементов
         $class      = array();                                                          // Массив атрибута class
 
-        if($info['block']) {
-            array_push($class, $info['block']);
+        if($info['block']) {                                                            // Если текущий узел является блоком
+            array_push($class, $info['block']);                                         // то нужно добавить его в атрибут class
         }
 
-        foreach($info['elemmod'] as $elemmod) {
+        foreach($info['elemmod'] as $elemmod) {                                         // Цикл по элементам и модификаторам
 
-            if(substr($elemmod, 0, 2) == '__') {                                        // элемент
+            if(substr($elemmod, 0, 2) == '__') {                                        // Элемент
                 array_push($blockElems, $elemmod);
                 array_push($class, $block . $elemmod);
             }
-            else if($elemmod[0] == '_') {                                               // модификатор
+            else if($elemmod[0] == '_') {                                               // Модификатор
                 
+                if($info['block']) {                                                    // Если текущий узел является блоком
+                    array_push($class, $info['block'] . $elemmod);                      // то к нему надо применить модификатор
+                }
+
+                for($elem = 1; $elem < count($blockElems); $elem++) {                   // Цикл по элементам начинается со второго итема, потому что первым идёт имя текущего блока
+                    array_push($class, $block . $blockElems[$elem] . $elemmod);         // Применение модификатора к элементу блока
+                }
             }
         }
 
