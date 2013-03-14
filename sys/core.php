@@ -704,17 +704,19 @@ class core {
      */
     private static function savetenhtml($file) {
 
+        $symbols = 'a-z0-9_\-\/<>';                                                     // Обычные символы, из которых состоят ключи
+
         $tenhtml = preg_replace(                                                        // Заключение ключей в кавычки
             '/'                                  .
                 '('                              .
                     '['                          .
                         implode('', core::$spec) .
-                        'a-z0-9_\-\/'            .
+                        $symbols                 .
                     ']'                          .
                     '['                          .
                         '\t\s\n'                 .
                         implode('', core::$spec) .
-                        'a-z0-9_\-\/'            .
+                        $symbols                 .
                     ']+'                         .
                 ')'                              .
                 '(?=:\s+[\{|\[|\'|\"])'          .
@@ -753,12 +755,18 @@ class core {
      *
      * @param  string              $key     Ключ селектора
      * @param  string|object|array $content Содержимое блока
-     * @param  string|boolean      $block   Имя блока, в контексте которого назначаются элементы и модификаторы
+     * @param  string|false        $block   Имя блока, в контексте которого назначаются элементы и модификаторы
      * @return string                       Сгенерированный шаблон
      */
     private static function parsetenhtml($key, $content, $block = false) {
 
         $keyInfo = core::parsetenhtmlKey($key);                                         // Получение массива информации по ключу
+
+        $keywordResult = core::parseKeyword($keyInfo, $content, $block);                // Парсинг ключевого слова
+
+        if($keywordResult) {                                                            // Если ключевое слово было найдено
+            return $keywordResult;                                                      // то нужно просто вернуть его результат
+        }                                                                               // Иначе получен обычный селектор
 
         if($keyInfo['block']) {                                                         // Если в ключе указан блок
             $block = $keyInfo['block'];                                                 // Текущий блок нужно переназначить
@@ -767,37 +775,20 @@ class core {
             error::print_error('Undefined block name');
         }
 
-        switch($keyInfo['keyword']) {                                                   // Селектор может являться ключевым словом
+        $class = core::genClass($block, $keyInfo);                                      // Генерация атрибута class
 
-            case 'for':                                                                 // Ключевое слово for
-                $inner =
-                    core::parseContent(
-                        '{{ begin ' . $keyInfo['elemmod'][0] . ' }}',
-                        $content,
-                        $block
-                    ) .
-                    '{{ end }}';
-                break;
-
-            default:                                                                    // Обычный селектор без ключевого слова
-                $class = core::genClass($block, $keyInfo);
-
-                $inner =
-                    core::parseContent(
-                        '<' .
-                            $keyInfo['tag'] .
-                            ((!empty($class)) ? ' class="' . $class . '"' : '') .
-                        '>',
-                        $content,
-                        $block
-                    ) . (                                                               // Если тег требуется закрыть
-                        (!in_array($keyInfo['tag'], core::$singleTags) && !$keyInfo['single']) ?
-                            '</' . $keyInfo['tag'] . '>' :
-                            ''
-                    );
-        }
-
-        return $inner;
+        return core::parseContent(
+            '<' .
+                $keyInfo['tag'] .
+                ((!empty($class)) ? ' class="' . $class . '"' : '') .
+            '>',
+            $content,
+            $block
+        ) . (                                                               // Если тег требуется закрыть
+            (!in_array($keyInfo['tag'], core::$singleTags) && !$keyInfo['single']) ?
+                '</' . $keyInfo['tag'] . '>' :
+                ''
+        );
     }
 
     /**
@@ -844,7 +835,13 @@ class core {
         }
     }
 
-    private static $keywords = array('for');                                            // Массив ключевых слов tenhtml
+    private static $keywords = array(                                                   // Массив ключевых слов tenhtml
+        'for',
+        'doctype', 'html', 'head',
+        'title', 'lang', 'charset', 'favicon',
+        'ie', 'ie<8', 'ie<9',
+        'body'
+    );
 
     /**
      * Формирование массива с информацией по ключу tenhtml-шаблона
@@ -924,6 +921,37 @@ class core {
     }
 
     /**
+     * Парсинг ключевых слов
+     *
+     * @param  array               $keyInfo Массив информации по ключу
+     * @param  string|object|array $content Содержимое блока
+     * @param  string|false        $block   Имя блока, в контексте которого назначаются элементы и модификаторы
+     * @return string|false                 Результат обработки ключевого слова
+     */
+    private static function parseKeyword($keyInfo, $content, $block) {
+
+        $keyword = $keyInfo['keyword'];
+
+        if(empty($keyword)) {
+            return false;
+        }
+
+        switch($keyword) {
+
+            case 'for':                                                                 // Ключевое слово for
+                return core::parseContent(
+                    '{{ begin ' . $keyInfo['elemmod'][0] . ' }}',
+                    $content,
+                    $block
+                ) .
+                '{{ end }}';
+
+            case 'doctype':
+                break;
+        }
+    }
+
+    /**
      * Генерация атрибута class
      *
      * @param  string $block Имя текущего блока
@@ -976,7 +1004,7 @@ class core {
     }
 
     /**
-     * Парсинг  tenhtml-массивов
+     * Парсинг tenhtml-массивов
      *
      * @param  array  $array Массив к парсингу
      * @param  string $block Имя текущего блока
