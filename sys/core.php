@@ -726,6 +726,10 @@ class core {
                 str_replace(array('\'', "\n"), array('"', ''), $tenhtml) .              // Замена экранированных одинарных кавычек в двойные и удаление переносов строк
             '}');
 
+        if(!$tenhtml) {                                                                 // Если не удалось получить JSON-дерево
+            error::print_error('invalid tenhtml in ' . $file);
+        }
+
         $gentpl = '';
 
         foreach($tenhtml as $key => $content) {                                         // Цикл по корневым элементам шаблона
