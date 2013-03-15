@@ -775,20 +775,7 @@ class core {
             error::print_error('Undefined block name');
         }
 
-        $class = core::genClass($block, $keyInfo);                                      // Генерация атрибута class
-
-        return core::parseContent(
-            '<' .
-                $keyInfo['tag'] .
-                ((!empty($class)) ? ' class="' . $class . '"' : '') .
-            '>',
-            $content,
-            $block
-        ) . (                                                               // Если тег требуется закрыть
-            (!in_array($keyInfo['tag'], core::$singleTags) && !$keyInfo['single']) ?
-                '</' . $keyInfo['tag'] . '>' :
-                ''
-        );
+        return core::makeTag($keyInfo, $content, $block);                               // Формирование тега
     }
 
     /**
@@ -833,6 +820,32 @@ class core {
             case 'array':                                                               // Нужно разобрать массив
                 return $inner . core::parseArray($content, $block);
         }
+    }
+
+    /**
+     * Формирование тега
+     *
+     * @param  array               $keyInfo Массив информации по ключу
+     * @param  string|object|array $content Содержимое блока
+     * @param  string|false        $block   Имя блока, в контексте которого назначаются элементы и модификаторы
+     * @return string                       Сформированный тег и его содержимое
+     */
+    private static function makeTag($keyInfo, $content, $block) {
+
+        $class = core::genClass($block, $keyInfo);                                      // Генерация атрибута class
+
+        return core::parseContent(                                                      // Рекурсивный парсинг контента
+            '<' .
+                $keyInfo['tag'] .
+                ((!empty($class)) ? ' class="' . $class . '"' : '') .
+            '>',
+            (($content) ? $content : ''),                                               // Если контент есть
+            $block
+        ) . (                                                                           // Если тег требуется закрыть
+            (!in_array($keyInfo['tag'], core::$singleTags) && !$keyInfo['single']) ?
+                '</' . $keyInfo['tag'] . '>' :
+                ''
+        );
     }
 
     private static $keywords = array(                                                   // Массив ключевых слов tenhtml
@@ -930,13 +943,11 @@ class core {
      */
     private static function parseKeyword($keyInfo, $content, $block) {
 
-        $keyword = $keyInfo['keyword'];
-
-        if(empty($keyword)) {
-            return false;
+        if(empty($keyInfo['keyword'])) {                                                // Если ключевого слова нет
+            return false;                                                               // то функция об этом сообщает
         }
 
-        switch($keyword) {
+        switch($keyInfo['keyword']) {
 
             case 'for':                                                                 // Ключевое слово for
                 return core::parseContent(
@@ -947,7 +958,16 @@ class core {
                 '{{ end }}';
 
             case 'doctype':
-                break;
+                $keyInfo['single'] = true;
+                $keyInfo['tag']    = '!doctype ' . $content;
+                return core::makeTag($keyInfo, false, $block);
+
+            case 'html':
+            case 'head':
+            case 'title':
+            case 'body':
+                $keyInfo['tag'] = $keyInfo['keyword'];
+                return core::makeTag($keyInfo, $content, $block);
         }
     }
 
