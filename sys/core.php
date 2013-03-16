@@ -704,6 +704,11 @@ class core {
      */
     private static function savetenhtml($file) {
 
+        $tenhtml = preg_replace(                                                        // Удаление комментариев
+            '/(\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)|(\/\/.*)/',
+            '', file_get_contents($file)
+        );
+
         $symbols = 'a-z0-9_\-\/<>';                                                     // Обычные символы, из которых состоят ключи
 
         $tenhtml = preg_replace(                                                        // Заключение ключей в кавычки
@@ -721,7 +726,7 @@ class core {
                 ')'                              .
                 '(?=:\s+[\{|\[|\'|\"])'          .
             '/i',
-            '"$1"', file_get_contents($file));
+            '"$1"', $tenhtml);
 
         $tenhtml = json_decode(                                                         // Декодирование в JSON-дерево
             '{' .                                                                       // Обрамление в фигурные скобики для валидного JSON
