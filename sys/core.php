@@ -783,10 +783,10 @@ class core {
      *
      * @param  string              $inner   Строка, предваряющая парсингуемый контент
      * @param  string|object|array $content Содержимое блока
-     * @param  string              $block   Имя контекстного блока
+     * @param  string|false        $block   Имя контекстного блока
      * @return string                       Пропарсенный контент
      */
-    private static function parseContent($inner, $content, $block) {
+    private static function parseContent($inner, $content, $block = false) {
 
         switch(gettype($content)) {                                                     // Способ разбора зависит от типа данных
 
@@ -830,7 +830,7 @@ class core {
      * @param  string|false        $block   Имя блока, в контексте которого назначаются элементы и модификаторы
      * @return string                       Сформированный тег и его содержимое
      */
-    private static function makeTag($keyInfo, $content, $block) {
+    private static function makeTag($keyInfo, $content, $block = false) {
 
         $class = core::genClass($block, $keyInfo);                                      // Генерация атрибута class
 
@@ -852,6 +852,7 @@ class core {
         'for',
         'doctype', 'html', 'head',
         'title', 'lang', 'charset', 'favicon',
+        'css', 'js',
         'ie', 'ie<8', 'ie<9',
         'body'
     );
@@ -952,22 +953,89 @@ class core {
             case 'for':                                                                 // Ключевое слово for
                 return core::parseContent(
                     '{{ begin ' . $keyInfo['elemmod'][0] . ' }}',
-                    $content,
-                    $block
+                    $content
                 ) .
                 '{{ end }}';
 
             case 'doctype':
                 $keyInfo['single'] = true;
                 $keyInfo['tag']    = '!doctype ' . $content;
-                return core::makeTag($keyInfo, false, $block);
+                return core::makeTag($keyInfo, false);
+
+            case 'lang':
+                $keyInfo['single'] = true;
+                $keyInfo['tag']    = 'meta';
+                return core::makeTag($keyInfo, (object)array(
+                    'attr' => (object)array(
+                        'http-equiv' => 'Content-Language',
+                        'content'    => $content
+                    )
+                ));
+
+            case 'charset':
+                $keyInfo['single'] = true;
+                $keyInfo['tag']    = 'meta';
+                return core::makeTag($keyInfo, (object)array(
+                    'attr' => (object)array(
+                        'http-equiv' => 'Content-Type',
+                        'content'    => 'text/html; charset=' . $content
+                    )
+                ));
+
+            case 'favicon':
+                $keyInfo['single'] = true;
+                $keyInfo['tag']    = 'link';
+                return core::makeTag($keyInfo, (object)array(
+                    'attr' => (object)array(
+                        'type' => 'ico',
+                        'rel'  => 'shortcut icon',
+                        'href' => $content
+                    )
+                ));
+
+            case 'css':
+                $keyInfo['single'] = true;
+                $keyInfo['tag']    = 'link';
+                return core::makeTag($keyInfo, (object)array(
+                    'attr' => (object)array(
+                        'type' => 'text/css',
+                        'rel'  => 'stylesheet',
+                        'href' => $content
+                    )
+                ));
+
+            case 'js':
+                $keyInfo['tag'] = 'script';
+                return core::makeTag($keyInfo, (object)array(
+                    'attr' => (object)array(
+                        'src' => $content
+                    )
+                ));
+
+            case 'ie':
+                return core::parseContent(
+                    '<!--[if IE]>',
+                    $content
+                ) . '<![endif]-->';
+
+            case 'ie<8':
+                return core::parseContent(
+                    '<!--[if lt IE 8]>',
+                    $content
+                ) . '<![endif]-->';
+
+            case 'ie<9':
+                return core::parseContent(
+                    '<!--[if lt IE 9]>',
+                    $content
+                ) . '<![endif]-->';
 
             case 'html':
             case 'head':
             case 'title':
             case 'body':
                 $keyInfo['tag'] = $keyInfo['keyword'];
-                return core::makeTag($keyInfo, $content, $block);
+                return core::makeTag($keyInfo, $content);
         }
     }
 
