@@ -833,7 +833,7 @@ class core {
                             break;
 
                         case 'content':                                                 // Массив контента
-                            $inner .= core::parseArray($content, $block);
+                            $inner = core::parseContent($inner, $content, $block);
                             break;
 
                         default:                                                        // Произвольный ключ (селектор)
