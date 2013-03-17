@@ -99,6 +99,10 @@
             "." - элемент или модификатор
             "&" - микс
 
+        Можно использовать привычные комментарии:
+            "//" - однострочные
+            "/*" - и многострочные
+
         В tenhtml JSON-подобный синтаксис:
             %page: {                                                // <div class="page">
 
@@ -145,6 +149,22 @@
                     'Second paragraph.'                                 //     Second paragraph.
                 ]                                                       // </div>
             }                                                       // </div>
+
+        Ключевые слова:
+            1)  for.items                                           // описан в примере синтаксиса
+            2)  doctype: 'html'                                     // <!doctype html>
+            3)  html: { ... }                                       // <html> ... </html>
+            4)  head: { ... }                                       // <head> ... </head>
+            5)  title: 'text'                                       // <title>text</title>
+            6)  lang: 'ru'                                          // <meta http-equiv="Content-Language" content="ru">
+            7)  charset: 'utf-8'                                    // <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+            8)  favicon: '/assets/images/favicon.ico'               // <link type="ico" rel="shortcut icon" href="/assets/images/favicon.ico">
+            9)  css: '/assets/css/style.css'                        // <link type="text/css" rel="stylesheet" href="/assets/css/style.css">
+            10) js: '/assets/js/html5.js'                           // <script src="/assets/js/html5.js"></script>
+            11) ie: { ... }                                         // <!--[if IE]> ... <![endif]-->
+            12) ie<8: { ... }                                       // <!--[if lt IE 8]> ... <![endif]-->
+            13) ie<9: { ... }                                       // <!--[if lt IE 9]> ... <![endif]-->
+            14) body: { ... }                                       // <body> ... </body>
 
     Подключение include-файлов:
         echo core::includes(
