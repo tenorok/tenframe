@@ -141,8 +141,9 @@
                             .__link                                     //                   page__link
                             ._align_right                               //                   page__logo_align_right page__link_align_right
                             &mytag__class: {                            //                   mytag__class"
-                            attr: {                                     //            data-num="100">
-                                data-num: 100
+                            attr: {                                     //            data-num="100" selected>
+                                data-num: 100,
+                                selected: true
                             }
                         }
                     },
@@ -744,7 +745,11 @@ class core {
                         $symbols                 .
                     ']+'                         .
                 ')'                              .
-                '(?=:\s+[\{|\[|\'|\"])'          .
+                '(?=:\s+['                       .                                      // Перед значением ключа могут стоять пробелы
+                    '\{|\[|\'|\"|'               .                                      // Ключ может начинаться со скобок или кавычек
+                    '\d+|'                       .                                      // Ключ может быть числом
+                    'true|false'                 .                                      // Ключ может быть булевым значением
+                '])'                             .
             '/i',
             '"$1"', $tenhtml);
 
@@ -827,6 +832,10 @@ class core {
 
                         case 'attr':                                                    // Объект атрибутов
                             foreach($content as $attr => $val) {
+                                if(gettype($val) == 'boolean' && $val) {                // Если атрибут = true
+                                    $attributes .= ' ' . $attr;                         // то это одиночный атрибут
+                                    continue;
+                                }
                                 $attributes .= ' ' . $attr . '="' . core::setVar($val) . '"';       // Формирование строки атрибутов
                             }
                             $inner = substr_replace($inner, $attributes, strlen($inner) -1, 0);     // Вставка сформированной строки перед закрывающей скобкой
