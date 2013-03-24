@@ -1,4 +1,4 @@
-.mod-admin-logon {
+.mod-admin-logon__form {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -32,7 +32,7 @@
         .mod-admin-logon__send {
             float: right;
         }
-            .mod-admin-logon__input_send {
+            .mod-admin-logon__input-send {
                 padding: 2px 4px;
             }
         .mod-admin-logon__error {
