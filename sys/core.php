@@ -152,20 +152,22 @@
             }                                                       // </div>
 
         Ключевые слова:
-            1)  for.items                                           // описан в примере синтаксиса
-            2)  doctype: 'html'                                     // <!doctype html>
-            3)  html: { ... }                                       // <html> ... </html>
-            4)  head: { ... }                                       // <head> ... </head>
-            5)  title: 'text'                                       // <title>text</title>
-            6)  lang: 'ru'                                          // <meta http-equiv="Content-Language" content="ru">
-            7)  charset: 'utf-8'                                    // <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-            8)  favicon: '/assets/images/favicon.ico'               // <link type="ico" rel="shortcut icon" href="/assets/images/favicon.ico">
-            9)  css: '/assets/css/style.css'                        // <link type="text/css" rel="stylesheet" href="/assets/css/style.css">
-            10) js: '/assets/js/html5.js'                           // <script src="/assets/js/html5.js"></script>
-            11) ie: { ... }                                         // <!--[if IE]> ... <![endif]-->
-            12) ie<8: { ... }                                       // <!--[if lt IE 8]> ... <![endif]-->
-            13) ie<9: { ... }                                       // <!--[if lt IE 9]> ... <![endif]-->
-            14) body: { ... }                                       // <body> ... </body>
+            1)  for.$$$                                             // контекст шаблонизатора, где $$$ - имя контекста
+            2)  attr: {}                                            // объект атрибутов тега
+            3)  content: '' | [] | {}                               // свойство для хранения содержимого тега
+            4)  doctype: 'html'                                     // <!doctype html>
+            5)  html: { ... }                                       // <html> ... </html>
+            6)  head: { ... }                                       // <head> ... </head>
+            7)  title: 'text'                                       // <title>text</title>
+            8)  lang: 'ru'                                          // <meta http-equiv="Content-Language" content="ru">
+            9)  charset: 'utf-8'                                    // <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+            10) favicon: '/assets/images/favicon.ico'               // <link type="ico" rel="shortcut icon" href="/assets/images/favicon.ico">
+            11) css: '/assets/css/style.css'                        // <link type="text/css" rel="stylesheet" href="/assets/css/style.css">
+            12) js: '/assets/js/html5.js'                           // <script src="/assets/js/html5.js"></script>
+            13) ie: { ... }                                         // <!--[if IE]> ... <![endif]-->
+            14) ie<8: { ... }                                       // <!--[if lt IE 8]> ... <![endif]-->
+            15) ie<9: { ... }                                       // <!--[if lt IE 9]> ... <![endif]-->
+            16) body: { ... }                                       // <body> ... </body>
 
     Подключение include-файлов:
         echo core::includes(
@@ -717,6 +719,17 @@ class core {
         'mix'     => '&'                                                                // Миксованное значение
     );
 
+    private static $keywords = array(                                                   // Массив ключевых слов tenhtml
+        'for', 'attr', 'content',
+        'doctype', 'html', 'head',
+        'title', 'lang', 'charset', 'favicon',
+        'css', 'js',
+        'ie', 'ie<8', 'ie<9',
+        'body'
+    );
+
+    private static $iterateSeparator = '___';                                           // Разделитель ключа и его порядкового номера
+
     /**
      * Генерирования шаблона из tenhtml
      *
@@ -732,7 +745,10 @@ class core {
 
         $symbols = 'a-z0-9_\-\/<>';                                                     // Обычные символы, из которых состоят ключи
 
-        $tenhtml = preg_replace(                                                        // Заключение ключей в кавычки
+        $keywords         = core::$keywords;
+        $iterateSeparator = core::$iterateSeparator;
+
+        $tenhtml = preg_replace_callback(                                               // Заключение ключей в кавычки
             '/'                                  .
                 '('                              .
                     '['                          .
@@ -751,7 +767,12 @@ class core {
                     'true|false'                 .                                      // Ключ может быть булевым значением
                 '])'                             .
             '/i',
-            '"$1"', $tenhtml);
+            function($match) use ($keywords, $iterateSeparator) {                       // Обеспечение возможности использования одинаковых ключей объекта
+                static $i = 0;
+                return (!in_array($match[1], $keywords))?
+                    '"' . $match[1] . $iterateSeparator . ($i++) . '"':                 // Каждый найденный ключ дополняется уникальным порядковым номером
+                    '"' . $match[1] . '"';
+            }, $tenhtml);
 
         $tenhtml = json_decode(                                                         // Декодирование в JSON-дерево
             '{' .                                                                       // Обрамление в фигурные скобики для валидного JSON
@@ -832,13 +853,15 @@ class core {
 
                         case 'attr':                                                    // Объект атрибутов
                             foreach($content as $attr => $val) {
+                                $clearAttr = explode(core::$iterateSeparator, $attr);   // Получение чистого ключа атрибута без порядкового номера
+
                                 if(gettype($val) == 'boolean' && $val) {                // Если атрибут = true
-                                    $attributes .= ' ' . $attr;                         // то это одиночный атрибут
+                                    $attributes .= ' ' . $clearAttr[0];                 // то это одиночный атрибут
                                     continue;
                                 }
-                                $attributes .= ' ' . $attr . '="' . core::setVar($val) . '"';       // Формирование строки атрибутов
+                                $attributes .= ' ' . $clearAttr[0] . '="' . core::setVar($val) . '"'; // Формирование строки атрибутов
                             }
-                            $inner = substr_replace($inner, $attributes, strlen($inner) -1, 0);     // Вставка сформированной строки перед закрывающей скобкой
+                            $inner = substr_replace($inner, $attributes, strlen($inner) -1, 0);       // Вставка сформированной строки перед закрывающей скобкой
                             break;
 
                         case 'content':                                                 // Массив контента
@@ -882,15 +905,6 @@ class core {
         );
     }
 
-    private static $keywords = array(                                                   // Массив ключевых слов tenhtml
-        'for',
-        'doctype', 'html', 'head',
-        'title', 'lang', 'charset', 'favicon',
-        'css', 'js',
-        'ie', 'ie<8', 'ie<9',
-        'body'
-    );
-
     /**
      * Формирование массива с информацией по ключу tenhtml-шаблона
      *
@@ -899,9 +913,11 @@ class core {
      */
     private static function parsetenhtmlKey($key) {
 
+        $clearKey = explode(core::$iterateSeparator, $key);                             // Получение чистого ключа объекта без порядкового номера
+
         $info = preg_split(                                                             // Разбор ключа на массив
             '/([' . implode('', core::$spec) . '])/',
-            str_replace(' ', '', $key),                                                 // Удаление всех пробелов из ключа
+            str_replace(' ', '', $clearKey[0]),                                         // Удаление всех пробелов из ключа
             -1,
             PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
         );
