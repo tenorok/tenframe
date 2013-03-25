@@ -1,0 +1,29 @@
+%mod-admin-header: {
+    a.__tosite: {
+        attr: {
+            href: '/'
+        },
+        content: [
+            '&larr;',
+            {
+                span.__tosite-text: 'Перейти на сайт'
+            }
+        ]
+    },
+    form.__formout: {
+        attr: {
+            method: 'post',
+            action: '{action}'
+        },
+        content: {
+            .__login: '{login}',
+            input.__logout: {
+                attr: {
+                    type: 'submit',
+                    name: 'logout',
+                    value: 'выйти'
+                }
+            }
+        }
+    }
+}

@@ -5,20 +5,20 @@
 
     .clearfix;
 }
-    .mod-admin-header-tosite {
+    .mod-admin-header__tosite {
         float: left;
         color: #555;
         text-decoration: none;
     }
-        .mod-admin-header-tosite__text {
+        .mod-admin-header__tosite-text {
             text-decoration: underline;
         }
-    .mod-admin-header-formout {
+    .mod-admin-header__formout {
         float: right;
     }
-        .mod-admin-header-login {
+        .mod-admin-header__login {
             text-align: right;
         }
-        .mod-admin-header-logout {
+        .mod-admin-header__logout {
             padding: 2px 4px;
         }
