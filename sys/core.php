@@ -769,9 +769,7 @@ class core {
             '/i',
             function($match) use ($keywords, $iterateSeparator) {                       // Обеспечение возможности использования одинаковых ключей объекта
                 static $i = 0;
-                return (!in_array($match[1], $keywords))?
-                    '"' . $match[1] . $iterateSeparator . ($i++) . '"':                 // Каждый найденный ключ дополняется уникальным порядковым номером
-                    '"' . $match[1] . '"';
+                return '"' . $match[1] . $iterateSeparator . ($i++) . '"';              // Каждый найденный ключ дополняется уникальным порядковым номером
             }, $tenhtml);
 
         $tenhtml = json_decode(                                                         // Декодирование в JSON-дерево
@@ -849,7 +847,9 @@ class core {
 
                     $attributes = '';
 
-                    switch($key) {                                                      // Способ разбора зависит от ключа объекта
+                    $clearKey = explode(core::$iterateSeparator, $key);                 // Получение чистого ключа объекта без порядкового номера
+
+                    switch($clearKey[0]) {                                              // Способ разбора зависит от ключа объекта
 
                         case 'attr':                                                    // Объект атрибутов
                             foreach($content as $attr => $val) {
