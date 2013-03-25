@@ -148,7 +148,8 @@
                         }
                     },
                     'Second paragraph.'                                 //     Second paragraph.
-                ]                                                       // </div>
+                ],                                                      // </div>
+                p: 'Just paragraph'                                     // <p>Just paragraph</p>
             }                                                       // </div>
 
         Ключевые слова:
@@ -759,7 +760,7 @@ class core {
                         '\t\s\n'                 .
                         implode('', core::$spec) .
                         $symbols                 .
-                    ']+'                         .
+                    ']*'                         .
                 ')'                              .
                 '(?=:\s+['                       .                                      // Перед значением ключа могут стоять пробелы
                     '\{|\[|\'|\"|'               .                                      // Ключ может начинаться со скобок или кавычек
