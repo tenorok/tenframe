@@ -1,0 +1,4 @@
+%mod-admin-content: {
+    h1.__title: '{title}',
+    .__content: '{content}'
+}
