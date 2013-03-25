@@ -4,7 +4,7 @@
             href: '/'
         },
         content: [
-            '&larr;',
+            '&larr;&nbsp;',
             {
                 span.__tosite-text: 'Перейти на сайт'
             }
