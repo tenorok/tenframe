@@ -1007,7 +1007,8 @@ class core {
             case 'for':                                                                 // Ключевое слово for
                 return core::parseContent(
                     '{{ begin ' . $keyInfo['elemmod'][0] . ' }}',
-                    $content
+                    $content,
+                    $block
                 ) .
                 '{{ end }}';
 
