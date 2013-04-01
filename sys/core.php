@@ -746,7 +746,6 @@ class core {
 
         $symbols = 'a-z0-9_\-\/<>';                                                     // Обычные символы, из которых состоят ключи
 
-        $keywords         = core::$keywords;
         $iterateSeparator = core::$iterateSeparator;
 
         $tenhtml = preg_replace_callback(                                               // Заключение ключей в кавычки
@@ -768,7 +767,7 @@ class core {
                     'true|false'                 .                                      // Ключ может быть булевым значением
                 '])'                             .
             '/i',
-            function($match) use ($keywords, $iterateSeparator) {                       // Обеспечение возможности использования одинаковых ключей объекта
+            function($match) use ($iterateSeparator) {                                  // Обеспечение возможности использования одинаковых ключей объекта
                 static $i = 0;
                 return '"' . $match[1] . $iterateSeparator . ($i++) . '"';              // Каждый найденный ключ дополняется уникальным порядковым номером
             }, $tenhtml);
