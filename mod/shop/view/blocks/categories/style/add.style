@@ -74,7 +74,7 @@
                         color: #333;
                     }
                     .mod-shop-categories__selectinput_right-column {
-                        margin-left: 104px;
+                        margin-left: 100px;
                     }
                         .mod-shop-categories__optioninput {
                             padding: @mod_shop_categories__input_padding_top_bottom 4px;
