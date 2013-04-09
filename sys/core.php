@@ -103,6 +103,9 @@
             "//" - однострочные
             "/*" - и многострочные
 
+        Зарезервированные переменные:
+            {this} - имя текущего блока
+
         В tenhtml JSON-подобный синтаксис:
             %page: {                                                // <div class="page">
 
@@ -149,7 +152,7 @@
                     },
                     'Second paragraph.'                                 //     Second paragraph.
                 ],                                                      // </div>
-                p: 'Just paragraph'                                     // <p>Just paragraph</p>
+                p: 'Current block: {this}'                              // <p>Current block: page</p>
             }                                                       // </div>
 
         Ключевые слова:
@@ -843,7 +846,7 @@ class core {
         switch(gettype($content)) {                                                     // Способ разбора зависит от типа данных
 
             case 'string':                                                              // Обычной строке надо только проставить переменные
-                return $inner . core::setVar($content);
+                return $inner . core::setVar($content, $block);
 
             case 'object':                                                              // По объекту нужно пробежаться
                 foreach($content as $key => $content) {
@@ -862,9 +865,9 @@ class core {
                                     $attributes .= ' ' . $clearAttr[0];                 // то это одиночный атрибут
                                     continue;
                                 }
-                                $attributes .= ' ' . $clearAttr[0] . '="' . core::setVar($val) . '"'; // Формирование строки атрибутов
+                                $attributes .= ' ' . $clearAttr[0] . '="' . core::setVar($val, $block) . '"'; // Формирование строки атрибутов
                             }
-                            $inner = substr_replace($inner, $attributes, strlen($inner) -1, 0);       // Вставка сформированной строки перед закрывающей скобкой
+                            $inner = substr_replace($inner, $attributes, strlen($inner) -1, 0);               // Вставка сформированной строки перед закрывающей скобкой
                             break;
 
                         case 'content':                                                 // Массив контента
@@ -1138,9 +1141,11 @@ class core {
      * Установка переменных
      *
      * @param string $string Строка контента
+     * @param string $block  Имя текущего блока
      * @return               Изменённая строка
      */
-    private static function setVar($string) {
+    private static function setVar($string, $block) {
+        $string = str_replace(array('{this}'), array($block), $string);                 // Замена зарезервированных переменных
         $string = preg_replace('/{\s*([a-z0-9_\-]*)\s*}/i', '{{ $$1 }}', $string);      // Замена переменных
         return str_replace(array('\{', '\}'), array('{', '}'), $string);                // Замена экранированных фигурных скобок
     }
@@ -1161,7 +1166,7 @@ class core {
             switch(gettype($elem)) {
 
                 case 'string':
-                    $string .= core::setVar($elem);
+                    $string .= core::setVar($elem, $block);
                     break;
 
                 case 'object':
