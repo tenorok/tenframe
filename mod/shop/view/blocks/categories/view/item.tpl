@@ -2,7 +2,15 @@
     
     <div class="mod-shop-categories__name">
         <span class="mod-shop-categories__draggable"></span>
-        <a href="/{{ $page }}/modshop/categories/{{ $id }}/" class="mod-shop-categories__cat {{ $hided }}" title="{{ $title }}">{{ $name }}</a>
+        
+        {{ begin visible }}
+            <a href="/{{ $page }}/modshop/categories/{{ $id }}/" class="mod-shop-categories__cat">{{ $name }}</a>
+        {{ end }}
+        
+        {{ begin hidden }}
+            <a href="/{{ $page }}/modshop/categories/{{ $id }}/" class="mod-shop-categories__cat mod-shop-categories__cat_hided" title="Скрытая категория">{{ $name }}</a>
+        {{ end }}
+        
     </div>
 
     <ul class="mod-shop-categories__list">
