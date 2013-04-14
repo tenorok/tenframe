@@ -1,0 +1,31 @@
+ctx%mod-shop-categories: {
+    li.__item: {
+        attr: {
+            id: 'c_{id}'
+        },
+        div: {
+            for.item: {
+                a
+                    .__cat
+                    ._edit: {
+                        attr: {
+                            href: '{id}'
+                        },
+                        content: '{name}'
+                    }
+            },
+            for.parent: {
+                a
+                    .__cat
+                    ._edit
+                    ._selected_yes: {
+                        attr: {
+                            href: '{id}'
+                        },
+                        content: '{name}'
+                    }
+            }
+        },
+        ul.__list: '[[child_{id}]]'
+    }
+}
