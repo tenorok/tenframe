@@ -137,6 +137,15 @@
                                 alt: '\\{logo\\}'
                             }
                         },
+                        input: {                                        //     <input type="checkbox" name="box" {{ $biggest }}>
+                            attr: {
+                                type: 'checkbox',
+                                name: 'box',
+                                bool: {
+                                    checked: '{biggest}'
+                                }
+                            }
+                        },
                         mytag/                                          //     <mytag class="
                             .__logo                                     //                   page__logo
                             ._size_xl                                   //                   page__logo_size_xl
@@ -144,11 +153,15 @@
                             .__link                                     //                   page__link
                             ._align_right                               //                   page__logo_align_right page__link_align_right
                             &mytag__class: {                            //                   mytag__class"
-                            attr: {                                     //            data-num="100" selected>
-                                data-num: 100,
-                                selected: true
+                            attr: {
+                                data-num: 100,                          //            data-num="100"
+                                selected: true,                         //            selected
+                                bool: [
+                                    '{hided}',                          //            {{ $hided }}
+                                    '{checked}'                         //            {{ $checked }}
+                                ]
                             }
-                        }
+                        }                                               //     >
                     },
                     'Second paragraph.'                                 //     Second paragraph.
                 ],                                                      // </div>
@@ -157,7 +170,11 @@
 
         Ключевые слова:
             1)  for.$$$                                             // контекст шаблонизатора, где $$$ - имя контекста
-            2)  attr: {}                                            // объект атрибутов тега
+            2)  attr: {                                             // объект атрибутов тега
+                    bool: {}                                        // объект одиночных атрибутов по переменной
+                    // или
+                    bool: []                                        // массив одиночных атрибутов по переменной
+                }
             3)  content: '' | [] | {}                               // свойство для хранения содержимого тега
             4)  doctype: 'html'                                     // <!doctype html>
             5)  html: { ... }                                       // <html> ... </html>
@@ -847,43 +864,69 @@ class core {
         switch(gettype($content)) {                                                     // Способ разбора зависит от типа данных
 
             case 'string':                                                              // Обычной строке надо только проставить переменные
-                return $inner . core::setVar($content, $block);
+                return $inner . self::setVar($content, $block);
 
             case 'object':                                                              // По объекту нужно пробежаться
                 foreach($content as $key => $content) {
 
-                    $attributes = '';
-
-                    $clearKey = explode(core::$iterateSeparator, $key);                 // Получение чистого ключа объекта без порядкового номера
+                    $clearKey = explode(self::$iterateSeparator, $key);                 // Получение чистого ключа объекта без порядкового номера
 
                     switch($clearKey[0]) {                                              // Способ разбора зависит от ключа объекта
 
                         case 'attr':                                                    // Объект атрибутов
-                            foreach($content as $attr => $val) {
-                                $clearAttr = explode(core::$iterateSeparator, $attr);   // Получение чистого ключа атрибута без порядкового номера
-
-                                if(gettype($val) == 'boolean' && $val) {                // Если атрибут = true
-                                    $attributes .= ' ' . $clearAttr[0];                 // то это одиночный атрибут
-                                    continue;
-                                }
-                                $attributes .= ' ' . $clearAttr[0] . '="' . core::setVar($val, $block) . '"'; // Формирование строки атрибутов
-                            }
-                            $inner = substr_replace($inner, $attributes, strlen($inner) -1, 0);               // Вставка сформированной строки перед закрывающей скобкой
+                            $inner = self::setAttrs($inner, $content, $block);
                             break;
 
                         case 'content':                                                 // Массив контента
-                            $inner = core::parseContent($inner, $content, $block);
+                            $inner = self::parseContent($inner, $content, $block);
                             break;
 
                         default:                                                        // Произвольный ключ (селектор)
-                            $inner .= core::parsetenhtml($key, $content, $block);
+                            $inner .= self::parsetenhtml($key, $content, $block);
                     }
                 }
                 return $inner;
 
             case 'array':                                                               // Нужно разобрать массив
-                return $inner . core::parseArray($content, $block);
+                return $inner . self::parseArray($content, $block);
         }
+    }
+
+    /**
+     * Установка атрибутов
+     *
+     * @param  string              $inner   Предваряющая строка, в последний тег которой будут добавлены атрибуты
+     * @param  object              $content Объект атрибутов
+     * @param  string|false        $block   Имя блока, в контексте которого устанавливаются переменные
+     * @return string                       Тег с добавленными атрибутами
+     */
+    private static function setAttrs($inner, $content, $block) {
+
+        $attributes = '';                                                                           // Подготовка строки под атрибуты
+
+        foreach($content as $attr => $val) {
+
+            $clearAttr = explode(self::$iterateSeparator, $attr);                                   // Получение чистого ключа атрибута без порядкового номера
+
+            if(is_bool($val) && $val) {                                                             // Если атрибут = true
+                $attributes .= ' ' . $clearAttr[0];                                                 // то это одиночный атрибут
+                continue;
+            }
+
+            switch($clearAttr[0]) {                                                                 // Обработка по имени атрибута
+
+                case 'bool':                                                                        // Одиночные атрибуты по переменной
+                    foreach($val as $boolVal) {
+                        $attributes .= ' ' . self::setVar($boolVal, $block);
+                    }
+                    continue;
+
+                default:                                                                            // Обычный атрибут
+                    $attributes .= ' ' . $clearAttr[0] . '="' . self::setVar($val, $block) . '"';   // Формирование строки атрибутов
+            }
+        }
+
+        return substr_replace($inner, $attributes, strlen($inner) -1, 0);                           // Вставка сформированной строки перед закрывающей скобкой
     }
 
     /**
