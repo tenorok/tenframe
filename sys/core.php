@@ -172,6 +172,7 @@
             14) ie<8: { ... }                                       // <!--[if lt IE 8]> ... <![endif]-->
             15) ie<9: { ... }                                       // <!--[if lt IE 9]> ... <![endif]-->
             16) body: { ... }                                       // <body> ... </body>
+            17) ctx%blockname                                       // Установка контекста блока без DOM-узла
 
     Подключение include-файлов:
         echo core::includes(
@@ -896,6 +897,10 @@ class core {
     private static function makeTag($keyInfo, $content, $block = false) {
 
         $class = core::genClass($block, $keyInfo);                                      // Генерация атрибута class
+
+        if(!empty($keyInfo['block']) && $keyInfo['tag'] == 'ctx') {                     // Если нужно добавить только контекст блока без DOM-узла
+            return core::parseContent('', (($content) ? $content : ''), $block);
+        }
 
         return core::parseContent(                                                      // Рекурсивный парсинг контента
             '<' .
