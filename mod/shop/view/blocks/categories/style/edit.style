@@ -16,9 +16,14 @@
     .mod-shop-categories__link_pseudo {
         color: #4F3FFF;
         text-decoration: none;
+
+        &:hover .mod-shop-categories__link-text {
+            border-bottom-color: #f00;
+        }
     }
         .mod-shop-categories__link-text {
             border-bottom: 1px dotted #4F3FFF;
+            cursor: pointer;
 
             &:hover {
                 border-bottom-color: #f00;
