@@ -12,7 +12,7 @@ form%mod-admin-logon: {
                         attr: {
                             type: 'text',
                             name: 'login',
-                            autofocus: ''
+                            autofocus: true
                         }
                     }
                 }
