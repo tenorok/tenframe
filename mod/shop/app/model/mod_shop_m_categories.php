@@ -190,7 +190,7 @@ class mod_shop_m_categories {
             $info['action'] = 'edit/' . $categoryid;
             $info['name']   = $catinfo->name;
             $info['alias']  = $catinfo->alias;
-            $info['hided']  = ($catinfo->hide == 1) ? 'checked' : '';
+            $info['hided']  = $catinfo->hide;
         }
         else {                                                                           // Иначе просто добавление категории в корень
             
