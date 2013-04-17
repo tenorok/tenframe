@@ -141,7 +141,7 @@
                                 alt: '\\{logo\\}'
                             }
                         },
-                        input: {                                        //     <input type="checkbox" name="box" {{ $biggest }}>
+                        input: {                                        //     <input type="checkbox" name="box" {{ if($biggest, "checked") }}>
                             attr: {
                                 type: 'checkbox',
                                 name: 'box',
@@ -160,10 +160,9 @@
                             attr: {
                                 data-num: 100,                          //            data-num="100"
                                 selected: true,                         //            selected
-                                bool: [
-                                    '{hided}',                          //            {{ $hided }}
-                                    '{checked}'                         //            {{ $checked }}
-                                ]
+                                bool: {
+                                    hided: '{visibility}',              //            {{ if($visibility, "hided") }}
+                                }
                             }
                         }                                               //     >
                     },
@@ -175,9 +174,9 @@
         Ключевые слова:
             1)  for.$$$                                             // контекст шаблонизатора, где $$$ - имя контекста
             2)  attr: {                                             // объект атрибутов тега
-                    bool: {}                                        // объект одиночных атрибутов по переменной
-                    // или
-                    bool: []                                        // массив одиночных атрибутов по переменной
+                    bool: {                                         // объект одиночных атрибутов по переменной
+                        attribute: '{variable}'                     // атрибут "attribute" установится, если
+                    }                                               // переменная $variable, переданная шаблону будет положительна
                 }
             3)  content: '' | [] | {}                               // свойство для хранения содержимого тега
             4)  doctype: 'html'                                     // <!doctype html>
@@ -1002,10 +1001,13 @@ class core {
             switch($clearAttr[0]) {                                                                 // Обработка по имени атрибута
 
                 case 'bool':                                                                        // Одиночные атрибуты по переменной
-                    foreach($val as $boolVal) {
-                        $attributes .= ' ' . self::setVar($boolVal, $block);
+                    if(is_object($val)) {                                                           // Одиночные атрибуты должны быть указаны в виде объекта
+                        foreach($val as $name => $variable) {
+                            $clearBoolName = explode(self::$iterateSeparator, $name);
+                            $attributes .= ' {{ if($' . self::getVarName($variable) . ', "' . $clearBoolName[0] . '") }}';
+                        }
+                        continue;
                     }
-                    continue;
 
                 default:                                                                            // Обычный атрибут
                     $attributes .= ' ' . $clearAttr[0] . '="' . self::setVar($val, $block) . '"';   // Формирование строки атрибутов
@@ -1282,6 +1284,16 @@ class core {
         $string = str_replace(array('{this}'), array($block), $string);                 // Замена зарезервированных переменных
         $string = preg_replace('/{\s*([a-z0-9_\-]*)\s*}/i', '{{ $$1 }}', $string);      // Замена переменных
         return str_replace(array('\{', '\}'), array('{', '}'), $string);                // Замена экранированных фигурных скобок
+    }
+
+    /**
+     * Получение имени переменной из строки вида "{variable}"
+     *
+     * @param  string $string Строка с переменной
+     * @return string         Имя переменной
+     */
+    private static function getVarName($string) {
+        return preg_replace('/{\s*([a-z0-9_\-]*)\s*}/i', '$1', $string);
     }
 
     /**
