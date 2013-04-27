@@ -1,0 +1,5 @@
+%mod-admin-page: [
+    '{header}',
+    '{menu}',
+    '{content}'
+]

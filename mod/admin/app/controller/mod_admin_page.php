@@ -84,16 +84,21 @@ class mod_admin_page {
                                 'items' => array(
                                     
                                     'array' => mod_admin_m_menu::get_menu($page, $tab),
-                                    'parse' => array(
-                                        'title'  => 'title',
-                                        'active' => 'active'
-                                    ),
                                     
                                     'deactive' => array(
                                         
                                         '!if'   => 'active',
                                         'parse' => array(
-                                            'href' => 'href'
+                                            'href'   => 'href',
+                                            'title'  => 'title'
+                                        )
+                                    ),
+
+                                    'active' => array(
+
+                                        'if'   => 'active',
+                                        'parse' => array(
+                                            'title' => 'title'
                                         )
                                     ),
 
@@ -109,13 +114,17 @@ class mod_admin_page {
                                                 
                                                 '!if'   => 'active',
                                                 'parse' => array(
-                                                    'href' => 'href'
+                                                    'href'   => 'href',
+                                                    'title'  => 'title'
                                                 )
                                             ),
 
-                                            'parse' => array(
-                                                'active' => 'active',
-                                                'title'  => 'title'
+                                            'active' => array(
+
+                                                'if'   => 'active',
+                                                'parse' => array(
+                                                    'title' => 'title'
+                                                )
                                             )
                                         )
                                     )

@@ -1,6 +1,6 @@
 <li class="mod-shop-categories__labelitem mod-shop-categories__labelitem_position_right">
     <label class="mod-shop-categories__label mod-shop-categories__label_long">
-        <input type="checkbox" name="hide" {{ $hided }} class="mod-shop-categories__checkboxinput"> скрыть категорию
+        <input type="checkbox" name="hide" {{ if($hided, 'checked') }} class="mod-shop-categories__checkboxinput"> скрыть категорию
     </label>
 </li>
 <li class="mod-shop-categories__labelitem mod-shop-categories__labelitem_independent">

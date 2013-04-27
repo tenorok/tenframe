@@ -1,0 +1,29 @@
+%mod-shop-categories: {
+    a.__add: {
+        attr: {
+            href: '/{page}/modshop/categories/add/'
+        },
+        content: 'Добавить категорию'
+    },
+    h2.__h2: 'Существующие категории',
+    ul
+        .__mainlist
+        .__list: '{categories}',
+    .__dropdown: {
+        .__dropdown-item: {
+            a
+                .__dropdown-menu
+                ._add-product: 'Добавить товар'
+        },
+        .__dropdown-item: {
+            a
+                .__dropdown-menu
+                ._add-category: 'Добавить подкатегорию'
+        },
+        .__dropdown-item: {
+            a
+                .__dropdown-menu
+                ._edit: 'Изменить категорию'
+        }
+    }
+}

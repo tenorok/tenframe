@@ -11,16 +11,19 @@
         .mod-admin-menu__item-wrap {
             padding: 3px 6px;
         }
-        .mod-admin-submenu {
+        .mod-admin-menu__item-wrap_active {
+            background-color: #F3EDC3;
+        }
+            .mod-admin-menu__url {
+                color: #4F3FFF;
+            }
+        .mod-admin-menu__submenu {
             margin: 5px 0 0 15px;
             font-size: 12px;
         }
-            .mod-admin-submenu__item {
+            .mod-admin-menu__submenu-item {
                 padding: 3px 6px;
             }
-    .mod-admin-menu__item_active {
-        background-color: #F3EDC3;
-    }
-        .mod-admin-menu__url {
-            color: #4F3FFF;
-        }
+            .mod-admin-menu__submenu-item_active {
+                background-color: #F3EDC3;
+            }

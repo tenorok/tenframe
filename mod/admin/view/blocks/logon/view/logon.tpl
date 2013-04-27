@@ -1,5 +1,5 @@
-<form method="post" action="{{ $action }}">
-    <ul class="mod-admin-logon">
+<form method="post" action="{{ $action }}" class="mod-admin-logon">
+    <ul class="mod-admin-logon__form">
         <li class="mod-admin-logon__item">
             <label class="mod-admin-logon__label">Логин</label>
             <div class="mod-admin-logon__value">
@@ -14,7 +14,7 @@
         </li>
         <li class="mod-admin-logon__item">
             <div class="mod-admin-logon__send">
-                <input type="submit" name="send" value="войти" class="mod-admin-logon__input_send">
+                <input type="submit" name="send" value="войти" class="mod-admin-logon__input-send">
             </div>
         </li>
         <li class="mod-admin-logon__item">

@@ -1,23 +1,31 @@
 <ul class="mod-admin-menu">
     {{ begin items }}
         <li class="mod-admin-menu__item">
-            
-            <div class="mod-admin-menu__item-wrap{{ $active }}">
-                {{ begin deactive }}<a href="{{ $href }}" class="mod-admin-menu__url">{{ end }}
-                    {{ $title }}
-                {{ begin deactive }}</a>{{ end }}
-            </div>
+
+            {{ begin deactive }}
+                <div class="mod-admin-menu__item-wrap">
+                    <a href="{{ $href }}" class="mod-admin-menu__url">{{ $title }}</a>
+                </div>
+            {{ end }}
+
+            {{ begin active }}
+                <div class="mod-admin-menu__item-wrap mod-admin-menu__item-wrap_active">{{ $title }}</div>
+            {{ end }}
 
             {{ begin sub }}
-                <ul class="mod-admin-submenu">
+                <ul class="mod-admin-menu__submenu">
                     {{ begin subitems }}
-                        <li class="mod-admin-submenu__item{{ $active }}">
-                            
-                            {{ begin deactive }}<a href="{{ $href }}" class="mod-admin-menu__url">{{ end }}
-                                {{ $title }}
-                            {{ begin deactive }}</a>{{ end }}
 
-                        </li>
+                        {{ begin deactive }}
+                            <li class="mod-admin-menu__submenu-item">
+                                <a href="{{ $href }}" class="mod-admin-menu__url">{{ $title }}</a>
+                            </li>
+                        {{ end }}
+
+                        {{ begin active }}
+                            <li class="mod-admin-menu__submenu-item mod-admin-menu__submenu-item_active">{{ $title }}</li>
+                        {{ end }}
+
                     {{ end }}
                 </ul>
             {{ end }}

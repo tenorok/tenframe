@@ -42,6 +42,7 @@
                     display: inline-block;
                     width: 16px;
                     height: 16px;
+                    padding-right: 4px;
 
                     background: url(/mod/shop/view/blocks/categories/images/draggable.png) no-repeat;
                     vertical-align: bottom;

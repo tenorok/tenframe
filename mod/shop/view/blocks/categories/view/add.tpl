@@ -3,12 +3,12 @@
         <input type="hidden" name="catparent" value="{{ $parent }}" class="mod-shop-categories__catparent">
         <ul class="mod-shop-categories__labellist">
             <li class="mod-shop-categories__labelitem">
-                <label for="mod-shop-categories-catname" class="mod-shop-categories__label">Название</label>
-                <input type="text" value="{{ $name }}" name="catname" placeholder="Телевизоры" id="mod-shop-categories-catname" class="mod-shop-categories__catname" autofocus class="mod-shop-categories__textinput">
+                <label for="mod-shop-categories__catname" class="mod-shop-categories__label">Название</label>
+                <input type="text" value="{{ $name }}" name="catname" placeholder="Телевизоры" id="mod-shop-categories__catname" class="mod-shop-categories__catname mod-shop-categories__textinput" autofocus>
             </li>
             <li class="mod-shop-categories__labelitem">
-                <label for="mod-shop-categories-catalias" class="mod-shop-categories__label">Алиас</label>
-                <input type="text" value="{{ $alias }}" name="catalias" placeholder="tv" id="mod-shop-categories-catalias" class="mod-shop-categories__catalias" class="mod-shop-categories__textinput">
+                <label for="mod-shop-categories__catalias" class="mod-shop-categories__label">Алиас</label>
+                <input type="text" value="{{ $alias }}" name="catalias" placeholder="tv" id="mod-shop-categories__catalias" class="mod-shop-categories__catalias mod-shop-categories__textinput">
             </li>
             
             {{ $edit }}

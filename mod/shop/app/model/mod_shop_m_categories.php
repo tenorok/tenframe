@@ -27,8 +27,7 @@ class mod_shop_m_categories {
                         $category->tmod_shop_categories_id,
                         $category->name,
                         (isset($category->parent)) ? $category->parent : '',
-                        ($category->hide) ? 'mod-shop-categories__cat_hided' : '',
-                        ($category->hide) ? 'Скрытая категория' : ''
+                        (bool) $category->hide
                     );
 
                     $items = mod_shop_m_categories::get_category(                        // Получение дочерних категорий
@@ -64,8 +63,7 @@ class mod_shop_m_categories {
                     $category->tmod_shop_categories_id,
                     $category->name,
                     (isset($category->parent)) ? $category->parent : '',
-                    ($category->hide) ? 'mod-shop-categories__cat_hided' : '',
-                    ($category->hide) ? 'Скрытая категория' : ''
+                    (bool) $category->hide
                 );
 
                 $child_tmp = '[[child_' . $current . ']]';                               // Генерация переменной шаблона
@@ -87,15 +85,14 @@ class mod_shop_m_categories {
     /**
      * Парсинг шаблона элемента категории
      * 
-     * @param string  $page   Имя главной страницы административной панели
-     * @param integer $id     Идентификатор категории
-     * @param string  $name   Название категории
-     * @param string  $parent Имя класса для выделения родительской категории
-     * @param string  $hided  Класс скрытой категории
-     * @param string  $title  Значение атрибута title для скрытой категории
+     * @param string   $page    Имя главной страницы административной панели
+     * @param integer  $id      Идентификатор категории
+     * @param string   $name    Название категории
+     * @param boolean  $parent  Имя класса для выделения родительской категории
+     * @param boolean  $hidden  Скрытая/видимая категория
      * @return string
      */
-    private static function parse_category_item($page, $id, $name, $parent, $hided, $title) {
+    private static function parse_category_item($page, $id, $name, $parent, $hidden) {
 
         if((int) $page > 0)                                                              // Если вместо адреса страницы админки передан идентификатор категории
             return core::block(array(                                                    // Значит нужно парсить список категорий для изменения родительской категории
@@ -104,11 +101,27 @@ class mod_shop_m_categories {
                 'block' => 'categories',
                 'view'  => 'parent',
 
-                'parse' => array(
+                'context' => array(
 
-                    'id'       => $id,
-                    'name'     => $name,
-                    'selected' => $parent
+                    'item' => array(
+                        '!if' => $parent,
+                        'parse' => array(
+                            'id'   => $id,
+                            'name' => $name
+                        )
+                    ),
+
+                    'parent' => array(
+                        'if' => $parent,
+                        'parse' => array(
+                            'id'   => $id,
+                            'name' => $name
+                        )
+                    )
+                ),
+
+                'parse' => array(
+                    'id'       => $id
                 )
             ));
         else                                                                             // Иначе нужно парсить список категорий для главной страницы категорий
@@ -118,13 +131,29 @@ class mod_shop_m_categories {
                 'block' => 'categories',
                 'view'  => 'item',
 
-                'parse' => array(
+                'context' => array(
 
-                    'page'   => $page,
-                    'id'     => $id,
-                    'name'   => $name,
-                    'hided'  => $hided,
-                    'title'  => $title
+                    'visible' => array(
+                        '!if' => $hidden,
+                        'parse' => array(
+                            'page' => $page,
+                            'id'   => $id,
+                            'name' => $name
+                        )
+                    ),
+
+                    'hidden' => array(
+                        'if' => $hidden,
+                        'parse' => array(
+                            'page' => $page,
+                            'id'   => $id,
+                            'name' => $name
+                        )
+                    )
+                ),
+
+                'parse' => array(
+                    'id' => $id
                 )
             ));
     }
@@ -161,7 +190,7 @@ class mod_shop_m_categories {
             $info['action'] = 'edit/' . $categoryid;
             $info['name']   = $catinfo->name;
             $info['alias']  = $catinfo->alias;
-            $info['hided']  = ($catinfo->hide == 1) ? 'checked' : '';
+            $info['hided']  = $catinfo->hide;
         }
         else {                                                                           // Иначе просто добавление категории в корень
             
@@ -191,11 +220,11 @@ class mod_shop_m_categories {
                     ->where('tmod_shop_categories_id <> ' . $category_id);
 
             foreach($categories as $category) {                                          // Цикл по полученным категориям
-                
-                if($category->tmod_shop_categories_id != $category->parent)              // Если категория не является родительской для текущей
-                    $category->parent = '';
-                else                                                                     // Иначе категория является родительской для текущей
-                    $category->parent = 'mod-shop-categories__cat_selected_yes';
+
+                $category->parent =
+                    ($category->tmod_shop_categories_id != $category->parent) ?          // Если категория не является родительской для текущей
+                    false :
+                    true;                                                                // Иначе категория является родительской для текущей
             }
             
             return $categories;                                                          // Возврат обработанных результатов выборки
