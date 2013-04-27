@@ -24,13 +24,13 @@ if(
 if(isset(core::$settings['mysql']) && core::$settings['mysql']) {
 
     $mysql = core::$settings['mysql'];
-    
+
     orm::connect(                                               // Подключение к mysql
         $mysql['host'],
         $mysql['user'],
         $mysql['password']
     );
-    
+
     orm::db($mysql['database']);                                // Выбор базы данных
 }
 
