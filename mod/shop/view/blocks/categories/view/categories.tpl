@@ -2,9 +2,9 @@
     <a href="/{{ $page }}/modshop/categories/add/" class="mod-shop-categories__add">Добавить категорию</a>
     <h2 class="mod-shop-categories__h2">Существующие категории</h2>
     <ul class="mod-shop-categories__mainlist mod-shop-categories__list">
-        
+
         {{ $categories }}
-        
+
     </ul>
     <div class="mod-shop-categories__dropdown">
         <div class="mod-shop-categories__dropdown-item">

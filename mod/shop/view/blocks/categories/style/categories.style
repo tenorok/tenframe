@@ -1,5 +1,5 @@
 .mod-shop-categories {
-    
+
 }
     .mod-shop-categories__add {
         margin-left: -18px;
@@ -13,7 +13,7 @@
         margin: 40px 0 20px;
         font: normal 17px georgia, serif;
     }
-    
+
     @mod_admin_categories__item_margin_top_bottom: 15px;
 
     .mod-shop-categories__mainlist {
@@ -30,7 +30,7 @@
             margin-bottom: @mod_admin_categories__item_margin_top_bottom;
         }
             .mod-shop-categories__name {
-                
+
                 margin-left: -20px;
 
                 &:hover .mod-shop-categories__draggable {
@@ -98,9 +98,9 @@
     }
 }
     .mod-shop-categories__dropdown-item {
-        
+
     }
-        
+
         @mod_admin_categories_dropdown__menu_color: #333;
 
         .mod-shop-categories__dropdown-menu {

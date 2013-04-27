@@ -15,15 +15,15 @@ core.add({
                     init: function() {                                                              // Инициализация добавления категории
 
                         var that = this;
-                        
+
                         this.block = core.mod.shop.categories.block;
 
                         this.fieldHtml = $(this.block + '(fielditem)').htmlWithParent();            // Получение html-структуры добавления поля категории
-                        
+
                         $(this.block + '(catname)').keyup(function() {                              // Событие ввода названия категории
                             that.setAlias.call(that, this);
                         });
-                        
+
                         $(this.block + '(fielditem)')                                               // Событие изменения значения выпадающего списка "Новое поле" и выбора уже существующих
                             .find(this.block + '(selectinput){existfield}')
                             .change(function() {
@@ -60,7 +60,7 @@ core.add({
                                     .not(this.block + '(existlist)');
 
                         if($select.val() != 'new') {                                                // Если выбрана уже существующая категория
-                            
+
                             this.addField.call(this, select);                                       // Нужно добавить ещё одну пустую форму для ввода нового поля
 
                             labels.css({'display': 'none'});                                        // Скрыть все поля для ввода информации о текущем поле
@@ -79,7 +79,7 @@ core.add({
                         lastField                                                                   // Назначение класса, символизирующего, что данная форма уже добавила после себя новую форму
                             .find(this.block + '(selectinput){existfield}')
                             .bemSetMod('field', 'added');
-                        
+
                         lastField                                                                   // Назначение класса, символизирующего, что данная форма уже добавила после себя новую форму
                             .find(this.block + '(textinput){name}')
                             .bemSetMod('field', 'added');
@@ -95,7 +95,7 @@ core.add({
                             newField = $(newFieldHtml).appendTo(this.block + '(fieldlist)'),        // Добавление новой формы
 
                             that = this;
-                        
+
                         $(newField)                                                                 // Назначение события изменения выпадающего списка "Новое поле" и выбора уже существующих полей в новой форме
                             .find(this.block + '(selectinput){existfield}')
                             .change(function() {
@@ -120,7 +120,7 @@ core.add({
                         var hiddenInput = $checkbox.next();                                         // Получение скрытого поля-флага, говорящего, является ли поле выпадающим списком
 
                         if($checkbox.is(':checked')) {                                              // Если флажок поставлен
-                            
+
                             $(classifier).css({'display': 'block'});                                // Нужно показать поля для ввода значений выпадающего списка
 
                             $(classifier)                                                           // Поставить фокус в первое поле
@@ -140,7 +140,7 @@ core.add({
                     addClassifierValue: function(field) {                                           // Добавление чистого поля для ввода значения выпадающего списка
 
                         var $field = $(field);
-                        
+
                         if($field.bemGetMod('added'))                                               // Если по текущему элементу уже добавлялось новое поле
                             return;
 

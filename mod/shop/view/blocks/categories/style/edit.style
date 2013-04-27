@@ -3,7 +3,7 @@
     top: -10px;
 
     margin-left: 350px;
-    
+
     color: #888888;
 }
 
@@ -28,7 +28,7 @@
             &:hover {
                 border-bottom-color: #f00;
             }
-            
+
             &:hover + .mod-shop-categories__harr {
                 color: #f00;
             }
@@ -46,6 +46,6 @@
             margin-left: -4px;
             border-bottom: medium none;
             padding: 2px 4px;
-            
+
             background: #C0DCED;
         }
