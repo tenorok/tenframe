@@ -4,10 +4,10 @@
 // From 09.02.2013
 
 /*    core
-    
+
     Маршрутизация (route.php):
         get|post(                                                      // Проведение GET- и POST-запросов осуществляется одинаково
-            
+
             string|array,                                              // Первым параметром является адрес или массив адресов
             Например:
                 Один адрес:
@@ -23,9 +23,9 @@
                 Любой адрес:                                           // Такой вызов будет проведён всегда
                     '*'                                                // при этом, он не останавливает проведение последующих маршрутов
                                                                        // поэтому его рекомендуется прописывать самым первым, чтобы другие маршруты не остановили проведение, когда очередь дойдёт до него
-            
+
             'controller->method',                                      // Контроллер и его метод, который будет вызван при проведении маршрута
-            
+
             array(                                                     // Правила для переменных
                 Например:
                     'id'   => '/\d+/',
@@ -41,17 +41,17 @@
 
     Подключение ядра:
         require 'sys/core.php';
-        
+
     Включение автоподгрузки классов:
         spl_autoload_register(array('core', 'auto_load'));
-    
+
     Парсинг blitz-шаблонов:
         echo core::block(array(                                        // Функция всегда принимает в качестве параметра массив
-            
+
             'mod'   => 'modulename',                                   // Имя модуля. Если шаблон находится в модуле
             'block' => 'blockname',                                    // Обязательный. Имя блока
             'view'  => 'viewname',                                     // Имя шаблона. (По умолчанию: имя блока)
-             
+
             'parse' => array(                                          // Массив парсинга
                 'tplvar1' => 'val',                                    // Имя_переменной_в_шаблоне => значение
                 'tplvar2' => core::block(array(...))                   // В качестве значения может быть другой блок. Вложенность не ограничена
@@ -69,7 +69,7 @@
                     'parse' => array(                                  // Массив парсинга
                          'tplvar1' => 'key'                            // Имя_переменной_в_шаблоне => ключ_массива_или_объекта
                     ),
-                    
+
                     'context3' => array(                               // Вложенность контекстов не ограничена
                         'parse' => array(                              // Если для текущего контекста не указан array,
                             'tplvar1' => 'key'                         // будут использованы переменные текущей итерации массива родителя
@@ -78,7 +78,7 @@
                         // или
                         '!if' => 'key'                                 // Контекст будет проитерирован, если переменная массива (или объекта) с ключом key ложна
                     ),
-                    
+
                     'context4' => array(
                         'array' => 'subarray',                         // Если в качестве array указана строка
                                                                        // то это ключ массива контекста-родителя, которому соответствует вложенный массив (вложенность массивов не ограничена)
@@ -215,7 +215,7 @@
 */
 
 /* orm
-    
+
     Правило наименования ключей в БД:
         Первичный ключ: table_id
         Внешний ключ:   table_fk
@@ -263,7 +263,7 @@
 
         $result =                                                      // Результатом выборки будет всегда массив объектов
             orm::join('table', array(                                  // From table и массив join-таблиц
-                
+
                 array(                                                 // Описание подключаемой таблицы
                     'table'  => 'tablename_1',                         // Обязательный. Имя подключаемой таблицы
                     'join'   => 'inner',                               // Тип join: inner (по умолчанию), left outer, right outer, full outer, cross
@@ -296,32 +296,32 @@
 */
 
 /*    error
-    
+
     Отключение отображения ошибок интерпретатора:
         error_reporting(0);
-    
+
     Указание метода, которые будет вызван по окончании выполнения всего скрипта:
         register_shutdown_function(array('error', 'get_error'));
-    
+
      Вывод ошибки системы:
         error::print_error('Error text');
 */
 
 /*    message
-    
+
     Вывод сообщения системы:
         message::print_message('Message text');
 */
 
 /*    mod
-    
+
     Просмотр readme модуля:
         Адрес: domen.com/mod/{modname}/
         В корне модуля должен лежать readme.md
 
     Инициализация модулей (require.php):
         mod::init(array('mod1', 'mod2', ..., 'modN'));
-        
+
         Инициализация модуля:
             1) добавляет его стили и скрипты в единый объединённый файл
             2) обеспечивает автоподключение вызываемых классов модуля
@@ -333,31 +333,31 @@ defined('MODEL')      or die('Core error: Model path is not declared!');
 
 // Класс ядра
 class core {
-    
+
     public static $settings;                                               // Параметры работы фреймворка
-    
+
     public static $paths = array(SYS, CONTROLLER, MODEL);                  // Массив с директориями классов
-    
+
     /**
      * Функция автоматической подгрузки необходимых файлов
      *
      * @param string $class Имя подключаемого класса (оно должно соответствовать имени файла, в котором находится класс)
      */
     public static function auto_load($class) {
-        
+
         foreach(core::$paths as $dir) {
-            
+
             $path = str_replace('__', '/', strtolower($class));            // Двойное подчёркивание заменяется на слеш
-            
+
             $file = $dir . $path . '.php';
-            
+
             if(is_file($file)) {
                 require $file;
                 break;
             }
         }
     }
-    
+
     /**
      * Функция разбора адресной строки на части
      *
@@ -365,15 +365,15 @@ class core {
      * @return array
      */
     public static function parse_urn($urn = null) {
-        
+
         if(is_null($urn))
             $urn = URI;
-            
+
         return preg_split('/\//', $urn, -1, PREG_SPLIT_NO_EMPTY);
     }
-    
+
     public static $called = false;                                         // Флаг для определения была ли уже вызвана функция по текущему маршруту
-    
+
     /**
      * Функция обработки маршрутов, отправленных методами GET и POST
      *
@@ -384,7 +384,7 @@ class core {
      * @return boolean
      */
     public static function request($type, $url, $callback, $asserts = array()) {
-        
+
         if(
             core::$called ||                                               // Если маршрут был проведён
             $_SERVER['REQUEST_METHOD'] != $type                            // или метод вызова не соответствует
@@ -392,7 +392,7 @@ class core {
             return false;                                                  // то маршрут обрабатывать не нужно
 
         if(gettype($url) == 'string') {                                    // Если у маршрута один адрес
-                
+
                 if(trim($url) == '*')
                     return core::callback($type, $callback);
 
@@ -403,14 +403,14 @@ class core {
                 $pathArr[$p] = core::parse_urn($path);                     // Путь каждого адреса
 
         $urn  = core::parse_urn();                                         // Текущий URN
-        
+
         foreach($pathArr as $p => $path) {                                 // Цикл по маршрутам
 
             if(count($urn) != count($path))                                // Если количество частей URN и пути разное
                 continue;                                                  // значит надо вызывать следующий маршрут в index.php
-            
+
             $args = array();                                               // Объявление массива аргументов
-            
+
             for($part = 0; $part < count($urn); $part++)
                 if(preg_match('|^\{(.*)\}$|', $path[$part], $match))       // Если часть пути является {переменной}
                     if(!isset($asserts[$match[1]]) ||                      // Если для этой переменной не назначено регулярное выражение
@@ -427,7 +427,7 @@ class core {
                         get::unset_args();                                 // Нужно очистить объект переменных
                         continue 2;                                        // и вызывать следующий маршрут в index.php
                     }
-            
+
             core::$called = true;                                          // Изменение флага для определения, что по текущему маршруту уже проведён роут
 
             return core::callback($type, $callback, $args);
@@ -436,7 +436,7 @@ class core {
 
     /**
      * Функция обработки колбека
-     * 
+     *
      * @param string $type     Тип запроса [GET || POST]
      * @param string $callback Класс->Метод для вызова
      * @param array  $args     Массив переданных аргументов
@@ -444,7 +444,7 @@ class core {
     private static function callback($type, $callback, $args = array()) {
 
         $call = explode('->', $callback);                                  // Разбор callback на две части: 1) До стрелки и 2) После стрелки
-        
+
         if(method_exists($call[0], $call[1]))                              // Если метод существует
             call_user_func_array(                                          // Вызов
                 array($call[0], $call[1]),                                 // из класса $call[0] метода с именем $call[1]
@@ -462,9 +462,9 @@ class core {
         'asserts' => array(),
         'dev'     => false                                                 // Проводить маршрут всегда
     );
-    
+
     public static $routes = array(                                         // Системные маршруты
-        
+
         array(
             'url'      => '/module/{mod}/',
             'callback' => 'mod->readme',
@@ -474,28 +474,28 @@ class core {
 
     /**
      * Функция проведения системных маршуртов
-     * 
+     *
      */
     public static function routes() {
 
         foreach(core::$routes as $route) {                                 // Цикл по системным маршрутам
-            
+
             foreach(core::$routes_default as $key => $val)                 // Установка значений по умолчанию
                 if(!isset($route[$key]))                                   // для незаданных опций
                     $route[$key] = $val;
-            
+
             if(!$route['dev'] || $route['dev'] && DEV)                     // Если маршрут надо проводить всегда или только для режима разработчика и режим включен
                 core::request($route['type'], $route['url'], $route['callback'], $route['asserts']);
         }
     }
-    
+
     private static $default_404_options = array(                           // Дефолтные параметры для ненайденной страницы
         'title'   => 'Страница не найдена',
         'header'  => 'Страница не найдена',
         'content' => '',
         'sysauto' => false
     );
-    
+
     /**
      * Функция возврата ошибки 404
      *
@@ -503,7 +503,7 @@ class core {
      * @return boolean false
      */
     public static function not_found($options = array()) {
-        
+
         if(
             core::$called              &&                                  // Если маршрут был проведён
             isset($options['sysauto']) &&                                  // и функция вызывается автоматически с главной страницы после всех роутов
@@ -512,13 +512,13 @@ class core {
             return false;                                                  // то страница найдена и ошибка 404 не нужна
 
         header('HTTP/1.1 404 Not Found');
-        
+
         foreach(core::$default_404_options as $key => $val)                // Установка значений по умолчанию
             if(!isset($options[$key]))                                     // для незаданных опций
                 $options[$key] = $val;
-        
+
         $template = new Blitz(ROOT . '/view/blocks/html/view/404.tpl');
-        
+
         die($template->parse(array(
             'title'   => $options['title'],
             'header'  => $options['header'],
@@ -528,7 +528,7 @@ class core {
 
     /**
      * Функция сохранения флага режима разработчика в JS
-     * 
+     *
      * @param boolean $dev Флаг режима разработчика
      */
     public static function dev($dev = false) {
@@ -553,7 +553,7 @@ class core {
 
     /**
      * Функция парсинга блоков
-     * 
+     *
      * @param  array $options Параметры парсинга блока
      * @return string
      */
@@ -623,7 +623,7 @@ class core {
 
     /**
      * Компрессирует HTML
-     * 
+     *
      * @param  string $html HTML-строка
      * @return string       Сжатая HTML-строка
      */
@@ -640,7 +640,7 @@ class core {
 
     /**
      * Рекурсивная функция парсинга контекстов
-     * 
+     *
      * @param Blitz  $tpl Объект шаблона
      * @param string $ctx Имя контекста
      * @param array  $val Массив с описанием контекста
@@ -648,7 +648,7 @@ class core {
     private static function context($tpl, $ctx, $val) {
 
         if(is_array($val)) {                                                            // Если контекст нужно проитерировать
-            
+
             if(
                 !isset($val['array']) &&                                                // Если у текущего контекста не задан массив к перебору
                 !empty(core::$ctx_last_array_element)                                   // и существует последний элемент предыдущего контекста
@@ -719,7 +719,7 @@ class core {
         }
 
         $tmp = array();                                                                 // Временный массив для хранения сопоставленных значений текущей итерации
-            
+
         if(isset($val['parse'])) {                                                      // Если переменная parse задана
             foreach($val['parse'] as $parse_key => $parse_val) {                        // Цикл по массиву ключей: переменная_шаблона => ключ_массива_значений
                 $tmp[$parse_key] = $parse_val;                                          // Добавление элемента с текущим значением во временный массив
@@ -1255,7 +1255,7 @@ class core {
                 array_push($class, $block . $elemmod);
             }
             else if($elemmod[0] == '_') {                                               // Модификатор
-                
+
                 if($info['block']) {                                                    // Если текущий узел является блоком
                     array_push($class, $info['block'] . $elemmod);                      // то к нему надо применить модификатор
                 }
@@ -1330,7 +1330,7 @@ class core {
 
     /**
      * Функция подключения include-файлов
-     * 
+     *
      * @param  string $files  Имена include-файлов
      * @param  string $prefix Префикс перед именами include-файлов
      * @return string
@@ -1342,10 +1342,10 @@ class core {
         foreach(explode(',', $files) as $file) {                                                    // Цикл по массиву переданных имён файлов
 
             $file = trim($file);                                                                    // Обрезание пробелов с обеих сторон имени текущего файла
-            
+
             if(in_array($file, core::$include_dev) && !DEV)                                         // Если текущий файл требуется для режима разработчика и режим разработчика выключен
                 continue;                                                                           // то его подключать не нужно и выполняется переход к следующему файлу
-            
+
             $includes .= file_get_contents(ROOT . '/view/include/' . $prefix . $file . '.tpl');		// Конкатенация содержимого текущего файла
         }
 
@@ -1354,7 +1354,7 @@ class core {
 
     /**
      * Функция выполняется после завершения работы всего скрипта
-     * 
+     *
      */
     public static function shutdown() {
 
@@ -1373,9 +1373,9 @@ class core {
 
 // Класс работы с GET-переменными
 class get {
-    
+
     public static $arg;                                                    // Объект, который используется из приложения для обращения к GET-переменным
-    
+
     /**
      * Функция добавления свойства для объекта $arg
      *
@@ -1383,16 +1383,16 @@ class get {
      * @param string $val Значение GET-переменной
      */
     public static function set_arg($key, $val) {
-        
+
         get::$arg->$key = $val;
     }
-    
+
     /**
      * Функция удаления всех свойств объекта $arg
      *
      */
     public static function unset_args() {
-        
+
         if(count(get::$arg))                                               // Если объект аргументов содержит хотя бы одно значение
             foreach(get_object_vars(get::$arg) as $key => $val)
                 get::$arg->$key = '';
@@ -1401,22 +1401,22 @@ class get {
 
 // Класс работы с базой данных
 class orm {
-    
+
     public static $mysqli;                                                 // Объект работы с MySQL
-    
+
     private static $queries = array();                                     // Массив данных о выполняемых запросах
     private static $parameters = null;                                     // Массив параметров текущей операции
     private static $object;                                                // Текущий объект
-    
+
     /**
      * Конструктор для сохранения текущей операции
      *
      * @param string $operation Название текущей операции
      */
     private function __construct($operation = null) {
-        
+
         orm::$queries[count(orm::$queries)]->name = $operation;
-        
+
         orm::$limit      = null;                                           // Обнуление дополнительных переменных перед каждым новым запросом
         orm::$order      = null;
         orm::$group      = null;
@@ -1424,10 +1424,10 @@ class orm {
         orm::$addfields  = null;
         orm::$subqueries = null;
         orm::$prefix     = null;
-        
+
         orm::$single     = false;                                          // Выключение флага одиночной выборки
     }
-    
+
     /**
      * Функция подключения к MySQL
      *
@@ -1436,22 +1436,22 @@ class orm {
      * @param string $password Пароль
      */
     public static function connect($host, $login, $password) {
-        
+
         orm::$mysqli = new mysqli($host, $login, $password);
         orm::$mysqli->set_charset('utf8');
     }
-    
+
     /**
      * Функция выбора базы данных
      *
      * @param string $db Имя базы данных
      */
     public static function db($db) {
-        
+
         if(!orm::$mysqli->select_db($db))
             error::print_error('Selected database <b>' . $db . '</b> not found');
     }
-    
+
     /**
      * Функция преобразования значений для использования в SQL-запросе
      *
@@ -1459,11 +1459,11 @@ class orm {
      * @return mixed
      */
      private static function get_value($val) {
-        
+
         $quote = '';
 
         if(strpos($val, 'func:') !== false) {                              // Если в значении присутствует ключевое слово, указывающее на функцию
-            
+
             $val = str_replace('func:', '', $val);                         // Удаление ключевого слова из значения
             $val = str_replace(' ', '', $val);                             // Удаление пробелов из значения
         }
@@ -1473,10 +1473,10 @@ class orm {
                 !preg_match('/^\d+$/', $val) &&                            // и это не число со строковым типом
                 strtolower($val) != 'null'                                 // и это не null
             ) ? '\'' : '';                                                 // то надо добавить кавычки
-        
+
         return $quote . $val . $quote;                                     // При необходимости возвращаемое значение обрамляется в апострофы
      }
-    
+
     /**
      * Функция добавления записи в базу данных
      *
@@ -1485,28 +1485,28 @@ class orm {
      * @return integer || boolean
      */
     public static function insert($table, $values) {
-        
+
         orm::$parameters = array($table, $values);
-        
+
         new orm(__FUNCTION__);
-        
+
         orm::set_debug(debug_backtrace());
-        
+
         $fields    = '';
         $variables = '';
 
         foreach($values as $key => $val) {
-            
+
             $fields .= $key . ', ';
             $variables .=  orm::get_value($val) . ', ';
         }
-        
+
         if(!orm::execute_query('insert into ' . $table . '(' . substr($fields, 0, -2) . ') values (' . substr($variables, 0, -2) . ')'))
             return false;                                                  // Запрос не выполнен и возвращается отрицательный результат
-        
+
         return orm::$mysqli->insert_id;                                    // Возвращается последний добавленный идентификатор
     }
-    
+
     /**
      * Функция обновления записи в базе данных
      *
@@ -1515,15 +1515,15 @@ class orm {
      * @return object
      */
     public static function update($table, $values) {
-        
+
         orm::$parameters = array($table, $values);
-        
+
         orm::$object = new orm(__FUNCTION__);
         orm::set_debug(debug_backtrace());
-        
+
         return orm::$object;
     }
-    
+
     /**
      * Функция обработки данных перед отправкой на выполнение запроса на обновление записи
      *
@@ -1532,15 +1532,15 @@ class orm {
      * @return boolean
      */
     private static function update_query($table, $values) {
-        
+
         $variables = '';
 
         foreach($values as $key => $val)
             $variables .= $key . ' = ' . orm::get_value($val) . ', ';
-        
+
         return orm::execute_query('update ' . $table . ' set ' . substr($variables, 0, -2) . orm::$where);
     }
-    
+
     /**
      * Функция удаления записи из базы данных
      *
@@ -1548,14 +1548,14 @@ class orm {
      * @return object
      */
     public static function delete($table) {
-        
+
         orm::$parameters = array($table);
         orm::$object = new orm(__FUNCTION__);
         orm::set_debug(debug_backtrace());
-        
+
         return orm::$object;
     }
-    
+
     /**
      * Функция вызова запроса на удаление записи
      *
@@ -1563,10 +1563,10 @@ class orm {
      * @return boolean
      */
     private static function delete_query($table) {
-        
+
         return orm::execute_query('delete from ' . $table . orm::$where);
     }
-    
+
     /**
      * Функция выборки записей из базы данных
      *
@@ -1574,23 +1574,23 @@ class orm {
      * @return object
      */
     public static function select($table) {
-        
+
         orm::$parameters = array($table);
         orm::$object = new orm(__FUNCTION__);
         orm::set_debug(debug_backtrace());
-        
+
         return orm::$object;
     }
-    
+
     private static $int_array = array(                                     // Массив типов данных базы данных, которые необходимо перевести в integer
-        'tinyint' => 1, 'smallint'  => 2, 'integer' => 3, 
+        'tinyint' => 1, 'smallint'  => 2, 'integer' => 3,
         'bigint'  => 8, 'mediumint' => 9, 'year'    => 13
     );
-    
+
     private static $float_array = array(                                   // Массив типов данных базы данных, которые необходимо перевести в float
         'float' => 4, 'double' => 5
     );
-    
+
     /**
      * Функция вызова запроса на выборку
      *
@@ -1598,11 +1598,11 @@ class orm {
      * @return array || boolean
      */
     private static function select_query($table) {
-        
+
         $select = (!is_null(orm::$fields)) ? orm::$fields : '*';
-        
+
         return orm::modernize_selection(
-            
+
             orm::execute_query(
                 'select '         .
                 $select           .
@@ -1619,7 +1619,7 @@ class orm {
 
     /**
      * Функция соединения таблиц базы данных
-     * 
+     *
      * @param string $table Имя левой таблицы
      * @param array  $join  Массив массивов с описанием правых таблиц
      * @return object
@@ -1629,13 +1629,13 @@ class orm {
         orm::$parameters = array($table, $join);
         orm::$object = new orm(__FUNCTION__);
         orm::set_debug(debug_backtrace());
-        
+
         return orm::$object;
     }
 
     /**
      * Функция вызова join-запроса
-     * 
+     *
      * @param string $table Имя левой таблицы
      * @param array  $join  Массив массивов с описанием правых таблиц
      * @return array || boolean
@@ -1645,7 +1645,7 @@ class orm {
         $exist_fields = array();                                                                    // Массив для хранения всех выбранных полей
 
         $fields = orm::execute_query('show columns from ' . $table);                                // Запрос на получение списка полей левой таблицы
-        
+
         while($field = $fields->fetch_object())                                                     // Цикл по полученному списку полей левой таблицы
             array_push($exist_fields, $field->Field);                                               // Добавление поля в массив полей
 
@@ -1654,16 +1654,16 @@ class orm {
         $select = (!is_null(orm::$fields)) ? orm::$fields : $table . '.*';                          // Если задано значение для select, то используется оно, иначе все поля левой таблицы
 
         foreach($join as $tab) {                                                                    // Цикл по массивам с описанием правых таблиц
-            
+
             $type = (!isset($tab['join'])) ? 'inner' : $tab['join'];                                // Если не задан тип join, то по умолчанию устанавливается inner
-            
+
             if(isset($tab['right']))                                                                // Если задано правое направление связи
                 $on = $tab['table'] . '.' . $tab['table'] . '_id = ' . $tab['right'] . '.' . $tab['table'] . '_fk';
-            
+
             else {                                                                                  // Иначе правое направление связи не задано
-                
+
                 $left = (isset($tab['left'])) ? $tab['left'] : $table;                              // Если явно задано левое направление связи, то нужно использовать указанную в направлении таблицу, иначе использовать левую таблицу
-                
+
                 $on = $tab['table'] . '.' . $left . '_fk = ' . $left . '.' . $left . '_id';
             }
 
@@ -1679,14 +1679,14 @@ class orm {
             if(isset($tab['prefix']))                                                               // Если задан префикс для текущей правой таблицы
                 while($field = $fields->fetch_object())                                             // Цикл по полученному списку полей правой таблицы
                     $select .= ', ' . $tab['table'] . '.' . $field->Field . ' as ' . $tab['prefix'] . $field->Field;
-            
+
             else                                                                                    // Иначе префикс для текущей правой таблицы не задан
                 while($field = $fields->fetch_object()) {                                           // Цикл по полученному списку полей правой таблицы
 
                     $select .= ', ' . $tab['table'] . '.' . $field->Field;
 
                     if(in_array($field->Field, $exist_fields)) {                                    // Если поле, с именем текущего уже было в одной из предыдущих таблиц
-                        
+
                         $field->Field = $tab['table'] . '_' . $field->Field;                        // Значит этому полю нужно добавить табличный префикс
 
                         $select .= ' as ' . $field->Field;                                          // и в запросе указать его в качестве as
@@ -1697,7 +1697,7 @@ class orm {
         }
 
         return orm::modernize_selection(
-            
+
             orm::execute_query(
                 'select '         .
                 $select           .
@@ -1715,7 +1715,7 @@ class orm {
 
     /**
      * Функция обработки результатов выборки
-     * 
+     *
      * @param array $result Результат выборки
      * @return array || boolean
      */
@@ -1723,19 +1723,19 @@ class orm {
 
         if(!$result)                                                                                // Если запрос не был выполнен
             return false;
-        
+
         else {                                                                                      // Иначе запрос был успешно выполнен
-            
+
             $result_array = array();                                                                // Результирующий массив
-            
+
             while($current_row = $result->fetch_object()) {                                         // Цикл по строкам результатов выборки
-                
+
                 foreach($result->fetch_fields() as $val) {                                          // Цикл по полям текущей строки
-                    
+
                     $name = $val->name;                                                             // Имя текущего поля
-                    
+
                     if(!is_null(orm::$prefix)) {                                                    // Если требуется добавить префикс
-                        
+
                         $prefix = str_replace('{table}', $val->table, orm::$prefix);
 
                         $prefix_name = $prefix . $name;                                             // Формирование нового имени для поля
@@ -1743,27 +1743,27 @@ class orm {
                         unset($current_row->$name);                                                 // Удаление свойства со старым именем
                         $name = $prefix_name;                                                       // Замена основного имени на новое с префиксом
                     }
-                    
+
                     if(in_array($val->type, orm::$int_array))                                       // Если тип данных текущего поля является числовым и целым
                         $current_row->$name = intval($current_row->$name);                          // то это поле надо перевести в целое число
-                    
+
                     else if(in_array($val->type, orm::$float_array))                                // Если тип данных текущего поля является числовым и дробным
                         $current_row->$name = floatval($current_row->$name);                        // то это поле надо перевести в дробное число
                 }
-                
+
                 array_push($result_array, $current_row);                                            // Запись строки в результирующий массив
             }
-            
+
             if(orm::$single)                                                                        // Если нужно выбрать одну строку
                 return $result_array[0];                                                            // то нужно вернуть именно её
             else
                 return $result_array;                                                               // иначе массив записей
         }
     }
-    
+
     private static $where;                                                                          // Переменная, хранящая переданные условия
     private static $single = false;                                                                 // Флаг выборки одной строки
-    
+
     /**
      * Функция условия
      *
@@ -1771,32 +1771,32 @@ class orm {
      * @return mixed
      */
     public function where($where) {
-        
+
         $query_name = orm::$queries[count(orm::$queries) - 1]->name;                                // Имя текущей операции
 
         if(!$where)                                                                                 // Если аргумент отсутствует
             error::print_error('Missing argument for <b>where</b> in <b>' . $query_name . '</b> query');
-        
+
         else if(gettype($where) == 'integer' || preg_match('/^\d+$/', $where)) {                    // иначе если аргумент имеется и это целое число или это строка, являющаяся числом
-            
+
             if($query_name == 'select')                                                             // Если выполняется select
                 orm::$single = true;                                                                // нужно отметить, что к выборке требуется одна строка
-            
+
             orm::$where = ' where ' . orm::$parameters[0] . '_id = ' . $where;
         }
-        
+
         else if(gettype($where) == 'string')                                                        // иначе если аргумент имеется и это строка
             orm::$where = ($where == 'all' || $where == '*') ? '' : ' where ' . $where;             // Если запрос выполняется для всех записей, то условие не нужно
-        
+
         else                                                                                        // Иначе аргумент имеется, но у него неверный тип данных
             error::print_error('Wrong argument for <b>where</b> in <b>' . $query_name . '</b> query');
-        
+
         return call_user_func_array(
             array('orm', $query_name . '_query'),
             orm::$parameters
         );
     }
-    
+
     /**
      * Функция присоединения таблиц с использованием простых sql-запросов и их объединение в php
      *
@@ -1805,24 +1805,24 @@ class orm {
      */
     /*
     public static function inner($tables) {
-        
+
         $index = 0;                                                // Итератор для главного цикла
-        
+
         foreach($tables as $prefix => $tab) {                    // Цикл по выборкам
-            
+
             if(gettype($tab) == 'object')                        // Если таблица является объектом
                 $table[0] = $tab;                                // то этот объект надо сделать первым элементом массива
             else if(gettype($tab) == 'array')                    // Иначе если это массив
                 $table = $tab;                                    // и таблицу надо просто переприсовить
-            
+
             if($index > 0) {                                    // Если сейчас не первая таблица
-                
+
                 if(gettype($tab) == 'string')                            // Если текущая таблица - строка
                     $table = orm::select($tab)->limit(1)->where('all');    // надо сделать выборку одной строки, чтобы затем выявить поля-ключи
-                
+
                 $right_table_fk = array();                                // Массив внешних ключей правой таблицы
                 $right_table_id = array();                                // Массив первичных ключей правой таблицы
-                
+
                 if(isset($table[0]))                                    // Если у текущей таблицы есть хотя бы одна строка выборки
                     foreach($table[0] as $field => $value)                // Цикл по первой строке текущей таблицы
                         if(substr($field, -3) == '_fk') {                // Если текущее поле является внешним ключём
@@ -1833,59 +1833,59 @@ class orm {
                             $id_name = explode('_id', $field);
                             array_push($right_table_id, $id_name[0]);    // то его надо добавить в массив первичных ключей
                         }
-                
+
                 $tables_key = null;
-                
+
                 foreach($right_table_fk as $fk)                        // Цикл по внешним ключам правой таблицы
                     foreach($left_table_id as $id)                    // Цикл по первичным ключам левой таблицы
                         if($fk == $id) {                            // Если ключи совпадают
-                            
+
                             $relation = 'left';                        // Связь направлена влево
                             $tables_key = $fk;                        // то по этому ключу будут объединяться строки
                         }
-                
+
                 if(is_null($tables_key))                            // Если соответствие ключей не было найдено
                     foreach($right_table_id as $id)                    // Цикл по первичным ключам правой таблицы
                         foreach($left_table_fk as $fk)                // Цикл по внешним ключам левой таблицы
                             if($fk == $id) {                        // Если ключи совпадают
-                                
+
                                 $relation = 'right';                // Связь направлена вправо
                                 $tables_key = $fk;                    // то по этому ключу будут объединяться строки
                             }
-                
+
                 if(!is_null($tables_key)) {                            // Если соответствие ключей найдено
-                    
+
                     $tables_key_id = $tables_key . '_id';                            // Имя поля первичного ключа
                     $tables_key_fk = $tables_key . '_fk';                            // Имя поля внешнего ключа
                     $result = array();                                                // Результирующий массив
-                    
+
                     if(gettype($tab) == 'string') {                                    // Если текущая таблица - строка
-                        
+
                         $table = array();                                            // Массив формируемой таблицы
                         $exist = array();                                            // Массив первичных ключей, которые уже добавлены
-                        
+
                         foreach($left_table as $left_row) {                            // Цикл по строкам левой таблицы
-                            
+
                             if($relation == 'left')
                                 $where = $tables_key_fk . ' = ' . $left_row->$tables_key_id;
                             else if($relation == 'right')
                                 $where = $tables_key_id . ' = ' . $left_row->$tables_key_fk;
-                            
+
                             $right_rows = orm::select($tab)->where($where);            // Запрос к текущей таблице в соответствии с найденными ключами
-                            
+
                             foreach($right_rows as $row) {                            // Цикл по полученным в результате запроса строкам
-                                
+
                                 if($relation == 'right') {                            // Если связь направлена вправо
-                                    
+
                                     if(!in_array($row->$tables_key_id, $exist)) {    // Если в массиве ещё нет текущего первичного ключа
                                         array_push($exist, $row->$tables_key_id);    // Добавление нового ключа в массив первичных ключей
                                         array_push($table, $row);                    // Добавление полученных строк в текущую таблицу
                                     }
                                 }
                                 else if($relation == 'left') {                        // Иначе если связь направлена влево
-                                    
+
                                     $right_table_key = $right_table_id[0] . '_id';    // У правой таблицы, переданной в виде строки есть только один первичный ключ
-                                    
+
                                     if(!in_array($row->$right_table_key, $exist)) {    // Если в массиве ещё нет текущего первичного ключа
                                         array_push($exist, $row->$right_table_key);    // Добавление нового ключа в массив первичных ключей
                                         array_push($table, $row);                    // Добавление полученных строк в текущую таблицу
@@ -1894,26 +1894,26 @@ class orm {
                             }
                         }
                     }
-                    
+
                     if($relation == 'right')                                        // Если связь направлена вправо
                         list($left_table, $table) = array($table, $left_table);        // то нужно поменять местами таблицы для их дальнейшего объединения
-                    
+
                     foreach($left_table as $left_row => $left_row_values) {            // Цикл по строкам левой таблицы
-                        
+
                         foreach($table as $row => $row_values) {                    // Цикл по строкам правой таблицы
-                            
+
                             if($left_row_values->$tables_key_id == $row_values->$tables_key_fk) {    // Если значения ключей совпадают
-                                
+
                                 // array_push($result, (object) array_merge((array) $left_row_values, (array) $row_values)); // Слияние объектов
-                                
+
                                 if(gettype($prefix) == 'string' && $relation == 'right') {            // Если передан префикс и связь направлена вправо
-                                    
+
                                     $tmp = new stdClass;
-                                    
+
                                     foreach($left_row_values as $tmp_field => $tmp_value) {            // Цикл по полям текущей строки левой таблицы
-                                        
+
                                         if(substr($tmp_field, -3) != '_fk' && substr($tmp_field, -3) != '_id') {    // Если текущее поле не является ключом
-                                            
+
                                             $tmp_new_field = $prefix . $tmp_field;                    // Формирование нового имени для поля с учётом префикса
                                             $tmp->$tmp_new_field = $tmp_value;                        // Добавление нового свойства с прежним значением
                                         }
@@ -1923,17 +1923,17 @@ class orm {
                                 }
                                 else                                                                // Иначе префикс не передан или связь направлена влево
                                     $tmp = clone $left_row_values;
-                                
+
                                 foreach($row_values as $field => $value) {                    // Цикл по полям правой таблицы
-                                    
+
                                     if(substr($field, -3) != '_fk' && substr($field, -3) != '_id') {
-                                    
+
                                         if(gettype($prefix) == 'string' && $relation == 'left')    // Если указан префикс и связь направлена влево
                                             $field = $prefix . $field;
                                         else if(property_exists($tmp, $field)) {                // Иначе префикс не указан и если поле с таким названием уже есть
-                                            
+
                                             // if($relation == 'right') {                        // Если связь направлена вправо
-                                                
+
                                                 $left_field = $tables_key . '_' . $field;    // Новое название для поля
                                                 $tmp->$left_field = $tmp->$field;            // Присваивание значения полю с новым названием
                                             // }
@@ -1941,12 +1941,12 @@ class orm {
                                                 // $field = $tables_key . '_' . $field;        // Нужно просто задать новое название для поля
                                         }
                                     }
-                                    
+
                                     $tmp->$field = $value;                                    // Присваивание объекту левой таблицы значений свойств правой таблицы
                                 }
-                                
+
                                 array_push($result, $tmp);
-                                
+
                                 // Надо не очищать $result, а добавлять в него строки, тогда не придётся
                                 // передавать его значение в $left_table
                                 // array_splice($result, $left_row, 0, $tmp);
@@ -1955,80 +1955,80 @@ class orm {
                     }
                 }
                 else if(count($left_table) > 0 && count($table) > 0) {                        // Иначе связи не обнаружены и если у обоих таблиц есть хотя бы одна запись
-                    
+
                     $debug_info = debug_backtrace();
                     error::print_error('<b>inner</b> can\'t found conformity keys in <b>' . $debug_info[0]['file'] . '</b> on line <b>' . $debug_info[0]['line'] . '</b>');
                 }
-                
+
                 $left_table = $result;                                // Массив левой таблицы - это результат слияния таблиц
             }
             else {                                                    // Иначе сейчас первая таблица
-                
+
                 if(gettype($tab) == 'string')                        // Если переданная таблица - строка
                     $table = orm::select($tab)->where('all');        // надо сделать выборку в ручную
-                
+
                 if(gettype($prefix) == 'string') {                    // Если требуется добавить префикс
-                    
+
                     $left_table = array();
-                    
+
                     foreach($table as $row => $row_values) {            // Цикл по строкам первой таблицы
-                        
+
                         $left_table_row = new stdClass;
-                        
+
                         foreach($row_values as $field => $value) {        // Цикл по полям текущей строки первой таблицы
-                        
+
                             if(substr($field, -3) != '_fk' && substr($field, -3) != '_id') {    // Если текущее поле не является ключом
-                                
+
                                 $new_field = $prefix . $field;            // Формирование нового имени для поля с учётом префикса
                                 $left_table_row->$new_field = $value;    // Добавление нового свойства с прежним значением
                             }
                             else                                        // Иначе текущее поле является ключом
                                 $left_table_row->$field = $value;        // и его нужно просто переприсвоить
                         }
-                        
+
                         array_push($left_table, $left_table_row);        // Добавление сформированной строки в новый массив первой таблицы
                     }
                 }
                 else
                     $left_table = $table;                            // Иначе, если префикс не требуентся, массив левой таблицы - это первая таблица (слияний пока не было)
             }
-            
+
             $left_table_id = array();                                // Массив первичных ключей левой таблицы
             $left_table_fk = array();                                // Массив внешних ключей левой таблицы
-            
+
             if(isset($left_table[0]))                                // Если у текущей таблицы есть хотя бы одна строка выборки
                 foreach($left_table[0] as $field => $value) {        // Цикл по первой строке текущей таблицы
 
                     if(substr($field, -3) == '_id') {                // Если текущее поле является первичным ключём
-                        
+
                         $id_name = explode('_id', $field);
                         array_push($left_table_id, $id_name[0]);    // то его надо добавить в массив первичных ключей
                     }
                     else if(substr($field, -3) == '_fk') {            // Иначе если текущее поле является внешним ключём
-                        
+
                         $fk_name = explode('_fk', $field);
                         array_push($left_table_fk, $fk_name[0]);    // то его надо добавить в массив внешних ключей
                     }
                 }
-            
+
             $index++;
         }
-        
+
         return $result;
     }
     */
-    
+
     private static $limit;                                             // Переменная, хранящая значение для оператора limit
-    
+
     /**
      * Функция добавления значения для оператора limit к запросу
      *
      * @param string $limit Значение оператора
      */
     public function limit($limit) {
-        
+
         orm::$limit = ' limit ' . $limit;
-        
+
         return orm::$object;
     }
 
@@ -2040,9 +2040,9 @@ class orm {
      * @param string $fields Перечисление полей
      */
     public function fields($fields) {
-        
+
         orm::$fields = $fields;
-        
+
         return orm::$object;
     }
 
@@ -2054,71 +2054,71 @@ class orm {
      * @param string $addfields Перечисление полей
      */
     public function addfields($addfields) {
-        
+
         orm::$addfields = ', ' . $addfields;
-        
+
         return orm::$object;
     }
-    
+
     private static $order;                                             // Переменная, хранящая значение для оператора order
-    
+
     /**
      * Функция добавления значения для оператора order к запросу
      *
      * @param string $order Значение оператора
      */
     public function order($order) {
-        
+
         orm::$order = ' order by ' . $order;
-        
+
         return orm::$object;
     }
-    
+
     private static $group;                                             // Переменная, хранящая значение для оператора group
-    
+
     /**
      * Функция добавления значения для оператора group к запросу
      *
      * @param string $group Значение оператора
      */
     public function group($group) {
-        
+
         orm::$group = ' group by ' . $group;
-        
+
         return orm::$object;
     }
-    
+
     private static $subqueries;                                        // Переменная, хранящая подзапросы
-    
+
     /**
      * Функция добавления подзапросов
      *
      * @param array $subqueries Массив с текстами подзапросов
      */
     public function sub($subqueries) {
-        
+
         foreach($subqueries as $val => $key)
             orm::$subqueries .= ', (' . $val . ') as ' . $key;
-        
+
         return orm::$object;
     }
-    
+
     private static $prefix;                                            // Переменная, хранящая значение префикса
-    
+
     /**
      * Функция добавления значения префикса для полей таблицы
      *
      * @param string $prefix Значение для префикса
      */
     public function prefix($prefix) {
-        
+
         orm::$prefix = $prefix;
-        
+
         return orm::$object;
     }
 
     private static $selection_operation = array('select', 'join');                                          // Операции, выполняющие выборку данных
-    
+
     /**
      * Функция непосредственного выполнения запроса
      *
@@ -2126,53 +2126,53 @@ class orm {
      * @return boolean
      */
     private static function execute_query($query) {
-        
+
         orm::$queries[count(orm::$queries) - 1]->query = $query;                                            // Запись в массив данных текста текущего запроса
-        
+
         $start = microtime(true);                                                                           // Время начала выполнения запроса
         $result = orm::$mysqli->query($query);                                                              // Выполнение самого запроса
         orm::$queries[count(orm::$queries) - 1]                                                             // Запись в массив данных
             ->duration = microtime(true) - $start;                                                          // длительности выполнения запроса
-        
+
         if(!$result) {                                                                                      // Если запрос не был выполнен
-            
+
             orm::$queries[count(orm::$queries) - 1]->result = '<b>error:</b> ' . orm::$mysqli->error;       // Запись ошибки в результат выполнения запроса
             return false;                                                                                   // и возвращение отрицательного результата
         }
         else if(in_array(orm::$queries[count(orm::$queries) - 1]->name, orm::$selection_operation)) {       // Иначе запрос был выполнен и если текущая операция относится к операциям, выполняющим выборку данных
-            
+
             orm::$queries[count(orm::$queries) - 1]->result = 'complete: ' . $result->num_rows . ' rows';   // Запись количества выбранных строк в результат выполнения запроса
             return $result;                                                                                 // и возвращение результата выборки
         }
         else {                                                                                              // Иначе запрос успешно выполнен, но текущая операция не относится к выполняющим выборку
-            
+
             orm::$queries[count(orm::$queries) - 1]->result = 'complete';                                   // Запись сообщения об успешном выполнении в качестве результата
             return true;                                                                                    // и возвращение положительного результата
         }
     }
-    
+
     /**
      * Функция добавления информации по выполняемым запросам
      *
      */
     private static function set_debug($backtrace) {
-        
+
         orm::$queries[count(orm::$queries) - 1]->file = $backtrace[0]['file'];                              // Запись в массив данных пути к файлу
         orm::$queries[count(orm::$queries) - 1]->line = $backtrace[0]['line'];                              // и строки, откуда был вызван запрос
     }
-    
+
     /**
      * Функция вывода информации по отработанным запросам
      *
      */
     public static function debug() {
-        
+
         echo "<pre><b>Queries debuger:</b>\n\n";
-        
+
         $duration_sum = 0;
-        
+
         foreach(orm::$queries as $key => $val) {
-            
+
             echo $key + 1 . " -> " . $val->name . " [\n"
                 . "\t"   . "file     -> " . $val->file
                 . "\n\t" . "line     -> " . $val->line
@@ -2180,113 +2180,113 @@ class orm {
                 . "\n\t" . "duration -> " . $val->duration
                 . "\n\t" . "result   -> " . $val->result
                 . "\n]\n\n";
-            
+
             $duration_sum += $val->duration;
         }
-        
+
         echo "total [\n"
             . "\t" .   "count    -> " . count(orm::$queries)
             . "\n\t" . "duration -> " . $duration_sum
             . "\n]</pre>";
     }
-    
+
     /**
      * Функция вывода массива выборки в удобочитаемом виде
      *
      * @param array || object $query
      */
     public static function result($query) {
-        
+
         if(gettype($query) == 'object')                                // Если параметр является объектом (одна строка в результате выборки)
             $table[0] = $query;                                        // то надо добавить его в массив
         else                                                           // Иначе это массив
             $table = $query;                                           // и его надо просто переприсвоить
-        
+
         echo "<pre><b>Query result: </b>";
-        
+
         if(count($table) == 0)                                         // Если выборка пуста
             echo "empty\n\n";
         else {                                                         // Если есть результаты выборки
-            
+
             echo "\n\n";
-            
+
             foreach($table as $num => $row) {                          // Цикл по строкам результата выборки
-                
+
                 echo $num + 1 . " -> [\n";
-                
+
                 foreach($row as $key => $val)                          // Цикл по полям текущей строки
                     echo "\t" . $key . " => " . $val . "\n";
-                
+
                 echo "]\n\n";
             }
         }
-        
+
         echo "</pre>";
     }
 }
 
 // Класс обработки ошибок
 class error {
-    
+
     protected static $sys_classes = array(                             // Определение классов системы, имена которых нельзя использовать в приложении
         'core', 'get', 'orm', 'error', 'message', 'mods'
     );
-    
+
     /**
      * Функция обработки ошибок интерпретатора
-     * 
+     *
      */
     public static function get_error() {
-        
-        $info = error_get_last();                                      // Получение массива с информацией о последней ошибке в таком формате: Array([type] => 1 [message] => Message text [file] => Path to file [line] => 1 ) 
-        
+
+        $info = error_get_last();                                      // Получение массива с информацией о последней ошибке в таком формате: Array([type] => 1 [message] => Message text [file] => Path to file [line] => 1 )
+
         switch($info['type']) {
-            
+
             case 1:                                                    // Если ошибка является фатальной
-                
-                if(stripos($info['message'], 
+
+                if(stripos($info['message'],
                     'Call to undefined method') === 0) {               // Если это ошибка вызова неизвестного метода
-                    
+
                     if(preg_match('|Call to undefined method (.*)::|', $info['message'], $match)) {
-                        
+
                         foreach(error::$sys_classes as $class)
                             if($class == $match[1]) {                  // Если имя вызываемого класса совпадает хотя бы с одним из системных классов
-                                
+
                                 echo error::print_error('Called class-name (<b>' . $match[1] . '</b>) is used in system. Other reserved system class-name: ');
-                                
+
                                 foreach(error::$sys_classes as $class)
                                     echo '<b>' . $class . '</b>; ';
-                                
+
                                 break;
                             }
                     }
                 }
-                
+
                 break;
         }
     }
-    
+
     /**
      * Функция печати ошибок системы
      *
      * @param string $text Текст ошибки
      */
     public static function print_error($text) {
-        
+
         die('<br><b>Framework error</b>: ' . $text);
     }
 }
 
 // Класс вывода сообщений
 class message {
-    
+
     /**
      * Функция печати сообщений системы
      *
      * @param string $text Текст сообщения
      */
     public static function print_message($text) {
-        
+
         echo '<br><b>Framework message</b>: ' . $text;
     }
 }
@@ -2296,17 +2296,17 @@ class mod {
 
     /**
      * Функция инициализации модулей
-     * 
+     *
      * @param array $mods Массив имён модулей
      */
     public static function init($mods) {
 
         foreach($mods as $mod) {                                       // Цикл по перечисленным именам модулей
-            
+
             $path = '/mod/' . $mod;                                    // Относительный путь к модулю
 
             array_push(ten_file::$input_path, $path . '/view/');       // Добавление пути к представлениям модуля для объединения файлов
-            
+
             array_push(                                                // Добавление путей для автоподключения файлов модуля
                 core::$paths,
                 ROOT . $path . '/app/controller/',
@@ -2327,11 +2327,11 @@ class mod {
         require ROOT . '/assets/php/markdown.php';
 
         echo core::block(array(
-                
+
             'block' => 'html',
 
             'parse' => array(
-                
+
                 'title' => 'Модуль — ' . $mod,
                 'files' => core::includes('markdown', '__autogen__'),
                 'body'  => Markdown(file_get_contents(ROOT . '/mod/' . $mod . '/readme.md'))
