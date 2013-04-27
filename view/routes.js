@@ -1,14 +1,14 @@
 /** settings:
 
     saveless: {
-        
+
         path: '/assets/css/',          // Директория, в которую будут сохраняться файлы
         compress: true | false,        // Флаг компрессии выходящих css-файлов (по умолчанию true)
     }
 */
 
 /** routes:
-    
+
     url:   Адрес, при переходе по которому осуществляется вызов
         Примеры адресов:
             '/'
@@ -36,9 +36,9 @@
 */
 
 core.add({
-    
+
     routes: {
-        
+
         settings: {
 
             saveless: {
@@ -46,7 +46,7 @@ core.add({
                 path: '/assets/css/'
             }
         },
-        
+
         routes: [
             // {
             //     url: '/',
