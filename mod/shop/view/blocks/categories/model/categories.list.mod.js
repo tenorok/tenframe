@@ -11,11 +11,11 @@ core.add({
                 list: {
 
                     init: function() {                                                                    // Инициализация работы с категориями
-                        
+
                         var that = this;
-                        
+
                         this.block = core.mod.shop.categories.block;
-                        
+
                         $(this.block + '(cat)').click(function() {                                        // Событие клика по категории
                             return that.showDropdown.call(that, this);
                         });
@@ -29,7 +29,7 @@ core.add({
                     },
 
                     showDropdown: function(link) {                                                        // Отображение выпадушки с меню работы над категорией
-                        
+
                         var $link    = $(link),
                             position = $link.position(),
                             top      = position.top,
@@ -42,7 +42,7 @@ core.add({
                             'top'    : top  + 29,
                             'left'   : left - 8
                         });
-                        
+
                         $(dropdown + '{add-product}').attr({                                              // Изменение адреса ссылки добавления товара
                             'href': href + 'addproduct'
                         });
@@ -59,7 +59,7 @@ core.add({
                     },
 
                     hideDropdown: function() {                                                            // Скрытие выпадушки с меню работы над категорией
-                        
+
                         $(this.block + '(dropdown)').css({
                             'display': 'none'
                         });
@@ -88,7 +88,7 @@ core.add({
                             .parent()
                             .next(this.block + '(list)')                                                  // Получение объекта списка, который нужно скрыть или отобразить
                             .slideToggle(200, function() {                                                // Скрытие и отображение списка
-                                
+
                                 if($(this).is(':hidden'))                                                 // Изменение стрелочки
                                     arrow.html('&#9650;');
                                 else
@@ -97,7 +97,7 @@ core.add({
                     },
 
                     sortable: function() {                                                                // Сортировка категорий
-                        
+
                         var that = this;
 
                         $(this.block + '(list)')
@@ -126,12 +126,12 @@ core.add({
                         var arr = [];                                                                     // Массив для сохранения id категорий
 
                         $.each(items, function() {                                                        // Цикл по категориям
-                            
+
                             var id =                                                                      // Формирование чистого идентификатора текущей категории
                                 $(this)
                                     .attr('id')
                                     .split('_')[1];
-                            
+
                             arr.push(id);                                                                 // Добавление чистого идентификатора в массив
                         });
 

@@ -9,9 +9,9 @@ core.add({
             categories: {
 
                 block: '%mod-shop-categories',
-        
+
                 controller: {
-                    
+
                     list: function() {
 
                         core.mod.shop.categories.list.init();        // Инициализация работы с категориями

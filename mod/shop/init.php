@@ -28,7 +28,7 @@ ten_file::autogen('/mod/shop/view/include/routes.js', "core.addRoute({
 });");
 
 array_push(core::$routes, array(
-    
+
     'url'      => array(
         '/' . $adminpage . '/modshop/categories/add/',
         '/' . $adminpage . '/modshop/categories/{parentid}/addcategory/',
@@ -36,7 +36,7 @@ array_push(core::$routes, array(
     ),
     'callback' => 'mod_shop_categories->add_category_form'
 ), array(
-    
+
     'type'     => 'POST',
     'url'      => '/' . $adminpage . '/modshop/categories/insert/',
     'callback' => 'mod_shop_categories->insert_category'

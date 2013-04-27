@@ -3,10 +3,10 @@
 // Работа с категориями магазина
 
 class mod_shop_categories {
-    
+
     /**
      * Отображение категорий
-     * 
+     *
      */
     public static function view_categories() {
 
@@ -28,7 +28,7 @@ class mod_shop_categories {
     }
 
     private static $types = array(                                         // Типы полей
-        
+
         array(
             'val' => 'varchar',
             'txt' => 'Строка'
@@ -61,14 +61,14 @@ class mod_shop_categories {
 
     /**
      * Проверка доступа к страницам работы с категориями
-     * 
+     *
      */
     private static function get_categories_access() {
 
         $admin_info = mod_admin_m_auth::get_admin_info();                  // Получение данных об администраторе
 
         require ROOT . '/mod/shop/conf/pages.php';
-        
+
         if(
             !$admin_info ||                                                // Если администратор не авторизован
             !mod_admin_m_menu::get_access(                                 // Или если администратор не имеет доступа к текущей странице
@@ -80,7 +80,7 @@ class mod_shop_categories {
 
     /**
      * Отображение формы создания категории
-     * 
+     *
      */
     public static function add_category_form() {
 
@@ -117,26 +117,26 @@ class mod_shop_categories {
             $edit = '';
 
         echo core::block(array(                                            // Парсинг всей страницы
-            
+
             'block' => 'html',
 
             'parse' => array(
-                
+
                 'title' => 'Административная панель &mdash; ' . $info['title'],
                 'files' => core::includes('libs, developer, require', '__autogen__'),
-                
+
                 'body'  => core::block(array(
-                    
+
                     'mod'   => 'admin',
                     'block' => 'page',
 
                     'parse' => array(
-                        
+
                         'header' => core::block(array(
 
                             'mod'   => 'admin',
                             'block' => 'header',
-                            
+
                             'parse' => array(
                                 'login'  => $admin_info['login'],
                                 'action' => ten_text::rgum($settings['urls']['page'], '/') . 'quit/'
@@ -151,15 +151,15 @@ class mod_shop_categories {
                             'context' => array(
 
                                 'items' => array(
-                                    
+
                                     'array' => mod_admin_m_menu::get_menu(),
                                     'parse' => array(
                                         'title'  => 'title',
                                         'active' => 'active'
                                     ),
-                                    
+
                                     'deactive' => array(
-                                        
+
                                         '!if'   => 'active',
                                         'parse' => array(
                                             'href' => 'href'
@@ -173,9 +173,9 @@ class mod_shop_categories {
                                         'subitems' => array(
 
                                             'array' => 'tabs',
-                                            
+
                                             'deactive' => array(
-                                                
+
                                                 '!if'   => 'active',
                                                 'parse' => array(
                                                     'href' => 'href'
@@ -193,14 +193,14 @@ class mod_shop_categories {
                         )),
 
                         'content' => core::block(array(
-                            
+
                             'mod'   => 'admin',
                             'block' => 'content',
-                            
+
                             'parse' => array(
-                                
+
                                 'title'   => $info['title'],
-                                
+
                                 'content' => core::block(array(
                                     'mod'   => 'shop',
                                     'block' => 'categories',
@@ -226,7 +226,7 @@ class mod_shop_categories {
                                                 'field'    => 'tmod_shop_fields_name'
                                             )
                                         ),
-                                        
+
                                         'types' => array(
 
                                             'array' => mod_shop_categories::$types,
@@ -247,14 +247,14 @@ class mod_shop_categories {
 
     /**
      * Добавление новой категории
-     * 
+     *
      */
     public static function insert_category() {
 
         require ROOT . '/mod/admin/conf/settings.php';
-        
+
         mod_shop_categories::get_categories_access();                      // Проверка доступа к страницам работы с категориями
-        
+
         array_pop($_POST['existfield']);                                   // Удаление последнего элемента подмассива, так как это всегда незполенное поле
 
         if(!empty($_POST['catparent'])) {                                  // Если задана родительская категория
@@ -327,7 +327,7 @@ class mod_shop_categories {
 
     /**
      * Удаление пустых элементов массива
-     * 
+     *
      * @param string $e Текущий элемент массива
      * @return boolean
      */

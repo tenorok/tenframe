@@ -1,7 +1,7 @@
 <li id="c_{{ $id }}" class="mod-shop-categories__item">
-    
+
     <div>
-        
+
         {{ begin item }}
             <a href="{{ $id }}" class="mod-shop-categories__cat mod-shop-categories__cat_edit">{{ $name }}</a>
         {{ end }}

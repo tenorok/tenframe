@@ -10,7 +10,7 @@
                 <label for="mod-shop-categories__catalias" class="mod-shop-categories__label">Алиас</label>
                 <input type="text" value="{{ $alias }}" name="catalias" placeholder="tv" id="mod-shop-categories__catalias" class="mod-shop-categories__catalias mod-shop-categories__textinput">
             </li>
-            
+
             {{ $edit }}
 
         </ul>
@@ -37,7 +37,7 @@
                     <li class="mod-shop-categories__labelitem">
                         <label class="mod-shop-categories__label">Тип поля</label>
                         <select name="type[]" class="mod-shop-categories__selectinput">
-                            
+
                             {{ begin types }}
                                 <option value="{{ $value }}" class="mod-shop-categories__optioninput">{{ $text }}</option>
                             {{ end }}

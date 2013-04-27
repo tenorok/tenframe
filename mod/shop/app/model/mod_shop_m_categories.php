@@ -6,7 +6,7 @@ class mod_shop_m_categories {
 
     /**
      * Получение списка категорий с учётом вложенностей
-     * 
+     *
      * @param string $page Адрес главной страницы административной панели
      * @return string
      */
@@ -45,7 +45,7 @@ class mod_shop_m_categories {
 
     /**
      * Рекурсивная функция парсинга подкатегорий
-     * 
+     *
      * @param string  $page       Адрес главной страницы административной панели
      * @param array   $categories Массив всех категорий
      * @param integer $current    Идентификатор текущей категории
@@ -84,7 +84,7 @@ class mod_shop_m_categories {
 
     /**
      * Парсинг шаблона элемента категории
-     * 
+     *
      * @param string   $page    Имя главной страницы административной панели
      * @param integer  $id      Идентификатор категории
      * @param string   $name    Название категории
@@ -160,7 +160,7 @@ class mod_shop_m_categories {
 
     /**
      * Формирование массива данных для парсинга формы работы с категорией
-     * 
+     *
      */
     public static function get_info() {
 
@@ -177,13 +177,13 @@ class mod_shop_m_categories {
         );
 
         if(!is_null($parentid)) {                                                        // Если задана родительская категория
-            
+
             $info['title']    = 'Добавление подкатегории в &laquo;' . orm::select('tmod_shop_categories')->where($parentid)->name . '&raquo;';
             $info['parentid'] = $parentid;
             $info['action']   = 'insert';
         }
         else if(!is_null($categoryid)) {                                                 // Если задана конкретная категория на изменение
-            
+
             $catinfo = orm::select('tmod_shop_categories')->where($categoryid);
 
             $info['title']  = 'Изменение категории &laquo;' . $catinfo->name . '&raquo;';
@@ -193,7 +193,7 @@ class mod_shop_m_categories {
             $info['hided']  = $catinfo->hide;
         }
         else {                                                                           // Иначе просто добавление категории в корень
-            
+
             $info['title']  = 'Добавление новой категории';
             $info['action'] = 'insert';
         }
@@ -203,7 +203,7 @@ class mod_shop_m_categories {
 
     /**
      * Получение списка категорий
-     * 
+     *
      * @param string $category_id Номер текущей категории
      * @return array
      */
@@ -226,11 +226,11 @@ class mod_shop_m_categories {
                     false :
                     true;                                                                // Иначе категория является родительской для текущей
             }
-            
+
             return $categories;                                                          // Возврат обработанных результатов выборки
         }
         else                                                                             // Иначе передан адрес страницы админки (значит сейчас не страница редактирования категории)
-            return 
+            return
                 $categories =
                     orm::select('tmod_shop_categories')                                  // Получение списка существующих категорий
                         ->order('serial')
@@ -239,13 +239,13 @@ class mod_shop_m_categories {
 
     /**
      * Формирование массива полей категории
-     * 
+     *
      * @param string $category_id Номер текущей категории
      * @return array
      */
     public static function get_fields($category_id) {
 
-        $fields = 
+        $fields =
             orm::join('tmod_shop_fields', array(
                 array(
                     'table' => 'tmod_shop_values',
@@ -254,7 +254,7 @@ class mod_shop_m_categories {
                 )
             ))
             ->where('tmod_shop_fields.tmod_shop_categories_fk = ' . $category_id);
-        
+
         echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
         print_r($fields);
 
