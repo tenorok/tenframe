@@ -3,26 +3,26 @@
 // Авторизация в административной панели
 
 class mod_admin_auth {
-    
+
     /**
      * Отображение формы авторизации
-     * 
+     *
      */
     public static function view_auth() {
 
         require ROOT . '/mod/admin/conf/settings.php';
 
         return core::block(array(
-            
+
             'block' => 'html',
 
             'parse' => array(
-                
+
                 'title' => 'Вход в административную панель',
                 'files' => core::includes('libs, developer, require', '__autogen__'),
-                
+
                 'body'  => core::block(array(
-                    
+
                     'mod'   => 'admin',
                     'block' => 'logon',
 
@@ -37,7 +37,7 @@ class mod_admin_auth {
 
     /**
      * Выполнение авторизации
-     * 
+     *
      */
     public static function auth() {
 
@@ -50,7 +50,7 @@ class mod_admin_auth {
 
     /**
      * Выполнение выхода
-     * 
+     *
      */
     public static function quit() {
 

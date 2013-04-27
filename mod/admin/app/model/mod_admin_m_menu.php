@@ -8,7 +8,7 @@ class mod_admin_m_menu {
 
     /**
      * Получение файла настроек меню
-     * 
+     *
      * @return array
      */
     public static function get_menu_conf() {
@@ -24,7 +24,7 @@ class mod_admin_m_menu {
 
     /**
      * Получение блока меню
-     * 
+     *
      * @param  string $page Адрес страницы
      * @param  string $tab  Адрес подстраницы
      * @return array
@@ -52,9 +52,9 @@ class mod_admin_m_menu {
             ) ? ' mod-admin-menu__item_active' : '';
 
             if(isset($menuInfo['tabs'])) {                                               // Если у меню существует подменю
-                
+
                 foreach($menuInfo['tabs'] as $i => $curTab) {                            // Цикл по подменю
-                    
+
                     $tabInfo = $menuInfo['tabs'][$i];                                    // Заведение информационной переменной для удобства
 
                     if(!mod_admin_m_menu::get_access(                                    // Если администратор не имеет доступ к текущей подстранице
@@ -70,7 +70,7 @@ class mod_admin_m_menu {
                     $menu[$key]['tabs'][$i]['active'] = (                                // Задание активного класса
                         ten_text::del($page . '/' . $tab, '/') == $pageAndTab            // Если текущий адрес соответствует адресу ссылки подменю
                     ) ? ' mod-admin-menu__item_active' : '';
-                    
+
                     $menu[$key]['tabs'][$i]['href'] = $main_url . $pageAndTab;           // Изменение адреса ссылки подменю
                 }
             }
@@ -85,7 +85,7 @@ class mod_admin_m_menu {
 
     /**
      * Проверка доступа к странице или подстранице
-     * 
+     *
      * @param  array         $roleInfo Массив параметров роли авторизованного администратора
      * @param  string        $page     Имя страницы для проверки
      * @param  string | null $tab      Имя подстраницы для проверки
@@ -108,7 +108,7 @@ class mod_admin_m_menu {
                 $curTabs == $page                                                        // и она совпадает с переданной для проверки
             )
                 return true;                                                             // Значит администратор имеет к ней доступ
-            
+
             else if(
                 gettype($curTabs) == 'array'  &&                                         // Иначе если страница указана с табами
                 $curPage == $page                                                        // и она совпадает с переданной для проверки

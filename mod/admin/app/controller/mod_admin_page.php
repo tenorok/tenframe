@@ -3,7 +3,7 @@
 // Отображение административной панели
 
 class mod_admin_page {
-    
+
     /**
      * Формирование страницы авторизации
      *
@@ -13,11 +13,11 @@ class mod_admin_page {
         require ROOT . '/mod/admin/conf/settings.php';
 
         $admin_info = mod_admin_m_auth::get_admin_info();                // Получение данных об администраторе
-        
+
         if($admin_info) {                                                // Если администратор авторизован
-            
+
             if(!$page) {                                                 // Если страница не указана
-                
+
                 $index = explode('/', ten_text::del(                     // Нужно открыть главную страницу
                     $settings['urls']['index'], '/'                      // указанную в настройках
                 ));
@@ -39,7 +39,7 @@ class mod_admin_page {
 
     /**
      * Отображение главной страницы административной панели
-     * 
+     *
      */
     private static function view_page($login, $page, $tab) {
 
@@ -48,26 +48,26 @@ class mod_admin_page {
         $content = mod_admin_m_content::get_content($page, $tab);        // Получение массива наполнения текущей страницы
 
         echo core::block(array(                                          // Парсинг всей страницы
-            
+
             'block' => 'html',
 
             'parse' => array(
-                
+
                 'title' => 'Административная панель &mdash; ' . $content['title'],
                 'files' => core::includes('libs, developer, require', '__autogen__'),
-                
+
                 'body'  => core::block(array(
-                    
+
                     'mod'   => 'admin',
                     'block' => 'page',
 
                     'parse' => array(
-                        
+
                         'header' => core::block(array(
 
                             'mod'   => 'admin',
                             'block' => 'header',
-                            
+
                             'parse' => array(
                                 'login'  => $login,
                                 'action' => ten_text::rgum($settings['urls']['page'], '/') . 'quit/'
@@ -82,11 +82,11 @@ class mod_admin_page {
                             'context' => array(
 
                                 'items' => array(
-                                    
+
                                     'array' => mod_admin_m_menu::get_menu($page, $tab),
-                                    
+
                                     'deactive' => array(
-                                        
+
                                         '!if'   => 'active',
                                         'parse' => array(
                                             'href'   => 'href',
@@ -109,9 +109,9 @@ class mod_admin_page {
                                         'subitems' => array(
 
                                             'array' => 'tabs',
-                                            
+
                                             'deactive' => array(
-                                                
+
                                                 '!if'   => 'active',
                                                 'parse' => array(
                                                     'href'   => 'href',
@@ -133,10 +133,10 @@ class mod_admin_page {
                         )),
 
                         'content' => core::block(array(
-                            
+
                             'mod'   => 'admin',
                             'block' => 'content',
-                            
+
                             'parse' => array(
                                 'title'   => $content['title'],
                                 'content' => $content['content']
