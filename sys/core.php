@@ -313,20 +313,6 @@
         message::print_message('Message text');
 */
 
-/*    mod
-    
-    Просмотр readme модуля:
-        Адрес: domen.com/mod/{modname}/
-        В корне модуля должен лежать readme.md
-
-    Инициализация модулей (require.php):
-        mod::init(array('mod1', 'mod2', ..., 'modN'));
-        
-        Инициализация модуля:
-            1) добавляет его стили и скрипты в единый объединённый файл
-            2) обеспечивает автоподключение вызываемых классов модуля
-*/
-
 defined('SYS')        or die('Core error: System path is not declared!');
 defined('CONTROLLER') or die('Core error: Controller path is not declared!');
 defined('MODEL')      or die('Core error: Model path is not declared!');
@@ -463,14 +449,7 @@ class core {
         'dev'     => false                                                 // Проводить маршрут всегда
     );
     
-    public static $routes = array(                                         // Системные маршруты
-        
-        array(
-            'url'      => '/module/{mod}/',
-            'callback' => 'mod->readme',
-            'dev'      => true                                             // Проводить маршрут только когда включен режим разработчика
-        )
-    );
+    public static $routes = array();                                       // Системные маршруты
 
     /**
      * Функция проведения системных маршуртов
@@ -2288,54 +2267,5 @@ class message {
     public static function print_message($text) {
         
         echo '<br><b>Framework message</b>: ' . $text;
-    }
-}
-
-// Класс работы с модулями фреймворка
-class mod {
-
-    /**
-     * Функция инициализации модулей
-     * 
-     * @param array $mods Массив имён модулей
-     */
-    public static function init($mods) {
-
-        foreach($mods as $mod) {                                       // Цикл по перечисленным именам модулей
-            
-            $path = '/mod/' . $mod;                                    // Относительный путь к модулю
-
-            array_push(ten_file::$input_path, $path . '/view/');       // Добавление пути к представлениям модуля для объединения файлов
-            
-            array_push(                                                // Добавление путей для автоподключения файлов модуля
-                core::$paths,
-                ROOT . $path . '/app/controller/',
-                ROOT . $path . '/app/model/'
-            );
-
-            require ROOT . $path . '/init.php';                        // Подключение файла инициализации модуля
-        }
-    }
-
-    /**
-     * Функция отображения readme модулей
-     *
-     * @param string $mod Имя модуля
-     */
-    public static function readme($mod) {
-
-        require ROOT . '/assets/php/markdown.php';
-
-        echo core::block(array(
-                
-            'block' => 'html',
-
-            'parse' => array(
-                
-                'title' => 'Модуль — ' . $mod,
-                'files' => core::includes('markdown', '__autogen__'),
-                'body'  => Markdown(file_get_contents(ROOT . '/mod/' . $mod . '/readme.md'))
-            )
-        ));
     }
 }

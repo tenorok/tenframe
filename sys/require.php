@@ -34,6 +34,6 @@ if(isset(core::$settings['mysql']) && core::$settings['mysql']) {
     orm::db($mysql['database']);                                // Выбор базы данных
 }
 
-mod::init(core::$settings['modules']);                          // Инициализация модулей
+tmod::init(core::$settings['modules']);                         // Инициализация модулей
 
 unset($root, $query, $mysql);
