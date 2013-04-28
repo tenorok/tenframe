@@ -1,60 +1,60 @@
 <?php
 
-// Version 1.1.1
-// From 09.02.2013
+/**
+ * Работа с текстом
+ * @version 1.1.1
+ */
 
-// Класс работы с текстом
-
-/*    Использование
+/* Использование
 
     Перевод строки в нижний регистр:
-        $string = ten_text::lower_case($string);
+        $string = txt::lower_case($string);
 
     Преобразование текста в транслит:
-        $text = ten_text::translit($text);
+        $text = txt::translit($text);
 
     Преобразование URI в транслит:
-        $uri = ten_text::translit_uri($uri);
+        $uri = txt::translit_uri($uri);
 
     Типограф:
-        $text = ten_text::typograf('"Вы всё ещё кое-как верстаете в "Ворде"? - Тогда мы идем к вам!"');
+        $text = txt::typograf('"Вы всё ещё кое-как верстаете в "Ворде"? - Тогда мы идем к вам!"');
 
     Отбивка:
         Если второй параметр не указан, то используется отбивка для шрифта Arial:
-            $text = ten_text::wean('&laquo;подсказок&raquo;');
+            $text = txt::wean('&laquo;подсказок&raquo;');
 
         Можно указывать шрифт, если он есть в массиве $wean_fonts:
-            $text = ten_text::wean('&laquo;подсказок&raquo;', 'verdana');
+            $text = txt::wean('&laquo;подсказок&raquo;', 'verdana');
 
         Можно передавать массив специфичных отступов:
-            $text = ten_text::wean('&laquo;подсказок&raquo;', array('b'=>'.58', 'm'=>'.85', 's'=>'.4'));
+            $text = txt::wean('&laquo;подсказок&raquo;', array('b'=>'.58', 'm'=>'.85', 's'=>'.4'));
 
     Экранирование:
-        $text = ten_text::strip($text);
+        $text = txt::strip($text);
 
     Добавление подстрок:
         Добавление подстроки в начало и конец строки, если её там ещё нет:
-            $text = ten_text::gum($text,  'substr');
+            $text = txt::gum($text,  'substr');
         Добавление подстроки в начало строки, если её там ещё нет:
-            $text = ten_text::lgum($text, 'substr');
+            $text = txt::lgum($text, 'substr');
         Добавление подстроки в конец строки, если её там ещё нет:
-            $text = ten_text::rgum($text, 'substr');
+            $text = txt::rgum($text, 'substr');
 
     Удаление подстрок:
         $substr = string || array;                                           // Можно передать одну строку или массив строк
 
         Удаление подстроки из начала и конца строки, если она там есть
-            $text = ten_text::del($text,  $substr);
+            $text = txt::del($text,  $substr);
         Удаление подстроки из начала строки, если она там есть
-            $text = ten_text::ldel($text, $substr);
+            $text = txt::ldel($text, $substr);
         Удаление подстроки из конца строки, если она там есть
-            $text = ten_text::rdel($text, $substr);
+            $text = txt::rdel($text, $substr);
 
         Рекурсивное удаление подстрок:
             Те же самые функции с приставкой all: delall, ldelall, rdelall
 */
 
-class ten_text {
+class txt extends core {
 
     protected static $cyrillic_alphabet = array(                             // Кириллический алфавит
         'А'=>'а', 'Б'=>'б', 'В'=>'в', 'Г'=>'г', 'Д'=>'д',
@@ -87,7 +87,7 @@ class ten_text {
 
         return strtr(
             $string,
-            ten_text::$cyrillic_alphabet + ten_text::$latin_alphabet         // Объединение массивов кириллического и латинского алфавита
+            self::$cyrillic_alphabet + self::$latin_alphabet                 // Объединение массивов кириллического и латинского алфавита
         );
     }
 
@@ -120,7 +120,7 @@ class ten_text {
      */
     public static function translit($text) {
 
-        return strtr($text, ten_text::$exchange_letters);
+        return strtr($text, self::$exchange_letters);
     }
 
     /**
@@ -132,8 +132,8 @@ class ten_text {
     public static function translit_uri($uri) {
 
         return urlencode(strtr(
-            ten_text::lower_case($uri),                                      // Преобразование полученной строки в нижний регистр
-            ten_text::$exchange_letters + ten_text::$exchange_other          // Объединение массивов для замены символов и спецсимволов
+            self::lower_case($uri),                                      // Преобразование полученной строки в нижний регистр
+            self::$exchange_letters + self::$exchange_other              // Объединение массивов для замены символов и спецсимволов
         ));
     }
 
@@ -153,7 +153,7 @@ class ten_text {
 
 
     Example:
-        print ten_text::typograf('"Вы все еще кое-как верстаете в "Ворде"? - Тогда мы идем к вам!"');
+        print txt::typograf('"Вы все еще кое-как верстаете в "Ворде"? - Тогда мы идем к вам!"');
     */
 
     public static $entityType = 1;                                           // html = 1; xml = 2; no = 3; mixed = 4;
@@ -172,17 +172,17 @@ class ten_text {
         $text = str_replace('<', '&lt;', $text);
         $text = str_replace('>', '&gt;', $text);
 
-        $SOAPBody = '<?xml version="1.0" encoding="' . ten_text::$encoding . '"?>
+        $SOAPBody = '<?xml version="1.0" encoding="' . self::$encoding . '"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
   <soap:Body>
     <ProcessText xmlns="http://typograf.artlebedev.ru/webservices/">
       <text>' . $text . '</text>
-      <entityType>' . ten_text::$entityType . '</entityType>
-      <useBr>' . ten_text::$useBr . '</useBr>
-      <useP>' . ten_text::$useP . '</useP>
-      <maxNobr>' . ten_text::$maxNobr . '</maxNobr>
-      <quotA>' . ten_text::$quotA . '</quotA>
-      <quotB>' . ten_text::$quotB . '</quotB>
+      <entityType>' . self::$entityType . '</entityType>
+      <useBr>' . self::$useBr . '</useBr>
+      <useP>' . self::$useP . '</useP>
+      <maxNobr>' . self::$maxNobr . '</maxNobr>
+      <quotA>' . self::$quotA . '</quotA>
+      <quotB>' . self::$quotB . '</quotB>
     </ProcessText>
   </soap:Body>
 </soap:Envelope>';
@@ -243,7 +243,7 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
      */
     public static function wean($text, $font = 'arial') {
 
-        $ws_full = ten_text::$wean_symbols;
+        $ws_full = self::$wean_symbols;
 
         foreach($ws_full as $key => $val) {
             $ws_full['&nbsp;' . $key] = $val;
@@ -253,7 +253,7 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
         if(is_array($font))                                                      // Если передан массив с отступами
             $wean = $font;
         else                                                                     // Иначе ставятся отступы для заданного шрифта
-            $wean = ten_text::$wean_fonts[$font];
+            $wean = self::$wean_fonts[$font];
 
         $big    = '<span style="margin-right: ' . $wean['b'] . 'em;"> </span><span style="margin-left: -' . $wean['b'] . 'em;">{{symbol}}</span>';
         $middle = '<span style="margin-right: ' . $wean['m'] . 'em;"> </span><span style="margin-left: -' . $wean['m'] . 'em;">{{symbol}}</span>';
@@ -299,8 +299,8 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
      */
     public static function gum($string, $substr) {
 
-        $string = ten_text::lgum($string, $substr);
-        return    ten_text::rgum($string, $substr);
+        $string = self::lgum($string, $substr);
+        return    self::rgum($string, $substr);
     }
 
     /**
@@ -336,8 +336,8 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
      */
     public static function del($string, $substr) {
 
-        $string = ten_text::ldel($string, $substr);
-        return    ten_text::rdel($string, $substr);
+        $string = self::ldel($string, $substr);
+        return    self::rdel($string, $substr);
     }
 
     /**
@@ -349,8 +349,8 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
      */
     public static function delall($string, $substr) {
 
-        $string = ten_text::ldelall($string, $substr);
-        return    ten_text::rdelall($string, $substr);
+        $string = self::ldelall($string, $substr);
+        return    self::rdelall($string, $substr);
     }
 
     /**
@@ -362,7 +362,7 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
      */
     public static function ldel($string, $substr) {
 
-        return ten_text::delChar($string, $substr, 'left');
+        return self::delChar($string, $substr, 'left');
     }
 
     /**
@@ -374,7 +374,7 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
      */
     public static function ldelall($string, $substr) {
 
-        return ten_text::delChar($string, $substr, 'left', true);
+        return self::delChar($string, $substr, 'left', true);
     }
 
     /**
@@ -386,7 +386,7 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
      */
     public static function rdel($string, $substr) {
 
-        return ten_text::delChar($string, $substr, 'right');
+        return self::delChar($string, $substr, 'right');
     }
 
     /**
@@ -398,7 +398,7 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
      */
     public static function rdelall($string, $substr) {
 
-        return ten_text::delChar($string, $substr, 'right', true);
+        return self::delChar($string, $substr, 'right', true);
     }
 
     /**
@@ -428,7 +428,7 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
      */
     private static function delChar($string, $substr, $position, $all = false) {
 
-        foreach(ten_text::getCharArr($substr) as $charCur) {
+        foreach(self::getCharArr($substr) as $charCur) {
 
             switch($position) {
 
@@ -447,7 +447,7 @@ SOAPAction: "http://typograf.artlebedev.ru/webservices/ProcessText"
                 if(!$all)
                     return $ret;
                 else
-                    return ten_text::delChar($ret, $substr, $position, $all);
+                    return self::delChar($ret, $substr, $position, $all);
         }
 
         return $string;

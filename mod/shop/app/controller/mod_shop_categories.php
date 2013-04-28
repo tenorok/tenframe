@@ -12,7 +12,7 @@ class mod_shop_categories {
 
         require ROOT . '/mod/admin/conf/settings.php';
 
-        $page = ten_text::del($settings['urls']['page'], '/');
+        $page = txt::del($settings['urls']['page'], '/');
 
         return tpl::block(array(
 
@@ -139,7 +139,7 @@ class mod_shop_categories {
 
                             'parse' => array(
                                 'login'  => $admin_info['login'],
-                                'action' => ten_text::rgum($settings['urls']['page'], '/') . 'quit/'
+                                'action' => txt::rgum($settings['urls']['page'], '/') . 'quit/'
                             )
                         )),
 
@@ -207,7 +207,7 @@ class mod_shop_categories {
                                     'view'  => 'add',
 
                                     'parse' => array(
-                                        'page'   => ten_text::del($settings['urls']['page'], '/'),
+                                        'page'   => txt::del($settings['urls']['page'], '/'),
                                         'action' => $info['action'],
                                         'parent' => $info['parentid'],
                                         'name'   => $info['name'],
@@ -322,7 +322,7 @@ class mod_shop_categories {
             }
         }
 
-        header('location: ' . ten_text::gum($settings['urls']['page'], '/'));
+        header('location: ' . txt::gum($settings['urls']['page'], '/'));
     }
 
     /**

@@ -21,7 +21,7 @@ class mod_admin_m_content {
 
         foreach($menu as $key => $item) {                                                // Цикл по элементам меню
 
-            $main_url = ten_text::rgum($settings['urls']['page'], '/');                  // Адрес главной страницы административной панели
+            $main_url = txt::rgum($settings['urls']['page'], '/');                       // Адрес главной страницы административной панели
 
             $menuInfo = $menu[$key];                                                     // Заведение информационной переменной для удобства
 

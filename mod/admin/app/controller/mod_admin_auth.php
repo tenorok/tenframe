@@ -27,7 +27,7 @@ class mod_admin_auth {
                     'block' => 'logon',
 
                     'parse' => array(
-                        'action' => ten_text::rgum($settings['urls']['page'], '/') . 'auth/',
+                        'action' => txt::rgum($settings['urls']['page'], '/') . 'auth/',
                         'error'  => (isset($_SESSION['mod_admin_auth_logon']) && !$_SESSION['mod_admin_auth_logon']) ? 'Неверный логин или пароль' : ''
                     )
                 ))

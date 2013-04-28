@@ -18,7 +18,7 @@ class mod_admin_page {
 
             if(!$page) {                                                 // Если страница не указана
 
-                $index = explode('/', ten_text::del(                     // Нужно открыть главную страницу
+                $index = explode('/', txt::del(                          // Нужно открыть главную страницу
                     $settings['urls']['index'], '/'                      // указанную в настройках
                 ));
 
@@ -70,7 +70,7 @@ class mod_admin_page {
 
                             'parse' => array(
                                 'login'  => $login,
-                                'action' => ten_text::rgum($settings['urls']['page'], '/') . 'quit/'
+                                'action' => txt::rgum($settings['urls']['page'], '/') . 'quit/'
                             )
                         )),
 
