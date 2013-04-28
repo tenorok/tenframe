@@ -39,6 +39,9 @@
                get::$arg->key2;
                get::$arg->key3;
 
+Получение значения GET-переменной:
+        $value = core::$get->key;
+
     Подключение ядра:
         require 'sys/core.php';
         
@@ -208,12 +211,6 @@
         ));
 */
 
-/*    get
-
-    Получение значения GET-переменной:
-        $value = get::$arg->key;
-*/
-
 defined('SYS')        or die('Core error: System path is not declared!');
 defined('CONTROLLER') or die('Core error: Controller path is not declared!');
 defined('MODEL')      or die('Core error: Model path is not declared!');
@@ -303,15 +300,15 @@ class core {
                     if(!isset($asserts[$match[1]]) ||                      // Если для этой переменной не назначено регулярное выражение
                         preg_match($asserts[$match[1]], $urn[$part])) {    // или если переменная проходит проверку регулярным выражением
                         $args[$match[1]] = $urn[$part];                    // Запись переменной в массив аргументов для дальнейшей передачи функции
-                        get::set_arg($match[1], $urn[$part]);              // Добавление пары ключ-значение в объект для работы с переменными
+                        self::set_get_arg($match[1], $urn[$part]);         // Добавление пары ключ-значение в объект для работы с переменными
                     }
                     else {                                                 // Иначе переменная не проходит проверку регулярным выражением
-                        get::unset_args();                                 // Нужно очистить объект переменных
+                        self::unset_get_args();                            // Нужно очистить объект переменных
                         continue 2;                                        // и вызывать следующий маршрут в index.php
                     }
                 else                                                       // иначе часть пути не является переменной
                     if($urn[$part] != $path[$part]) {                      // и если часть URN не совпадает с частью пути
-                        get::unset_args();                                 // Нужно очистить объект переменных
+                        self::unset_get_args();                            // Нужно очистить объект переменных
                         continue 2;                                        // и вызывать следующий маршрут в index.php
                     }
             
@@ -367,6 +364,30 @@ class core {
             if(!$route['dev'] || $route['dev'] && DEV)                     // Если маршрут надо проводить всегда или только для режима разработчика и режим включен
                 core::request($route['type'], $route['url'], $route['callback'], $route['asserts']);
         }
+    }
+
+    public static $get;                                                    // Объект, который используется из приложения для обращения к GET-переменным
+
+    /**
+     * Функция добавления свойства для объекта self::$get
+     *
+     * @param string $key Имя GET-переменной
+     * @param string $val Значение GET-переменной
+     */
+    public static function set_get_arg($key, $val) {
+
+        self::$get->$key = $val;
+    }
+
+    /**
+     * Функция удаления всех свойств объекта self::$get
+     *
+     */
+    public static function unset_get_args() {
+
+        if(count(self::$get))                                              // Если объект аргументов содержит хотя бы одно значение
+            foreach(get_object_vars(self::$get) as $key => $val)
+                self::$get->$key = '';
     }
     
     private static $default_404_options = array(                           // Дефолтные параметры для ненайденной страницы
@@ -1248,33 +1269,5 @@ class core {
             torm::$mysqli->close();                                         // Разрыв соединения с базой данных
 
         terr::get_error();                                                 // Обработка ошибок интерпретатора
-    }
-}
-
-// Класс работы с GET-переменными
-class get {
-    
-    public static $arg;                                                    // Объект, который используется из приложения для обращения к GET-переменным
-    
-    /**
-     * Функция добавления свойства для объекта $arg
-     *
-     * @param string $key Имя GET-переменной
-     * @param string $val Значение GET-переменной
-     */
-    public static function set_arg($key, $val) {
-        
-        get::$arg->$key = $val;
-    }
-    
-    /**
-     * Функция удаления всех свойств объекта $arg
-     *
-     */
-    public static function unset_args() {
-        
-        if(count(get::$arg))                                               // Если объект аргументов содержит хотя бы одно значение
-            foreach(get_object_vars(get::$arg) as $key => $val)
-                get::$arg->$key = '';
     }
 }
