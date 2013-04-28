@@ -29,7 +29,7 @@ class tmod extends core {
     public static function init($mods) {
 
         array_push(                                                    // Добавление маршрута отображения документации по модулю
-            parent::$routes,
+            troute::$routes,
             array(
                 'url'      => '/module/{mod}/',
                 'callback' => 'tmod->readme',
