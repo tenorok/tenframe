@@ -307,12 +307,6 @@
         error::print_error('Error text');
 */
 
-/*    message
-    
-    Вывод сообщения системы:
-        message::print_message('Message text');
-*/
-
 defined('SYS')        or die('Core error: System path is not declared!');
 defined('CONTROLLER') or die('Core error: Controller path is not declared!');
 defined('MODEL')      or die('Core error: Model path is not declared!');
@@ -2253,19 +2247,5 @@ class error {
     public static function print_error($text) {
         
         die('<br><b>Framework error</b>: ' . $text);
-    }
-}
-
-// Класс вывода сообщений
-class message {
-    
-    /**
-     * Функция печати сообщений системы
-     *
-     * @param string $text Текст сообщения
-     */
-    public static function print_message($text) {
-        
-        echo '<br><b>Framework message</b>: ' . $text;
     }
 }

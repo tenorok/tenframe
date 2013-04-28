@@ -510,14 +510,14 @@ class ten_file {
                     if(count(ten_file::$path_array) > 1) {                           // Если было загружено больше одного изображения
                         
                         if(ten_file::$debug)                                         // Если включена отладка
-                            message::print_message('Upload images array is complete');
+                            tmsg::log('Upload images array is complete');
                         
                         return ten_file::$path_array;                                // Возвращение массива путей
                     }
                     else {
                         
                         if(ten_file::$debug)                                         // Если включена отладка
-                            message::print_message('Upload complete to <b>' . $path . '</b>');
+                            tmsg::log('Upload complete to <b>' . $path . '</b>');
                         
                         return $path;                                                // Функция возвращает путь к загруженному файлу
                     }
@@ -537,7 +537,7 @@ class ten_file {
             return ten_file::upload_image($files, $mini_options);                    // Рекурсивный вызов функции для загрузки миниатюр
         
         if(ten_file::$debug)                                                         // Если включена отладка
-            message::print_message('Upload images array is complete');
+            tmsg::log('Upload images array is complete');
         
         return ten_file::$path_array;                                                // Функция возвращает массив путей к загруженным файлам
     }
