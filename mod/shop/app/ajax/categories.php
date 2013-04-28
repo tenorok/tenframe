@@ -10,7 +10,7 @@ switch($_GET['event']) {
 
         foreach($categories as $i => $id) {                      // Цикл по полученному массиву категорий
 
-            orm::update('tmod_shop_categories', array(
+            torm::update('tmod_shop_categories', array(
                 'serial' => $i
             ))->where($id);
         }

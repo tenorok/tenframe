@@ -26,7 +26,7 @@ class ten_secure {
         if(is_int($id) && $id > 0) {
 
             if(!is_null($table))
-                if(count(orm::select($table)->where($id)) > 0)
+                if(count(torm::select($table)->where($id)) > 0)
                     return true;
                 else
                     return false;

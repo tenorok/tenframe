@@ -178,13 +178,13 @@ class mod_shop_m_categories {
 
         if(!is_null($parentid)) {                                                        // Если задана родительская категория
 
-            $info['title']    = 'Добавление подкатегории в &laquo;' . orm::select('tmod_shop_categories')->where($parentid)->name . '&raquo;';
+            $info['title']    = 'Добавление подкатегории в &laquo;' . torm::select('tmod_shop_categories')->where($parentid)->name . '&raquo;';
             $info['parentid'] = $parentid;
             $info['action']   = 'insert';
         }
         else if(!is_null($categoryid)) {                                                 // Если задана конкретная категория на изменение
 
-            $catinfo = orm::select('tmod_shop_categories')->where($categoryid);
+            $catinfo = torm::select('tmod_shop_categories')->where($categoryid);
 
             $info['title']  = 'Изменение категории &laquo;' . $catinfo->name . '&raquo;';
             $info['action'] = 'edit/' . $categoryid;
@@ -212,7 +212,7 @@ class mod_shop_m_categories {
         if((int) $category_id > 0) {                                                     // Если вместо адреса страницы админки передан идентификатор категории
 
             $categories =
-                orm::select('tmod_shop_categories')                                      // Запрос на получение всех категорий с подзапросом на определение родителя текущей категории
+                torm::select('tmod_shop_categories')                                     // Запрос на получение всех категорий с подзапросом на определение родителя текущей категории
                     ->sub(array(
                         'select tmod_shop_categories_fk from tmod_shop_categories where tmod_shop_categories_id = ' . $category_id => 'parent'
                     ))
@@ -232,7 +232,7 @@ class mod_shop_m_categories {
         else                                                                             // Иначе передан адрес страницы админки (значит сейчас не страница редактирования категории)
             return
                 $categories =
-                    orm::select('tmod_shop_categories')                                  // Получение списка существующих категорий
+                    torm::select('tmod_shop_categories')                                 // Получение списка существующих категорий
                         ->order('serial')
                         ->where('all');
     }
@@ -246,7 +246,7 @@ class mod_shop_m_categories {
     public static function get_fields($category_id) {
 
         $fields =
-            orm::join('tmod_shop_fields', array(
+            torm::join('tmod_shop_fields', array(
                 array(
                     'table' => 'tmod_shop_values',
                     'join'  => 'left',
@@ -258,6 +258,6 @@ class mod_shop_m_categories {
         echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
         print_r($fields);
 
-        orm::debug();
+        torm::debug();
     }
 }
