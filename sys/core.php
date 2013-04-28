@@ -295,18 +295,6 @@
         orm::debug();                                                  // Статистика проведённых до этого момента запросов
 */
 
-/*    error
-    
-    Отключение отображения ошибок интерпретатора:
-        error_reporting(0);
-    
-    Указание метода, которые будет вызван по окончании выполнения всего скрипта:
-        register_shutdown_function(array('error', 'get_error'));
-    
-     Вывод ошибки системы:
-        error::print_error('Error text');
-*/
-
 defined('SYS')        or die('Core error: System path is not declared!');
 defined('CONTROLLER') or die('Core error: Controller path is not declared!');
 defined('MODEL')      or die('Core error: Model path is not declared!');
@@ -431,7 +419,7 @@ class core {
                 $args                                                      // и параметрами из массива $args
             );
         else
-            error::print_error(                                            // Иначе метод не существует
+            tmsg::error(                                                   // Иначе метод не существует
                 '[' . $type . '] Route error: Function is undefined: '
                 . $call[0] . '->' . $call[1]
             );
@@ -860,7 +848,7 @@ class core {
             '}');
 
         if(!$tenhtml) {                                                                 // Если не удалось получить JSON-дерево
-            error::print_error('invalid tenhtml in ' . $file);
+            tmsg::error('invalid tenhtml in ' . $file);
         }
 
         $gentpl = '';
@@ -903,7 +891,7 @@ class core {
             $block = $keyInfo['block'];                                                 // Текущий блок нужно переназначить
         }
         else if(!$block) {                                                              // Иначе если текущий блок не имеется
-            error::print_error('Undefined block name');
+            tmsg::error('Undefined block name');
         }
 
         return core::makeTag($keyInfo, $content, $block);                               // Формирование тега
@@ -1340,7 +1328,7 @@ class core {
         if(isset(orm::$mysqli))
             orm::$mysqli->close();                                         // Разрыв соединения с базой данных
 
-        error::get_error();                                                // Обработка ошибок интерпретатора
+        terr::get_error();                                                 // Обработка ошибок интерпретатора
     }
 }
 
@@ -1422,7 +1410,7 @@ class orm {
     public static function db($db) {
         
         if(!orm::$mysqli->select_db($db))
-            error::print_error('Selected database <b>' . $db . '</b> not found');
+            tmsg::error('Selected database <b>' . $db . '</b> not found');
     }
     
     /**
@@ -1748,7 +1736,7 @@ class orm {
         $query_name = orm::$queries[count(orm::$queries) - 1]->name;                                // Имя текущей операции
 
         if(!$where)                                                                                 // Если аргумент отсутствует
-            error::print_error('Missing argument for <b>where</b> in <b>' . $query_name . '</b> query');
+            tmsg::error('Missing argument for <b>where</b> in <b>' . $query_name . '</b> query');
         
         else if(gettype($where) == 'integer' || preg_match('/^\d+$/', $where)) {                    // иначе если аргумент имеется и это целое число или это строка, являющаяся числом
             
@@ -1762,7 +1750,7 @@ class orm {
             orm::$where = ($where == 'all' || $where == '*') ? '' : ' where ' . $where;             // Если запрос выполняется для всех записей, то условие не нужно
         
         else                                                                                        // Иначе аргумент имеется, но у него неверный тип данных
-            error::print_error('Wrong argument for <b>where</b> in <b>' . $query_name . '</b> query');
+            tmsg::error('Wrong argument for <b>where</b> in <b>' . $query_name . '</b> query');
         
         return call_user_func_array(
             array('orm', $query_name . '_query'),
@@ -2195,57 +2183,5 @@ class orm {
         }
         
         echo "</pre>";
-    }
-}
-
-// Класс обработки ошибок
-class error {
-    
-    protected static $sys_classes = array(                             // Определение классов системы, имена которых нельзя использовать в приложении
-        'core', 'get', 'orm', 'error', 'message', 'mods'
-    );
-    
-    /**
-     * Функция обработки ошибок интерпретатора
-     * 
-     */
-    public static function get_error() {
-        
-        $info = error_get_last();                                      // Получение массива с информацией о последней ошибке в таком формате: Array([type] => 1 [message] => Message text [file] => Path to file [line] => 1 ) 
-        
-        switch($info['type']) {
-            
-            case 1:                                                    // Если ошибка является фатальной
-                
-                if(stripos($info['message'], 
-                    'Call to undefined method') === 0) {               // Если это ошибка вызова неизвестного метода
-                    
-                    if(preg_match('|Call to undefined method (.*)::|', $info['message'], $match)) {
-                        
-                        foreach(error::$sys_classes as $class)
-                            if($class == $match[1]) {                  // Если имя вызываемого класса совпадает хотя бы с одним из системных классов
-                                
-                                echo error::print_error('Called class-name (<b>' . $match[1] . '</b>) is used in system. Other reserved system class-name: ');
-                                
-                                foreach(error::$sys_classes as $class)
-                                    echo '<b>' . $class . '</b>; ';
-                                
-                                break;
-                            }
-                    }
-                }
-                
-                break;
-        }
-    }
-    
-    /**
-     * Функция печати ошибок системы
-     *
-     * @param string $text Текст ошибки
-     */
-    public static function print_error($text) {
-        
-        die('<br><b>Framework error</b>: ' . $text);
     }
 }
