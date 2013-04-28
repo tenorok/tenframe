@@ -16,8 +16,8 @@
 
 class terr {
 
-    protected static $sys_classes = array(                             // Определение классов системы, имена которых нельзя использовать в приложении
-        'core', 'get', 'orm', 'error', 'message', 'mods'
+    private static $sys_classes = array(                               // Определение классов системы, имена которых нельзя использовать в приложении
+        'core', 'get', 'torm', 'terr', 'tmsg', 'tmod'
     );
 
     /**
@@ -37,12 +37,12 @@ class terr {
 
                     if(preg_match('|Call to undefined method (.*)::|', $info['message'], $match)) {
 
-                        foreach(terr::$sys_classes as $class)
+                        foreach(self::$sys_classes as $class)
                             if($class == $match[1]) {                  // Если имя вызываемого класса совпадает хотя бы с одним из системных классов
 
-                                echo terr::print_error('Called class-name (<b>' . $match[1] . '</b>) is used in Tenframe. Other reserved Tenframe classname: ');
+                                echo tmsg::error('Called class-name (<b>' . $match[1] . '</b>) is used in Tenframe. Other reserved Tenframe classname: ');
 
-                                foreach(terr::$sys_classes as $class)
+                                foreach(self::$sys_classes as $class)
                                     echo '<b>' . $class . '</b>; ';
 
                                 break;
