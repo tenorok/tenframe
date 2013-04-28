@@ -257,7 +257,7 @@ class ten_file {
 
         if(!file_exists($path))                                      // Если указанного пути не существует
             if(!mkdir($path, 0777, true))                            // Если не удалось создать каталоги, указанные в пути
-                error::print_error('<b>Error:</b> can\'t find and make directory: <b>' . $path . '</b>');
+                tmsg::error('<b>Error:</b> can\'t find and make directory: <b>' . $path . '</b>');
 
         return true;                                                 // Если скрипт не был убит, значит операция прошла успешно
     }
@@ -347,7 +347,7 @@ class ten_file {
             if(!$type[1] || !in_array($type[1], ten_file::$image_type)) {            // Если текущий файл не изображение или если изображение, но имеет не поддерживаемый тип
                 
                 if(ten_file::$debug)                                                 // Если включена отладка
-                    error::print_error('<b>Upload error:</b> Bad image type!');
+                    tmsg::error('<b>Upload error:</b> Bad image type!');
                 
                 return -1;                                                           // Ошибка -1: Неверный тип файла
             }
@@ -355,7 +355,7 @@ class ten_file {
             if($file['size'] > ten_file::$image_size) {                              // Если размер загружаемого файла не соответствует ограничению
                 
                 if(ten_file::$debug)                                                 // Если включена отладка
-                    error::print_error('<b>Upload error:</b> Big image size, maximum = ' . (ten_file::$image_size / 1024 / 1024) . ' megabites (' . ten_file::$image_size . ' bytes). And your file size = ' . $file['size'] . ' bytes');
+                    tmsg::error('<b>Upload error:</b> Big image size, maximum = ' . (ten_file::$image_size / 1024 / 1024) . ' megabites (' . ten_file::$image_size . ' bytes). And your file size = ' . $file['size'] . ' bytes');
                 
                 return -2;                                                           // Ошибка -2: Слишком большой размер загружаемого файла
             }
@@ -365,7 +365,7 @@ class ten_file {
             if(empty($image_info)) {
                 
                 if(ten_file::$debug)                                                 // Если включена отладка
-                    error::print_error('<b>Upload error:</b> can\'t read information about file');
+                    tmsg::error('<b>Upload error:</b> can\'t read information about file');
                 
                 return -3;                                                           // Ошибка -3: Отсутствует информация по изображению (скорее всего это не изображение)
             }
@@ -526,7 +526,7 @@ class ten_file {
             else {                                                                   // Иначе файл не загрузился
                 
                 if(ten_file::$debug)                                                 // Если включена отладка
-                    error::print_error('<b>Upload error:</b> ' . $path);
+                    tmsg::error('<b>Upload error:</b> ' . $path);
                 
                 return false;                                                        // Неизвестная ошибка
             }
@@ -729,7 +729,7 @@ class ten_file {
             closedir($input);                                                        // Закрытие текущего объекта
         }
         else
-            error::print_error('Can\'t open directory: ' . $options['input_path']);
+            tmsg::error('Can\'t open directory: ' . $options['input_path']);
     }
 
     /**
@@ -837,7 +837,7 @@ class ten_file {
                     $tag = 'link';
                 }
                 else                                                                 // иначе ни href ни src не указаны и надо вывести ошибку
-                    error::print_error('Can\'t read attribute "href" or "src" of include file');
+                    tmsg::error('Can\'t read attribute "href" or "src" of include file');
 
                 $type = end(explode('.', $file[$url]));                              // Расширение файла
                 $attrs = array_merge($def_attrs[$tag], $file);                       // Слияние массива дефолтных атрибутов с переданным массивом атрибутов
