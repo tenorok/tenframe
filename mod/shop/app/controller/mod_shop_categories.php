@@ -14,7 +14,7 @@ class mod_shop_categories {
 
         $page = ten_text::del($settings['urls']['page'], '/');
 
-        return core::block(array(
+        return tpl::block(array(
 
             'mod'   => 'shop',
             'block' => 'categories',
@@ -98,25 +98,25 @@ class mod_shop_categories {
 
         $info = mod_shop_m_categories::get_info();                         // Получение массива с информацией для парсинга
 
-        if(isset(get::$arg->categoryid)) {
+        if(isset(core::$get->categoryid)) {
 
-            $edit = core::block(array(
+            $edit = tpl::block(array(
                 'mod'   => 'shop',
                 'block' => 'categories',
                 'view'  => 'edit',
 
                 'parse' => array(
                     'hided'      => $info['hided'],
-                    'categories' => mod_shop_m_categories::get_categories_list(get::$arg->categoryid)
+                    'categories' => mod_shop_m_categories::get_categories_list(core::$get->categoryid)
                 )
             ));
 
-            mod_shop_m_categories::get_fields(get::$arg->categoryid);
+            mod_shop_m_categories::get_fields(core::$get->categoryid);
         }
         else
             $edit = '';
 
-        echo core::block(array(                                            // Парсинг всей страницы
+        echo tpl::block(array(                                             // Парсинг всей страницы
 
             'block' => 'html',
 
@@ -125,14 +125,14 @@ class mod_shop_categories {
                 'title' => 'Административная панель &mdash; ' . $info['title'],
                 'files' => core::includes('libs, developer, require', '__autogen__'),
 
-                'body'  => core::block(array(
+                'body'  => tpl::block(array(
 
                     'mod'   => 'admin',
                     'block' => 'page',
 
                     'parse' => array(
 
-                        'header' => core::block(array(
+                        'header' => tpl::block(array(
 
                             'mod'   => 'admin',
                             'block' => 'header',
@@ -143,7 +143,7 @@ class mod_shop_categories {
                             )
                         )),
 
-                        'menu' => core::block(array(
+                        'menu' => tpl::block(array(
 
                             'mod'   => 'admin',
                             'block' => 'menu',
@@ -192,7 +192,7 @@ class mod_shop_categories {
                             )
                         )),
 
-                        'content' => core::block(array(
+                        'content' => tpl::block(array(
 
                             'mod'   => 'admin',
                             'block' => 'content',
@@ -201,7 +201,7 @@ class mod_shop_categories {
 
                                 'title'   => $info['title'],
 
-                                'content' => core::block(array(
+                                'content' => tpl::block(array(
                                     'mod'   => 'shop',
                                     'block' => 'categories',
                                     'view'  => 'add',

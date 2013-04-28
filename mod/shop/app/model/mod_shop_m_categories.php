@@ -95,7 +95,7 @@ class mod_shop_m_categories {
     private static function parse_category_item($page, $id, $name, $parent, $hidden) {
 
         if((int) $page > 0)                                                              // Если вместо адреса страницы админки передан идентификатор категории
-            return core::block(array(                                                    // Значит нужно парсить список категорий для изменения родительской категории
+            return tpl::block(array(                                                     // Значит нужно парсить список категорий для изменения родительской категории
 
                 'mod'   => 'shop',
                 'block' => 'categories',
@@ -125,7 +125,7 @@ class mod_shop_m_categories {
                 )
             ));
         else                                                                             // Иначе нужно парсить список категорий для главной страницы категорий
-            return core::block(array(
+            return tpl::block(array(
 
                 'mod'   => 'shop',
                 'block' => 'categories',
@@ -164,8 +164,8 @@ class mod_shop_m_categories {
      */
     public static function get_info() {
 
-        $categoryid = (isset(get::$arg->categoryid)) ? get::$arg->categoryid : null;     // Если в адресной строке есть идентификатор категории
-        $parentid   = (isset(get::$arg->parentid))   ? get::$arg->parentid   : null;     // Если в адресной строке есть идентификатор родительской категории
+        $categoryid = (isset(core::$get->categoryid)) ? core::$get->categoryid : null;   // Если в адресной строке есть идентификатор категории
+        $parentid   = (isset(core::$get->parentid))   ? core::$get->parentid   : null;   // Если в адресной строке есть идентификатор родительской категории
 
         $info = array(                                                                   // Массив возможных полей с дефолтными значениями
             'title'    => '',
