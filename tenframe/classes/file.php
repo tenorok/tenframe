@@ -80,9 +80,10 @@ class file extends core {
      * @param  string $path    Путь к файлу
      * @param  string $content Контент сохраняемого файла
      * @param  string $prefix  Префикс сохраняемого файла
+     * @param  number $chmod   Права на создаваемый файл
      * @return string          Сформированный путь к сгенерированному файлу
      */
-    public static function autogen($path, $content, $prefix = '__autogen__') {
+    public static function autogen($path, $content, $prefix = '__autogen__', $chmod = false) {
         
         if(!preg_match('/^' . str_replace('/', '\/', ROOT) . '/', $path))            // Если в пути не указана корневая директория
             $path = ROOT . $path;                                                    // то её надо добавить
@@ -95,6 +96,10 @@ class file extends core {
 
         self::make_dir($final_path);
         file_put_contents($final_path, $content);
+
+        if($chmod && !chmod($final_path, $chmod)) {
+            message::error('can\'t set chmod in file: ' . $final_path);
+        }
 
         return $final_path;
     }
