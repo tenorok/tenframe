@@ -82,18 +82,18 @@ class route extends core {
         )
             return false;                                                  // то маршрут обрабатывать не нужно
 
-        if(gettype($url) == 'string') {                                    // Если у маршрута один адрес
+        if(is_string($url)) {                                              // Если у маршрута один адрес
 
-                if(trim($url) == '*')
-                    return self::callback($type, $callback);
+            if(trim($url) == '*')
+                return self::callback($type, $callback);
 
-                $pathArr[0] = self::parse_urn($url);                       // Путь текущего адреса
+            $pathArr[0] = self::parse_urn($url);                           // Путь текущего адреса
         }
         else                                                               // Иначе передан массив адресов
             foreach($url as $p => $path)                                   // Цикл по адресам маршрутов
                 $pathArr[$p] = self::parse_urn($path);                     // Путь каждого адреса
 
-        $urn  = self::parse_urn();                                         // Текущий URN
+        $urn = self::parse_urn();                                          // Текущий URN
 
         foreach($pathArr as $p => $path) {                                 // Цикл по маршрутам
 
@@ -174,24 +174,24 @@ class route extends core {
     }
 
     /**
-     * Функция добавления свойства для объекта self::$get
+     * Функция добавления свойства для объекта parent::$get
      *
      * @param string $key Имя GET-переменной
      * @param string $val Значение GET-переменной
      */
     public static function set_get_arg($key, $val) {
 
-        self::$get->$key = $val;
+        parent::$get->$key = $val;
     }
 
     /**
-     * Функция удаления всех свойств объекта self::$get
+     * Функция удаления всех свойств объекта parent::$get
      *
      */
     public static function unset_get_args() {
 
-        if(count(self::$get))                                              // Если объект аргументов содержит хотя бы одно значение
-            foreach(get_object_vars(self::$get) as $key => $val)
-                self::$get->$key = '';
+        if(count(parent::$get))                                            // Если объект аргументов содержит хотя бы одно значение
+            foreach(get_object_vars(parent::$get) as $key => $val)
+                parent::$get->$key = '';
     }
 }
