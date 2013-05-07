@@ -1,7 +1,12 @@
 <?php
 
-if(stripos($_SERVER['PHP_SELF'], 'sys/index.php')) {            // Если выполняется обычный запрос
-    list($root, $query) = explode('sys/index.php', $_SERVER['PHP_SELF']);
+define('TEN_PATH', 'tenframe');                                 // Константа директории tenframe
+
+if(stripos($_SERVER['PHP_SELF'], TEN_PATH . '/index.php')) {    // Если выполняется обычный запрос
+    list($root, $query) = explode(
+        TEN_PATH . '/index.php',
+        $_SERVER['PHP_SELF']
+    );
 }
 else {                                                          // Иначе выполняется ajax-запрос
     $root = '';
