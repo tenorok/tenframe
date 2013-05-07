@@ -6,6 +6,13 @@ require 'define.php';
 
 spl_autoload_register(array('ten\core', 'auto_load'));          // Включение автоподгрузки классов
 
+if(isset(ten\core::$settings['autoload'])) {                    // Добавление путей автоматической загрузки классов
+    ten\core::$paths = array_merge(
+        ten\core::$paths,
+        ten\core::$settings['autoload']
+    );
+}
+
 if(!DEV)                                                        // Если выключен режим разработчика
     error_reporting(0);                                         // Отключение отображения ошибок интерпретатора
 else

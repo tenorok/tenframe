@@ -1,15 +1,12 @@
 <?php
 
 /**
- * Базовый класс фреймворка
- * @version 1.5.9
+ * Базовый класс tenframe
+ * @version 0.0.1
  */
 
 /* Использование
         
-    Включение автоподгрузки классов:
-        spl_autoload_register(array('core', 'auto_load'));
-
     Подключение include-файлов:
         echo ten\core::includes(
             'libs, developer, require',                                // Обязательный. Файлы с именами 'developer' и 'dev' подключаются только при включенном режиме разработчика
@@ -19,16 +16,11 @@
 
 namespace ten;
 
-defined('SYS')        or die('Core error: System path is not declared!');
-defined('CONTROLLER') or die('Core error: Controller path is not declared!');
-defined('MODEL')      or die('Core error: Model path is not declared!');
-
-// Класс ядра
 class core {
     
     public static $settings;                                               // Параметры работы фреймворка
     public static $get;                                                    // Объект, который используется из приложения для обращения к GET-переменным
-    public static $paths = array(SYS, CONTROLLER, MODEL);                  // Массив с директориями классов
+    public static $paths = array('/');                                     // Массив с директориями классов
     
     /**
      * Функция автоматической подгрузки необходимых файлов
@@ -36,15 +28,16 @@ class core {
      * @param string $class Имя подключаемого класса (оно должно соответствовать имени файла, в котором находится класс)
      */
     public static function auto_load($class) {
-        
+
         foreach(self::$paths as $dir) {
             
             $path = str_replace(                                           // Замена символов в строке вызова метода tenframe
-                array('__', '\\', 'ten'),
-                array('/', '/', TEN_PATH . '/classes'),
-                strtolower($class));
+                array('__', 'ten\\', '\\'),
+                array('/', TEN_PATH . '/classes/', '/'),
+                strtolower($class)
+            );
             
-            $file = $dir . $path . '.php';
+            $file = ROOT . $dir . $path . '.php';
 
             if(is_file($file)) {
                 require $file;
