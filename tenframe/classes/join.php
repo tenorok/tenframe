@@ -195,8 +195,7 @@ class join extends file {
 
         parent::make_dir($output_file);                                              // Создание пути, если его не существует
 
-        file_put_contents($output_file, self::$output_file);                         // Запись итоговой строки в выходящий файл
-        @chmod($output_file, 0644);                                                  // Присвоение необходимых прав на файл
+        file::autogen($output_file, self::$output_file, '');                         // Запись итоговой строки в выходящий файл
 
         self::$output_file = '';                                                     // Обнуление строки собранного файла
 
