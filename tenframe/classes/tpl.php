@@ -352,7 +352,7 @@ class tpl extends core {
     public static function not_found($options = array()) {
 
         if(
-            troute::$called            &&                                               // Если маршрут был проведён
+            ten\route::$called            &&                                            // Если маршрут был проведён
             isset($options['sysauto']) &&                                               // и функция вызывается автоматически с главной страницы после всех роутов
             $options['sysauto']
         )

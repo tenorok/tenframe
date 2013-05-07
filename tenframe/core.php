@@ -45,7 +45,7 @@ class core {
                 strtolower($class));
             
             $file = $dir . $path . '.php';
-            echo $file . '<br>';
+
             if(is_file($file)) {
                 require $file;
                 break;
@@ -108,7 +108,7 @@ class core {
      */
     public static function shutdown() {
 
-        troute::routes();                                                  // Проведение системных маршрутов
+        route::routes();                                                   // Проведение системных маршрутов
 
         tpl::not_found(array(                                              // Если ни один маршрут не был проведён, значит страница не найдена
             'sysauto' => true                                              // Опция символизирует возврат автоматической страницы 404

@@ -27,7 +27,7 @@ ten_file::autogen('/mod/shop/view/include/routes.js', "core.addRoute({
     func: 'edit'
 });");
 
-array_push(troute::$routes, array(
+array_push(ten\route::$routes, array(
 
     'url'      => array(
         '/' . $adminpage . '/modshop/categories/add/',

@@ -45,7 +45,9 @@
         $value = ten\core::$get->key;
 */
 
-class troute extends core {
+namespace ten;
+
+class route extends core {
 
     /**
      * Функция разбора адресной строки на части

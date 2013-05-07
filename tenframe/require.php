@@ -18,7 +18,7 @@ if(
     preg_match('/\.php$/', $_SERVER['PHP_SELF']) &&             // а какой-то другой php-файл
     file_exists(ROOT .     $_SERVER['PHP_SELF'])                // и он существует
 ) {
-    ten\troute::$called = true;                                 // Маршрут считается проведённым
+    ten\route::$called = true;                                  // Маршрут считается проведённым
 }
 
 if(isset(ten\core::$settings['mysql']) && ten\core::$settings['mysql']) {

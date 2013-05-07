@@ -9,7 +9,7 @@
  */
 function get($path, $callback, $asserts = array()) {
 
-    troute::request('GET', $path, $callback, $asserts);
+    ten\route::request('GET', $path, $callback, $asserts);
 }
 
 /**
@@ -21,5 +21,5 @@ function get($path, $callback, $asserts = array()) {
  */
 function post($path, $callback, $asserts = array()) {
 
-    troute::request('POST', $path, $callback, $asserts);
+    ten\route::request('POST', $path, $callback, $asserts);
 }

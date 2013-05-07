@@ -2,7 +2,7 @@
 
 require 'conf/settings.php';
 
-array_push(troute::$routes, array(
+array_push(ten\route::$routes, array(
 
     'url'      => array(
         $settings['urls']['page'],
