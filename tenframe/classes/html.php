@@ -107,7 +107,9 @@
             17) ctx%blockname                                       // Установка контекста блока без DOM-узла
 */
 
-class thtml extends core {
+namespace html;
+
+class html extends core {
 
     private static $tenhtmlFolder = '/assets/__autogen__tenhtml';                       // Директория для хранения шаблонов, сгенерированных из tenhtml
 
