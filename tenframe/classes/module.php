@@ -12,14 +12,16 @@
         В корне модуля должен лежать readme.md
 
     Инициализация модулей (require.php):
-        mod::init(array('mod1', 'mod2', ..., 'modN'));
+        ten\module::init(array('mod1', 'mod2', ..., 'modN'));
 
         Инициализация модуля:
             1) добавляет его стили и скрипты в единый объединённый файл
             2) обеспечивает автоподключение вызываемых классов модуля
 */
 
-class tmod extends core {
+namespace ten;
+
+class module extends core {
 
     /**
      * Функция инициализации модулей
@@ -29,10 +31,10 @@ class tmod extends core {
     public static function init($mods) {
 
         array_push(                                                    // Добавление маршрута отображения документации по модулю
-            ten\route::$routes,
+            route::$routes,
             array(
                 'url'      => '/module/{mod}/',
-                'callback' => 'tmod->readme',
+                'callback' => 'ten\module->readme',
                 'dev'      => true                                     // Проводить маршрут только когда включен режим разработчика
             )
         );

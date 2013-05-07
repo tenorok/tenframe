@@ -34,6 +34,6 @@ if(isset(ten\core::$settings['mysql']) && ten\core::$settings['mysql']) {
     torm::db($mysql['database']);                               // Выбор базы данных
 }
 
-tmod::init(ten\core::$settings['modules']);                     // Инициализация модулей
+ten\module::init(ten\core::$settings['modules']);               // Инициализация модулей
 
 unset($root, $query, $mysql);
