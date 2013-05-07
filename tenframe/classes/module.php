@@ -43,7 +43,7 @@ class module extends core {
 
             $path = '/mod/' . $mod;                                    // Относительный путь к модулю
 
-            array_push(ten_file::$input_path, $path . '/view/');       // Добавление пути к представлениям модуля для объединения файлов
+            array_push(join::$input_path, $path . '/view/');           // Добавление пути к представлениям модуля для объединения файлов
 
             array_push(                                                // Добавление путей для автоподключения файлов модуля
                 parent::$paths,
@@ -64,7 +64,7 @@ class module extends core {
 
         require ROOT . '/assets/php/markdown.php';
 
-        echo parent::block(array(
+        echo tpl::block(array(
 
             'block' => 'html',
 
