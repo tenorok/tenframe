@@ -45,7 +45,9 @@
  * @link https://github.com/rgrove/jsmin-php/
  */
 
-class ten_file_jsmin {
+namespace ten;
+
+class jsmin extends join {
   const ORD_LF            = 10;
   const ORD_SPACE         = 32;
   const ACTION_KEEP_A     = 1;
@@ -71,7 +73,7 @@ class ten_file_jsmin {
    * @return string
    */
   public static function minify($js) {
-    $jsmin = new ten_file_jsmin($js);
+    $jsmin = new self($js);
     return $jsmin->min();
   }
 
@@ -369,7 +371,4 @@ class ten_file_jsmin {
     return $this->lookAhead;
   }
 }
-
-// -- Exceptions ---------------------------------------------------------------
-class JSMinException extends Exception {}
 ?>
