@@ -116,7 +116,5 @@ class core {
 
         if(isset(torm::$mysqli))
             torm::$mysqli->close();                                        // Разрыв соединения с базой данных
-
-        terr::get_error();                                                 // Обработка ошибок интерпретатора
     }
 }
