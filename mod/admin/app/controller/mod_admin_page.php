@@ -47,7 +47,7 @@ class mod_admin_page {
 
         $content = mod_admin_m_content::get_content($page, $tab);        // Получение массива наполнения текущей страницы
 
-        echo tpl::block(array(                                           // Парсинг всей страницы
+        echo ten\tpl::block(array(                                       // Парсинг всей страницы
 
             'block' => 'html',
 
@@ -56,14 +56,14 @@ class mod_admin_page {
                 'title' => 'Административная панель &mdash; ' . $content['title'],
                 'files' => ten\core::includes('libs, developer, require', '__autogen__'),
 
-                'body'  => tpl::block(array(
+                'body'  => ten\tpl::block(array(
 
                     'mod'   => 'admin',
                     'block' => 'page',
 
                     'parse' => array(
 
-                        'header' => tpl::block(array(
+                        'header' => ten\tpl::block(array(
 
                             'mod'   => 'admin',
                             'block' => 'header',
@@ -74,7 +74,7 @@ class mod_admin_page {
                             )
                         )),
 
-                        'menu' => tpl::block(array(
+                        'menu' => ten\tpl::block(array(
 
                             'mod'   => 'admin',
                             'block' => 'menu',
@@ -132,7 +132,7 @@ class mod_admin_page {
                             )
                         )),
 
-                        'content' => tpl::block(array(
+                        'content' => ten\tpl::block(array(
 
                             'mod'   => 'admin',
                             'block' => 'content',

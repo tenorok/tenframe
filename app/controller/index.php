@@ -10,7 +10,7 @@ class index {
      */
     public static function page() {
 
-        echo tpl::block(array(
+        echo ten\tpl::block(array(
 
             'block' => 'html',
 

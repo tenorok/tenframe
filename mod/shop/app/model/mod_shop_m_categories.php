@@ -95,7 +95,7 @@ class mod_shop_m_categories {
     private static function parse_category_item($page, $id, $name, $parent, $hidden) {
 
         if((int) $page > 0)                                                              // Если вместо адреса страницы админки передан идентификатор категории
-            return tpl::block(array(                                                     // Значит нужно парсить список категорий для изменения родительской категории
+            return ten\tpl::block(array(                                                 // Значит нужно парсить список категорий для изменения родительской категории
 
                 'mod'   => 'shop',
                 'block' => 'categories',
@@ -125,7 +125,7 @@ class mod_shop_m_categories {
                 )
             ));
         else                                                                             // Иначе нужно парсить список категорий для главной страницы категорий
-            return tpl::block(array(
+            return ten\tpl::block(array(
 
                 'mod'   => 'shop',
                 'block' => 'categories',

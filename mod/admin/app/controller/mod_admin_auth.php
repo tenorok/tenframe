@@ -12,7 +12,7 @@ class mod_admin_auth {
 
         require ROOT . '/mod/admin/conf/settings.php';
 
-        return tpl::block(array(
+        return ten\tpl::block(array(
 
             'block' => 'html',
 
@@ -21,7 +21,7 @@ class mod_admin_auth {
                 'title' => 'Вход в административную панель',
                 'files' => ten\core::includes('libs, developer, require', '__autogen__'),
 
-                'body'  => tpl::block(array(
+                'body'  => ten\tpl::block(array(
 
                     'mod'   => 'admin',
                     'block' => 'logon',

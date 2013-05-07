@@ -8,7 +8,7 @@
 /* Использование
 
     Парсинг blitz-шаблонов:
-        echo tpl::block(array(                                         // Функция всегда принимает в качестве параметра массив
+        echo ten\tpl::block(array(                                     // Функция всегда принимает в качестве параметра массив
 
             'mod'   => 'modulename',                                   // Имя модуля. Если шаблон находится в модуле
             'block' => 'blockname',                                    // Обязательный. Имя блока
@@ -16,7 +16,7 @@
 
             'parse' => array(                                          // Массив парсинга
                 'tplvar1' => 'val',                                    // Имя_переменной_в_шаблоне => значение
-                'tplvar2' => tpl::block(array(...))                    // В качестве значения может быть другой блок. Вложенность не ограничена
+                'tplvar2' => ten\tpl::block(array(...))                // В качестве значения может быть другой блок. Вложенность не ограничена
             ),
 
             'context' => array(                                        // Массив контекстов begin-end
@@ -58,12 +58,14 @@
         ));
 
     Вывод страницы 404:
-        tpl::not_found(array(
+        ten\tpl::not_found(array(
             'title'   => 'title',                                      // По умолчанию: "Страница не найдена"
             'header'  => 'header',                                     // По умолчанию: "Страница не найдена"
             'content' => 'content'                                     // По умолчанию: ""
         ));
 */
+
+namespace ten;
 
 class tpl extends core {
 
@@ -352,7 +354,7 @@ class tpl extends core {
     public static function not_found($options = array()) {
 
         if(
-            ten\route::$called            &&                                            // Если маршрут был проведён
+            route::$called             &&                                               // Если маршрут был проведён
             isset($options['sysauto']) &&                                               // и функция вызывается автоматически с главной страницы после всех роутов
             $options['sysauto']
         )
@@ -364,7 +366,7 @@ class tpl extends core {
             if(!isset($options[$key]))                                                  // для незаданных опций
                 $options[$key] = $val;
 
-        die(tpl::block(array(
+        die(self::block(array(
             'block' => 'html',
             'view'  => '404',
             'parse' => array(
