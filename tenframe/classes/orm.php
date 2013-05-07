@@ -176,7 +176,7 @@ class orm extends core {
 
         self::$parameters = array($table, $values);
 
-        new torm(__FUNCTION__);
+        new self(__FUNCTION__);
 
         self::set_debug(debug_backtrace());
 
@@ -206,7 +206,7 @@ class orm extends core {
 
         self::$parameters = array($table, $values);
 
-        self::$object = new torm(__FUNCTION__);
+        self::$object = new self(__FUNCTION__);
         self::set_debug(debug_backtrace());
 
         return self::$object;
@@ -238,7 +238,7 @@ class orm extends core {
     public static function delete($table) {
 
         self::$parameters = array($table);
-        self::$object = new torm(__FUNCTION__);
+        self::$object = new self(__FUNCTION__);
         self::set_debug(debug_backtrace());
 
         return self::$object;
@@ -264,7 +264,7 @@ class orm extends core {
     public static function select($table) {
 
         self::$parameters = array($table);
-        self::$object = new torm(__FUNCTION__);
+        self::$object = new self(__FUNCTION__);
         self::set_debug(debug_backtrace());
 
         return self::$object;
@@ -315,7 +315,7 @@ class orm extends core {
     public static function join($table, $join) {
 
         self::$parameters = array($table, $join);
-        self::$object = new torm(__FUNCTION__);
+        self::$object = new self(__FUNCTION__);
         self::set_debug(debug_backtrace());
 
         return self::$object;
