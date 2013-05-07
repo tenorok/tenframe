@@ -4,10 +4,10 @@ RewriteEngine On
 # Базовый URL для преобразований в каталоге
 DirectoryIndex tenframe/index.php
 
-# Защита папок "app/controller", "app/model", "sys" от просмотра
+# Защита папок "app/controller", "app/model", "tenframe" от просмотра
 RewriteRule ^(?:app/controller|app/model|tenframe/classes|tenframe/core.php|tenframe/define.php)\b.* tenframe/index.php/$0 [L]
 
-# Преобразование всех URL в sys/index.php/URL
+# Преобразование всех URL в tenframe/index.php/URL
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule .* tenframe/index.php/$0 [PT]
