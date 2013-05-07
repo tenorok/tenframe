@@ -183,7 +183,7 @@ class html extends core {
         );
 
         if(!$tenhtml) {                                                                 // Если не удалось получить JSON-дерево
-            tmsg::error('invalid tenhtml in ' . $file);
+            ten\message::error('invalid tenhtml in ' . $file);
         }
 
         $gentpl = '';
@@ -226,7 +226,7 @@ class html extends core {
             $block = $keyInfo['block'];                                                 // Текущий блок нужно переназначить
         }
         else if(!$block) {                                                              // Иначе если текущий блок не имеется
-            tmsg::error('Undefined block name');
+            ten\message::error('Undefined block name');
         }
 
         return self::makeTag($keyInfo, $content, $block);                               // Формирование тега

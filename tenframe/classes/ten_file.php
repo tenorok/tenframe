@@ -257,7 +257,7 @@ class ten_file {
 
         if(!file_exists($path))                                      // Если указанного пути не существует
             if(!mkdir($path, 0777, true))                            // Если не удалось создать каталоги, указанные в пути
-                tmsg::error('<b>Error:</b> can\'t find and make directory: <b>' . $path . '</b>');
+                message::error('<b>Error:</b> can\'t find and make directory: <b>' . $path . '</b>');
 
         return true;                                                 // Если скрипт не был убит, значит операция прошла успешно
     }
@@ -347,7 +347,7 @@ class ten_file {
             if(!$type[1] || !in_array($type[1], ten_file::$image_type)) {            // Если текущий файл не изображение или если изображение, но имеет не поддерживаемый тип
                 
                 if(ten_file::$debug)                                                 // Если включена отладка
-                    tmsg::error('<b>Upload error:</b> Bad image type!');
+                    message::error('<b>Upload error:</b> Bad image type!');
                 
                 return -1;                                                           // Ошибка -1: Неверный тип файла
             }
@@ -355,7 +355,7 @@ class ten_file {
             if($file['size'] > ten_file::$image_size) {                              // Если размер загружаемого файла не соответствует ограничению
                 
                 if(ten_file::$debug)                                                 // Если включена отладка
-                    tmsg::error('<b>Upload error:</b> Big image size, maximum = ' . (ten_file::$image_size / 1024 / 1024) . ' megabites (' . ten_file::$image_size . ' bytes). And your file size = ' . $file['size'] . ' bytes');
+                    message::error('<b>Upload error:</b> Big image size, maximum = ' . (ten_file::$image_size / 1024 / 1024) . ' megabites (' . ten_file::$image_size . ' bytes). And your file size = ' . $file['size'] . ' bytes');
                 
                 return -2;                                                           // Ошибка -2: Слишком большой размер загружаемого файла
             }
@@ -365,7 +365,7 @@ class ten_file {
             if(empty($image_info)) {
                 
                 if(ten_file::$debug)                                                 // Если включена отладка
-                    tmsg::error('<b>Upload error:</b> can\'t read information about file');
+                    message::error('<b>Upload error:</b> can\'t read information about file');
                 
                 return -3;                                                           // Ошибка -3: Отсутствует информация по изображению (скорее всего это не изображение)
             }
@@ -510,14 +510,14 @@ class ten_file {
                     if(count(ten_file::$path_array) > 1) {                           // Если было загружено больше одного изображения
                         
                         if(ten_file::$debug)                                         // Если включена отладка
-                            tmsg::log('Upload images array is complete');
+                            message::log('Upload images array is complete');
                         
                         return ten_file::$path_array;                                // Возвращение массива путей
                     }
                     else {
                         
                         if(ten_file::$debug)                                         // Если включена отладка
-                            tmsg::log('Upload complete to <b>' . $path . '</b>');
+                            message::log('Upload complete to <b>' . $path . '</b>');
                         
                         return $path;                                                // Функция возвращает путь к загруженному файлу
                     }
@@ -526,7 +526,7 @@ class ten_file {
             else {                                                                   // Иначе файл не загрузился
                 
                 if(ten_file::$debug)                                                 // Если включена отладка
-                    tmsg::error('<b>Upload error:</b> ' . $path);
+                    message::error('<b>Upload error:</b> ' . $path);
                 
                 return false;                                                        // Неизвестная ошибка
             }
@@ -537,7 +537,7 @@ class ten_file {
             return ten_file::upload_image($files, $mini_options);                    // Рекурсивный вызов функции для загрузки миниатюр
         
         if(ten_file::$debug)                                                         // Если включена отладка
-            tmsg::log('Upload images array is complete');
+            message::log('Upload images array is complete');
         
         return ten_file::$path_array;                                                // Функция возвращает массив путей к загруженным файлам
     }
@@ -729,7 +729,7 @@ class ten_file {
             closedir($input);                                                        // Закрытие текущего объекта
         }
         else
-            tmsg::error('Can\'t open directory: ' . $options['input_path']);
+            message::error('Can\'t open directory: ' . $options['input_path']);
     }
 
     /**
@@ -837,7 +837,7 @@ class ten_file {
                     $tag = 'link';
                 }
                 else                                                                 // иначе ни href ни src не указаны и надо вывести ошибку
-                    tmsg::error('Can\'t read attribute "href" or "src" of include file');
+                    message::error('Can\'t read attribute "href" or "src" of include file');
 
                 $type = end(explode('.', $file[$url]));                              // Расширение файла
                 $attrs = array_merge($def_attrs[$tag], $file);                       // Слияние массива дефолтных атрибутов с переданным массивом атрибутов

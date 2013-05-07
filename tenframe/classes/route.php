@@ -142,7 +142,7 @@ class route extends core {
                 $args                                                      // и параметрами из массива $args
             );
         else
-            tmsg::error(                                                   // Иначе метод не существует
+            message::error(                                                // Иначе метод не существует
                 '[' . $type . '] Route error: Function is undefined: '
                 . $call[0] . '->' . $call[1]
             );

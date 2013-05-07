@@ -135,7 +135,7 @@ class torm extends core {
     public static function db($db) {
 
         if(!self::$mysqli->select_db($db))
-            tmsg::error('Selected database <b>' . $db . '</b> not found');
+            message::error('Selected database <b>' . $db . '</b> not found');
     }
 
     /**
@@ -461,7 +461,7 @@ class torm extends core {
         $query_name = self::$queries[count(self::$queries) - 1]->name;                              // Имя текущей операции
 
         if(!$where)                                                                                 // Если аргумент отсутствует
-            tmsg::error('Missing argument for <b>where</b> in <b>' . $query_name . '</b> query');
+            message::error('Missing argument for <b>where</b> in <b>' . $query_name . '</b> query');
 
         else if(gettype($where) == 'integer' || preg_match('/^\d+$/', $where)) {                    // иначе если аргумент имеется и это целое число или это строка, являющаяся числом
 
@@ -475,7 +475,7 @@ class torm extends core {
             self::$where = ($where == 'all' || $where == '*') ? '' : ' where ' . $where;            // Если запрос выполняется для всех записей, то условие не нужно
 
         else                                                                                        // Иначе аргумент имеется, но у него неверный тип данных
-            tmsg::error('Wrong argument for <b>where</b> in <b>' . $query_name . '</b> query');
+            message::error('Wrong argument for <b>where</b> in <b>' . $query_name . '</b> query');
 
         return call_user_func_array(
             array('torm', $query_name . '_query'),

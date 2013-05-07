@@ -8,13 +8,15 @@
 /* Использование
 
     Вывод простого сообщения фреймворка:
-        tmsg::log('Message text');
+        ten\message::log('Message text');
 
     Вывод ошибки фреймворка:
-        tmsg::error('Error text');
+        ten\message::error('Error text');
 */
 
-class tmsg extends core {
+namespace ten;
+
+class message extends core {
 
     /**
      * Простое сообщение
