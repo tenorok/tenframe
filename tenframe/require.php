@@ -25,13 +25,13 @@ if(isset(ten\core::$settings['mysql']) && ten\core::$settings['mysql']) {
 
     $mysql = ten\core::$settings['mysql'];
 
-    torm::connect(                                              // Подключение к mysql
+    ten\orm::connect(                                           // Подключение к mysql
         $mysql['host'],
         $mysql['user'],
         $mysql['password']
     );
 
-    torm::db($mysql['database']);                               // Выбор базы данных
+    ten\orm::db($mysql['database']);                            // Выбор базы данных
 }
 
 ten\module::init(ten\core::$settings['modules']);               // Инициализация модулей

@@ -12,19 +12,19 @@
         Внешний ключ:   table_fk
 
     Подключение к MySQL:
-        torm::connect('host', 'login', 'password');
+        ten\orm::connect('host', 'login', 'password');
 
     Выбор базы данных:
-        torm::db('dbname');
+        ten\orm::db('dbname');
 
     Добавление записи:
-        $last_id = torm::insert('table', array(                        // Возвращается идентификатор добавленной записи или false, если запрос не был выполнен
+        $last_id = ten\orm::insert('table', array(                     // Возвращается идентификатор добавленной записи или false, если запрос не был выполнен
             'field_1' => 'value',                                      // Перечисление полей и значений
             'field_2' => 'func: now()'                                 // Для использования функций применяется ключевое слово "func:"
         ));
 
     Обновление записи:
-        torm::update('table', array(                                   // Возвращается true или false
+        ten\orm::update('table', array(                                // Возвращается true или false
             'field_1' => 'value',                                      // Перечисление полей и значений
             'field_2' => 'func: now()'                                 // Для использования функций применяется ключевое слово "func:"
         ))
@@ -34,13 +34,13 @@
         ->where('*');                                                  //     применить для всех строк таблицы (краткая запись)
 
     Удаление записи:
-        torm::delete('table')                                          // Возвращается true или false
+        ten\orm::delete('table')                                       // Возвращается true или false
             ->where(...);                                              // Обязательная опция. Условия удаления
 
     Выборка записей:
         $result =                                                      // Результаты выборки возвращаются в виде массива объектов
                                                                        // или в виде одного объекта, если был указан "->where(число)"
-            torm::select('table')                                      // По умолчанию выбираются все поля таблицы
+            ten\orm::select('table')                                   // По умолчанию выбираются все поля таблицы
                 ->sub(array(                                           // Подзапросы
                     'select count(*) from tab1' => 'count1'            // Идентично select count(*) from tab1 as `count1`
                 ))
@@ -53,7 +53,7 @@
                 ->where(...);                                          // Обязательно указывать последней! Последовательность предыдущих опций свободна
 
         $result =                                                      // Результатом выборки будет всегда массив объектов
-            torm::join('table', array(                                 // From table и массив join-таблиц
+            ten\orm::join('table', array(                              // From table и массив join-таблиц
 
                 array(                                                 // Описание подключаемой таблицы
                     'table'  => 'tablename_1',                         // Обязательный. Имя подключаемой таблицы
@@ -82,11 +82,13 @@
                 Данная проверка осуществляется, если для таблицы явно не указан префикс ('prefix' => 'prefix_').
 
     Отладка:
-        torm::result($result);                                          // Печать результатов выборки в удобочитаемом виде
-        torm::debug();                                                  // Статистика проведённых до этого момента запросов
+        ten\orm::result($result);                                      // Печать результатов выборки в удобочитаемом виде
+        ten\orm::debug();                                              // Статистика проведённых до этого момента запросов
 */
 
-class torm extends core {
+namespace ten;
+
+class orm extends core {
 
     public static $mysqli;                                                 // Объект работы с MySQL
 
@@ -123,7 +125,7 @@ class torm extends core {
      */
     public static function connect($host, $login, $password) {
 
-        self::$mysqli = new mysqli($host, $login, $password);
+        self::$mysqli = new \mysqli($host, $login, $password);
         self::$mysqli->set_charset('utf8');
     }
 
@@ -478,7 +480,7 @@ class torm extends core {
             message::error('Wrong argument for <b>where</b> in <b>' . $query_name . '</b> query');
 
         return call_user_func_array(
-            array('torm', $query_name . '_query'),
+            array('self', $query_name . '_query'),
             self::$parameters
         );
     }

@@ -75,7 +75,7 @@ class mod_shop_categories {
                 $pages['categories']
             )
         )
-            ten\core::not_found();                                             // то страница не найдена
+            ten\core::not_found();                                         // то страница не найдена
     }
 
     /**
@@ -90,7 +90,7 @@ class mod_shop_categories {
 
         mod_shop_categories::get_categories_access();                      // Проверка доступа к страницам работы с категориями
 
-        $fieldslist = torm::join('tmod_shop_categories', array(            // Получение списка существующих полей
+        $fieldslist = ten\orm::join('tmod_shop_categories', array(         // Получение списка существующих полей
             array(
                 'table' => 'tmod_shop_fields'
             )
@@ -263,7 +263,7 @@ class mod_shop_categories {
 
             $serial =                                                      // Получение сортировочного номера для новой категории
                 array_shift(
-                    torm::select('tmod_shop_categories')
+                    ten\orm::select('tmod_shop_categories')
                         ->fields('count(*) as serial')
                         ->where('tmod_shop_categories_fk = ' . $catparent)
                 )->serial;
@@ -274,13 +274,13 @@ class mod_shop_categories {
 
             $serial =                                                      // Получение сортировочного номера для новой категории
                 array_shift(
-                    torm::select('tmod_shop_categories')
+                    ten\orm::select('tmod_shop_categories')
                         ->fields('count(*) as serial')
                         ->where('all')
                 )->serial;
         }
 
-        $category_id = torm::insert('tmod_shop_categories', array(         // Добавление записи о категории
+        $category_id = ten\orm::insert('tmod_shop_categories', array(      // Добавление записи о категории
             'name'   => $_POST['catname'],
             'alias'  => $_POST['catalias'],
             'serial' => $serial,
@@ -294,7 +294,7 @@ class mod_shop_categories {
                 !empty($_POST['name'][$i])                                 // у которого заполнено имя
             ) {
 
-                $field_id = torm::insert('tmod_shop_fields', array(        // Добавление записи о поле
+                $field_id = ten\orm::insert('tmod_shop_fields', array(     // Добавление записи о поле
                     'name'  => $_POST['name'][$i],
                     'type'  => $_POST['type'][$i],
                     'count' => $_POST['count'][$i],
@@ -308,14 +308,14 @@ class mod_shop_categories {
                 );
 
                 foreach($options as $option)                               // Цикл по значениям выпадающего списка
-                    torm::insert('tmod_shop_values', array(                // Добавление записи значения выпадающего списка
+                    ten\orm::insert('tmod_shop_values', array(             // Добавление записи значения выпадающего списка
                         'val_' . $_POST['type'][$i] => $option,
                         'tmod_shop_fields_fk' => $field_id
                     ));
             }
             else if(is_numeric($existfield)) {                             // Иначе не нужно создавать новое поле, а привязать уже существующее по его номеру
 
-                torm::insert('tmod_shop_fields', array(                    // Добавление записи связанного поля
+                ten\orm::insert('tmod_shop_fields', array(                 // Добавление записи связанного поля
                     'tmod_shop_fields_fk'     => $existfield,
                     'tmod_shop_categories_fk' => $category_id
                 ));

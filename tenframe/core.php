@@ -114,7 +114,7 @@ class core {
             'sysauto' => true                                              // Опция символизирует возврат автоматической страницы 404
         ));
 
-        if(isset(torm::$mysqli))
-            torm::$mysqli->close();                                        // Разрыв соединения с базой данных
+        if(isset(ten\orm::$mysqli))
+            ten\orm::$mysqli->close();                                     // Разрыв соединения с базой данных
     }
 }
