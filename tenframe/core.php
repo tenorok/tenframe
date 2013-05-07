@@ -37,10 +37,13 @@ class core {
         
         foreach(core::$paths as $dir) {
             
-            $path = str_replace('__', '/', strtolower($class));            // Двойное подчёркивание заменяется на слеш
+            $path = str_replace(                                           // Замена символов в строке вызова метода tenframe
+                array('__', '\\', 'ten'),
+                array('/', '/', 'tenframe/classes'),
+                strtolower($class));
             
             $file = $dir . $path . '.php';
-            
+            echo $file . '<br>';
             if(is_file($file)) {
                 require $file;
                 break;

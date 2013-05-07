@@ -2,12 +2,12 @@
 RewriteEngine On
 
 # Базовый URL для преобразований в каталоге
-DirectoryIndex sys/index.php
+DirectoryIndex tenframe/index.php
 
 # Защита папок "app/controller", "app/model", "sys" от просмотра
-RewriteRule ^(?:app/controller|app/model|sys/classes|sys/core.php|sys/define.php)\b.* sys/index.php/$0 [L]
+RewriteRule ^(?:app/controller|app/model|tenframe/classes|tenframe/core.php|tenframe/define.php)\b.* tenframe/index.php/$0 [L]
 
 # Преобразование всех URL в sys/index.php/URL
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule .* sys/index.php/$0 [PT]
+RewriteRule .* tenframe/index.php/$0 [PT]
