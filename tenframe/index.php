@@ -10,8 +10,8 @@ require 'require.php';                                  // Общие подкл
 
 if(ten\core::dev(DEV)) {                                // Если включен режим разработчика
 
-    require '../merge.php';                             // Сборка файлов
-    require '../include.php';                           // Подключение файлов
+    require '../join.php';                              // Сборка файлов
+    require '../statical.php';                          // Подключение файлов
 }
 
 require 'request.php';                                  // Подключение функций обработки маршрутов

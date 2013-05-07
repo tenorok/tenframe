@@ -1,6 +1,6 @@
 <?php
 
-ten_file::include_files(array(                            // Markdown для модулей
+ten\statical::involve(array(                            // Markdown для модулей
     'markdown.css',
     'highlight/github.css',
     'highlight.js'
@@ -14,7 +14,7 @@ ten_file::include_files(array(                            // Markdown для м�
     'hash' => false
 ));
 
-ten_file::include_files(array(                            // Файлы библиотек и плагинов
+ten\statical::involve(array(                            // Файлы библиотек и плагинов
     'jquery-1.8.3.min.js',
     'jquery-ui-1.9.2.min.js',
     'modernizr-2.5.3.js',
@@ -32,7 +32,7 @@ ten_file::include_files(array(                            // Файлы библ
     'hash' => false
 ));
 
-ten_file::include_files(array(                            // Файлы для режима разработчика
+ten\statical::involve(array(                            // Файлы для режима разработчика
     array(
         'href'      => 'main.less',
         'rel'       => 'stylesheet/less',
@@ -54,7 +54,7 @@ ten_file::include_files(array(                            // Файлы для �
     'hash' => false
 ));
 
-ten_file::include_files(array(                            // Основные файлы
+ten\statical::involve(array(                            // Основные файлы
     'main.css',
     'main.js'
 ), array(
