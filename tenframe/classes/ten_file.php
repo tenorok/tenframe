@@ -784,7 +784,7 @@ class ten_file {
             
             $output_file = ten_file::autogen(                                        // Сохранение файла
                 $options['output_file'],
-                (core::$settings['compressHTML']) ? tpl::compressHTML($included) : $included,
+                (ten\core::$settings['compressHTML']) ? tpl::compressHTML($included) : $included,
                 (!empty($options['prefix'])) ? $options['prefix'] : ''               // Префикс для сохраняемого файла
             );
             

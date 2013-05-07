@@ -37,12 +37,12 @@
 
         Получить переменную в вызываемом методе контроллера можно двумя способами:
             1) method(key1, key2, ..., key3)
-            2) core::$get->key1;
-               core::$get->key2;
-               core::$get->key3;
+            2) ten\core::$get->key1;
+               ten\core::$get->key2;
+               ten\core::$get->key3;
 
     Получение значения GET-переменной:
-        $value = core::$get->key;
+        $value = ten\core::$get->key;
 */
 
 class troute extends core {

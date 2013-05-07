@@ -1,6 +1,6 @@
 <?php
 
-core::$settings = array(                    // Параметры работы фреймворка
+ten\core::$settings = array(                // Параметры работы фреймворка
 
     'develop'  => true,                     // Режим разработки
     'clearURI' => true,                     // Маршрутизировать относительный путь

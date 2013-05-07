@@ -16,7 +16,7 @@ class index {
 
             'parse' => array(
                 'title' => 'Готов?',
-                'files' => core::includes('libs, developer, require', '__autogen__'),
+                'files' => ten\core::includes('libs, developer, require', '__autogen__'),
                 'body'  => 'Поехали!'
             )
         ));

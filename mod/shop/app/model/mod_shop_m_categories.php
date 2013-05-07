@@ -164,8 +164,8 @@ class mod_shop_m_categories {
      */
     public static function get_info() {
 
-        $categoryid = (isset(core::$get->categoryid)) ? core::$get->categoryid : null;   // Если в адресной строке есть идентификатор категории
-        $parentid   = (isset(core::$get->parentid))   ? core::$get->parentid   : null;   // Если в адресной строке есть идентификатор родительской категории
+        $categoryid = (isset(ten\core::$get->categoryid)) ? ten\core::$get->categoryid : null;   // Если в адресной строке есть идентификатор категории
+        $parentid   = (isset(ten\core::$get->parentid))   ? ten\core::$get->parentid   : null;   // Если в адресной строке есть идентификатор родительской категории
 
         $info = array(                                                                   // Массив возможных полей с дефолтными значениями
             'title'    => '',

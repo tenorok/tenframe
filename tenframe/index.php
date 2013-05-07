@@ -8,7 +8,7 @@
 
 require 'require.php';                                  // Общие подключения
 
-if(core::dev(DEV)) {                                    // Если включен режим разработчика
+if(ten\core::dev(DEV)) {                                // Если включен режим разработчика
 
     require '../merge.php';                             // Сборка файлов
     require '../include.php';                           // Подключение файлов

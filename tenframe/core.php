@@ -11,11 +11,13 @@
         spl_autoload_register(array('core', 'auto_load'));
 
     Подключение include-файлов:
-        echo core::includes(
+        echo ten\core::includes(
             'libs, developer, require',                                // Обязательный. Файлы с именами 'developer' и 'dev' подключаются только при включенном режиме разработчика
             '__autogen__'                                              // Префикс перед именами файлов (по умолчанию отсутствует)
         );
 */
+
+namespace ten;
 
 defined('SYS')        or die('Core error: System path is not declared!');
 defined('CONTROLLER') or die('Core error: Controller path is not declared!');
@@ -35,7 +37,7 @@ class core {
      */
     public static function auto_load($class) {
         
-        foreach(core::$paths as $dir) {
+        foreach(self::$paths as $dir) {
             
             $path = str_replace(                                           // Замена символов в строке вызова метода tenframe
                 array('__', '\\', 'ten'),
@@ -91,7 +93,7 @@ class core {
 
             $file = trim($file);                                           // Обрезание пробелов с обеих сторон имени текущего файла
             
-            if(in_array($file, core::$include_dev) && !DEV)                // Если текущий файл требуется для режима разработчика и режим разработчика выключен
+            if(in_array($file, self::$include_dev) && !DEV)                // Если текущий файл требуется для режима разработчика и режим разработчика выключен
                 continue;                                                  // то его подключать не нужно и выполняется переход к следующему файлу
             
             $includes .= file_get_contents(ROOT . '/view/include/' . $prefix . $file . '.tpl');		// Конкатенация содержимого текущего файла

@@ -75,7 +75,7 @@ class mod_shop_categories {
                 $pages['categories']
             )
         )
-            core::not_found();                                             // то страница не найдена
+            ten\core::not_found();                                             // то страница не найдена
     }
 
     /**
@@ -98,7 +98,7 @@ class mod_shop_categories {
 
         $info = mod_shop_m_categories::get_info();                         // Получение массива с информацией для парсинга
 
-        if(isset(core::$get->categoryid)) {
+        if(isset(ten\core::$get->categoryid)) {
 
             $edit = tpl::block(array(
                 'mod'   => 'shop',
@@ -107,11 +107,11 @@ class mod_shop_categories {
 
                 'parse' => array(
                     'hided'      => $info['hided'],
-                    'categories' => mod_shop_m_categories::get_categories_list(core::$get->categoryid)
+                    'categories' => mod_shop_m_categories::get_categories_list(ten\core::$get->categoryid)
                 )
             ));
 
-            mod_shop_m_categories::get_fields(core::$get->categoryid);
+            mod_shop_m_categories::get_fields(ten\core::$get->categoryid);
         }
         else
             $edit = '';
@@ -123,7 +123,7 @@ class mod_shop_categories {
             'parse' => array(
 
                 'title' => 'Административная панель &mdash; ' . $info['title'],
-                'files' => core::includes('libs, developer, require', '__autogen__'),
+                'files' => ten\core::includes('libs, developer, require', '__autogen__'),
 
                 'body'  => tpl::block(array(
 

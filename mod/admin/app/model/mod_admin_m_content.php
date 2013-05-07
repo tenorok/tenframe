@@ -52,7 +52,7 @@ class mod_admin_m_content {
                         }
                     }
 
-                    core::not_found();                                                   // Если не найдена подстраница
+                    ten\core::not_found();                                               // Если не найдена подстраница
                 }
 
                 $content['content'] = $menuInfo['content'];                              // Присваивание контента страницы
@@ -61,6 +61,6 @@ class mod_admin_m_content {
             }
         }
 
-        core::not_found();                                                               // Если не найдено соответствие или нет прав
+        ten\core::not_found();                                                           // Если не найдено соответствие или нет прав
     }
 }
