@@ -1,11 +1,14 @@
 <?php
 
-// Класс работы с датой
+/**
+ * Работа с датой
+ * @version 0.0.1
+ */
 
-/*    Использование
+/* Использование
 
     Преобразование даты в привычный вид:
-        $date = ten_date::get_date('2011-04-28 18:21:02', array(
+        $date = ten\date::get_date('2011-04-28 18:21:02', array(
 
             'lang'  => 'ru   | en',            // Язык
             'month' => 'full | short',         // Полная или краткая запись месяца
@@ -14,7 +17,9 @@
         ));
 */
 
-class ten_date {
+namespace ten;
+
+class date extends core {
 
     private static $month = array(                                       // Месяца в родительном падеже
 
@@ -98,12 +103,12 @@ class ten_date {
      */
     public static function get_date($date, $options = null) {
 
-        foreach(ten_date::$default_options as $key => $val)                                         // Установка значений по умолчанию
+        foreach(self::$default_options as $key => $val)                                             // Установка значений по умолчанию
             if(!isset($options[$key]))                                                              // для незаданных опций
                 $options[$key] = $val;
 
         $lang  = $options['lang'];
-        $words = ten_date::$words;
+        $words = self::$words;
         $ret_date = null;                                                                           // Переменная для записи возвращаемой даты
 
         list($year, $month, $daytime) = explode('-', $date);                                        // Год, месяц и день со временем
@@ -126,7 +131,7 @@ class ten_date {
         if(is_null($ret_date))                                                                      // Если дата до сих пор не указана
             $ret_date =
                 $day . ' ' .
-                ten_date::$month[$lang][$options['month']][$month] . ' ' .
+                self::$month[$lang][$options['month']][$month] . ' ' .
                 (($year == date('Y')) ? '' : $year);                                                // Если год текущий, то его не надо печатать
 
         if(
