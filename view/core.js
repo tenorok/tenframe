@@ -197,7 +197,7 @@ var core = (function($) {
 
             var compress = (set.compress === undefined || set.compress) ? true : false;
 
-            $.post('/sys/ajax/less.php', {                              // Отправка post-запроса на сохранение стилей в отдельный файл
+            $.post('/tenframe/ajax/less.php', {                         // Отправка post-запроса на сохранение стилей в отдельный файл
                 event:    'save_lesscss',                               // Событие для AJAX-файла
                 css:      JSON.stringify(css),                          // Сконкатенированные стили
                 path:     set.path,                                     // Путь к выходящему файлу
