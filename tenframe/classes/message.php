@@ -25,7 +25,7 @@ class message extends core {
      */
     public static function log($text) {
 
-        echo '<br><b>Framework message</b>: ' . $text;
+        echo '<br><b>Tenframe message</b>: ' . $text;
     }
 
     /**
@@ -35,6 +35,6 @@ class message extends core {
      */
     public static function error($text) {
 
-        die('<br><b>Framework error</b>: ' . $text);
+        die('<br><b>Tenframe error</b>: ' . $text);
     }
 }
