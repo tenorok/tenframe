@@ -8,53 +8,55 @@
 /* Использование
 
     Перевод строки в нижний регистр:
-        $string = txt::lower_case($string);
+        $string = ten\text::lower_case($string);
 
     Преобразование текста в транслит:
-        $text = txt::translit($text);
+        $text = ten\text::translit($text);
 
     Преобразование URI в транслит:
-        $uri = txt::translit_uri($uri);
+        $uri = ten\text::translit_uri($uri);
 
     Типограф:
-        $text = txt::typograf('"Вы всё ещё кое-как верстаете в "Ворде"? - Тогда мы идем к вам!"');
+        $text = ten\text::typograf('"Вы всё ещё кое-как верстаете в "Ворде"? - Тогда мы идем к вам!"');
 
     Отбивка:
         Если второй параметр не указан, то используется отбивка для шрифта Arial:
-            $text = txt::wean('&laquo;подсказок&raquo;');
+            $text = ten\text::wean('&laquo;подсказок&raquo;');
 
         Можно указывать шрифт, если он есть в массиве $wean_fonts:
-            $text = txt::wean('&laquo;подсказок&raquo;', 'verdana');
+            $text = ten\text::wean('&laquo;подсказок&raquo;', 'verdana');
 
         Можно передавать массив специфичных отступов:
-            $text = txt::wean('&laquo;подсказок&raquo;', array('b'=>'.58', 'm'=>'.85', 's'=>'.4'));
+            $text = ten\text::wean('&laquo;подсказок&raquo;', array('b'=>'.58', 'm'=>'.85', 's'=>'.4'));
 
     Экранирование:
-        $text = txt::strip($text);
+        $text = ten\text::strip($text);
 
     Добавление подстрок:
         Добавление подстроки в начало и конец строки, если её там ещё нет:
-            $text = txt::gum($text,  'substr');
+            $text = ten\text::gum($text,  'substr');
         Добавление подстроки в начало строки, если её там ещё нет:
-            $text = txt::lgum($text, 'substr');
+            $text = ten\text::lgum($text, 'substr');
         Добавление подстроки в конец строки, если её там ещё нет:
-            $text = txt::rgum($text, 'substr');
+            $text = ten\text::rgum($text, 'substr');
 
     Удаление подстрок:
         $substr = string || array;                                           // Можно передать одну строку или массив строк
 
         Удаление подстроки из начала и конца строки, если она там есть
-            $text = txt::del($text,  $substr);
+            $text = ten\text::del($text,  $substr);
         Удаление подстроки из начала строки, если она там есть
-            $text = txt::ldel($text, $substr);
+            $text = ten\text::ldel($text, $substr);
         Удаление подстроки из конца строки, если она там есть
-            $text = txt::rdel($text, $substr);
+            $text = ten\text::rdel($text, $substr);
 
         Рекурсивное удаление подстрок:
             Те же самые функции с приставкой all: delall, ldelall, rdelall
 */
 
-class txt extends core {
+namespace ten;
+
+class text extends core {
 
     protected static $cyrillic_alphabet = array(                             // Кириллический алфавит
         'А'=>'а', 'Б'=>'б', 'В'=>'в', 'Г'=>'г', 'Д'=>'д',
@@ -153,7 +155,7 @@ class txt extends core {
 
 
     Example:
-        print txt::typograf('"Вы все еще кое-как верстаете в "Ворде"? - Тогда мы идем к вам!"');
+        print ten\text::typograf('"Вы все еще кое-как верстаете в "Ворде"? - Тогда мы идем к вам!"');
     */
 
     public static $entityType = 1;                                           // html = 1; xml = 2; no = 3; mixed = 4;

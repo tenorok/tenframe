@@ -193,7 +193,7 @@ class html extends core {
         }
 
         return ten_file::autogen(
-            self::$tenhtmlFolder . txt::ldel($file, ROOT),
+            self::$tenhtmlFolder . text::ldel($file, ROOT),
             $gentpl,
             ''
         );

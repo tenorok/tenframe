@@ -99,7 +99,7 @@ class tpl extends core {
                     $file = ten\html::savetenhtml($file);                               // то его нужно преобразовать в простой шаблон
                 }
                 else {                                                                  // Иначе нужно просто взять уже сгенерированный простой шаблон
-                    $file = ROOT . self::$compressTplFolder . txt::ldel($file, ROOT);
+                    $file = ROOT . self::$compressTplFolder . text::ldel($file, ROOT);
                 }
 
                 if(file_exists($file)) {                                                // Если этот уже сгенерированный простой шаблон существует
@@ -112,7 +112,7 @@ class tpl extends core {
 
             if(DEV) {                                                                   // Если включен режим разработчика
                 ten_file::autogen(                                                      // Сохранение сжатого шаблона
-                    self::$compressTplFolder . txt::ldel($file, ROOT),
+                    self::$compressTplFolder . text::ldel($file, ROOT),
                     self::compressHTML(file_get_contents($file)),
                     false
                 );

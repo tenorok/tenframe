@@ -37,7 +37,7 @@ class mod_admin_m_menu {
 
         foreach($menu as $key => $item) {                                                // Цикл по элементам меню
 
-            $main_url = txt::rgum($settings['urls']['page'], '/');                       // Адрес главной страницы административной панели
+            $main_url = ten\text::rgum($settings['urls']['page'], '/');                  // Адрес главной страницы административной панели
 
             $menuInfo = $menu[$key];                                                     // Заведение информационной переменной для удобства
 
@@ -48,7 +48,7 @@ class mod_admin_m_menu {
             }
 
             $menu[$key]['active'] = (                                                    // Задание активного класса
-                txt::del($page . '/' . $tab, '/') == $item['name']                       // Если текущий адрес соответствует адресу ссылки меню
+                ten\text::del($page . '/' . $tab, '/') == $item['name']                  // Если текущий адрес соответствует адресу ссылки меню
             ) ? ' mod-admin-menu__item_active' : '';
 
             if(isset($menuInfo['tabs'])) {                                               // Если у меню существует подменю
@@ -68,7 +68,7 @@ class mod_admin_m_menu {
                     $pageAndTab = $menuInfo['name'] . '/' . $tabInfo['name'];
 
                     $menu[$key]['tabs'][$i]['active'] = (                                // Задание активного класса
-                        txt::del($page . '/' . $tab, '/') == $pageAndTab                 // Если текущий адрес соответствует адресу ссылки подменю
+                        ten\text::del($page . '/' . $tab, '/') == $pageAndTab            // Если текущий адрес соответствует адресу ссылки подменю
                     ) ? ' mod-admin-menu__item_active' : '';
 
                     $menu[$key]['tabs'][$i]['href'] = $main_url . $pageAndTab;           // Изменение адреса ссылки подменю
