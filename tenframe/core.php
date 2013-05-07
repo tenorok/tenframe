@@ -41,7 +41,7 @@ class core {
             
             $path = str_replace(                                           // Замена символов в строке вызова метода tenframe
                 array('__', '\\', 'ten'),
-                array('/', '/', 'tenframe/classes'),
+                array('/', '/', TEN_PATH . '/classes'),
                 strtolower($class));
             
             $file = $dir . $path . '.php';
@@ -65,7 +65,7 @@ class core {
             $dev                                                           // или он просто включен
         ) {
 
-            ten_file::autogen('/view/include/dev.js', 'core.dev=' . (($dev) ? 'true;' : 'false;'));
+            file::autogen('/view/include/dev.js', 'core.dev=' . (($dev) ? 'true;' : 'false;'));
             $ret = true;                                                   // то надо вернуть true, чтобы собрать JS-файлы с новым значением
         }
         else                                                               // Иначе режим разработчика выключен
@@ -114,7 +114,7 @@ class core {
             'sysauto' => true                                              // Опция символизирует возврат автоматической страницы 404
         ));
 
-        if(isset(ten\orm::$mysqli))
-            ten\orm::$mysqli->close();                                     // Разрыв соединения с базой данных
+        if(isset(orm::$mysqli))
+            orm::$mysqli->close();                                         // Разрыв соединения с базой данных
     }
 }

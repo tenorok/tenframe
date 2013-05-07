@@ -96,7 +96,7 @@ class tpl extends core {
             if($ext == 'tenhtml' && self::$settings['tenhtml']) {                       // Если рассматриваемое расширение tenhtml и включена его настройка
 
                 if(DEV && file_exists($file)) {                                         // Если включен режим разработчика и шаблон существует
-                    $file = ten\html::savetenhtml($file);                               // то его нужно преобразовать в простой шаблон
+                    $file = html::savetenhtml($file);                                   // то его нужно преобразовать в простой шаблон
                 }
                 else {                                                                  // Иначе нужно просто взять уже сгенерированный простой шаблон
                     $file = ROOT . self::$compressTplFolder . text::ldel($file, ROOT);
@@ -111,7 +111,7 @@ class tpl extends core {
         if(self::$settings['compressHTML'] && $ext != 'tenhtml') {                      // Если HTML нужно сжимать
 
             if(DEV) {                                                                   // Если включен режим разработчика
-                ten_file::autogen(                                                      // Сохранение сжатого шаблона
+                file::autogen(                                                          // Сохранение сжатого шаблона
                     self::$compressTplFolder . text::ldel($file, ROOT),
                     self::compressHTML(file_get_contents($file)),
                     false
@@ -129,7 +129,7 @@ class tpl extends core {
             }
         }
 
-        $tpl = new Blitz($file);                                                        // Получение шаблона
+        $tpl = new \Blitz($file);                                                       // Получение шаблона
 
         if(isset($context))                                                             // Если требуется контекст begin-end
             foreach($context as $ctx => $val)                                           // Цикл по контекстам

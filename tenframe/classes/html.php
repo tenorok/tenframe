@@ -107,7 +107,7 @@
             17) ctx%blockname                                       // Установка контекста блока без DOM-узла
 */
 
-namespace html;
+namespace ten;
 
 class html extends core {
 
@@ -192,7 +192,7 @@ class html extends core {
             $gentpl .= self::parsetenhtml($key, $content);
         }
 
-        return ten_file::autogen(
+        return file::autogen(
             self::$tenhtmlFolder . text::ldel($file, ROOT),
             $gentpl,
             ''

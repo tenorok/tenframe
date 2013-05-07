@@ -6,7 +6,7 @@ require ROOT . '/mod/admin/conf/settings.php';
 
 $adminpage = ten\text::del($settings['urls']['page'], '/');
 
-ten_file::autogen('/mod/shop/view/include/routes.js', "core.addRoute({
+ten\file::autogen('/mod/shop/view/include/routes.js', "core.addRoute({
     url:  [
         '" . $settings['urls']['page'] . "',
         '" . $settings['urls']['page'] . "{page}/',
