@@ -2,15 +2,30 @@
 
 /**
  * Базовый класс tenframe
- * @version 0.0.1
+ * @version 0.0.2
  */
 
 /* Использование
-        
+
+    Приведение путей к корректному виду:
+        Корневой путь добавится автоматически:
+            ten\core::resolvePath(                      // Путь до папки: /Users/name/project/one/two/third/four/
+                'one//two///',
+                'third',
+                'four/'
+            );
+        Корневой путь не добавится, если он уже есть:
+            ten\core::resolvePath(                      // Путь до файла: /Users/name/project/one/two/third/four
+                ROOT,
+                'one//two///',
+                'third',
+                'four'
+            );
+
     Подключение include-файлов:
         echo ten\core::includes(
-            'libs, developer, require',                                // Обязательный. Файлы с именами 'developer' и 'dev' подключаются только при включенном режиме разработчика
-            '__autogen__'                                              // Префикс перед именами файлов (по умолчанию отсутствует)
+            'libs, developer, require',                 // Обязательный. Файлы с именами 'developer' и 'dev' подключаются только при включенном режиме разработчика
+            '__autogen__'                               // Префикс перед именами файлов (по умолчанию отсутствует)
         );
 */
 
@@ -33,17 +48,49 @@ class core {
             
             $path = str_replace(                                           // Замена символов в строке вызова метода tenframe
                 array('__', 'ten\\', '\\'),
-                array('/', TEN_PATH . '/classes/', '/'),
+                array('/', TEN_CLASSES . '/', '/'),
                 strtolower($class)
             );
-            
-            $file = ROOT . $dir . $path . '.php';
 
-            if(is_file($file)) {
-                require $file;
+            $file = self::resolve_path($dir, $path . '.php');               // Приведение пути к корректному виду
+
+            if(is_file($file)) {                                           // Если файл существует
+                require $file;                                             // его нужно подключить
                 break;
             }
         }
+    }
+
+    /**
+     * Приведение путей к корректному виду с дополнением до абсолютного расположения
+     *
+     * @param  string Arguments Любое количество строк к объединению
+     * @return string           Приведённый путь
+     */
+    public static function resolve_path() {
+        $arguments = implode('/', func_get_args());                        // Объединение всех аргументов в строку
+        $path = self::remove_path_slashes($arguments);                     // Удаление лишних слешей
+
+        if(!preg_match('/^' . str_replace('/', '\/', ROOT) . '/', $path))  // Если в пути не указана корневая директория
+            $path = self::remove_path_slashes(ROOT . $path);               // то её надо добавить
+
+        return $path . (                                                   // Приведённый путь
+            ($arguments[strlen($arguments) - 1] == '/') ?                  // Если последним символом был слеш
+                '/' :                                                      // то его надо оставить
+                ''
+        );
+    }
+
+    /**
+     * Удаление лишних слешей из пути
+     *
+     * @param  string $path Путь с лишними слешами
+     * @return string       Путь без лишних слешей
+     */
+    private static function remove_path_slashes($path) {
+        $path = explode('/', $path);                                       // Разбить путь на части в массив
+        $path = array_filter($path);                                       // Удалить пустые элементы массива
+        return '/' . implode('/', $path);                                  // Снова объединить элементы в строку
     }
 
     /**
