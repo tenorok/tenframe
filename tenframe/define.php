@@ -1,6 +1,7 @@
 <?php
 
 define('TEN_PATH', 'tenframe');                                 // Константа директории tenframe
+define('TEN_CLASSES', TEN_PATH . '/classes');                   // Константа директории для хранения классов tenframe
 
 if(stripos($_SERVER['PHP_SELF'], TEN_PATH . '/index.php')) {    // Если выполняется обычный запрос
     list($root, $query) = explode(
@@ -14,13 +15,7 @@ else {                                                          // Иначе в
 }
 
 define('ROOT', $_SERVER['DOCUMENT_ROOT'] . $root);              // Константа корневого пути
-
-// Определение констант для автоподключения классов
-define('SYS',        ROOT . '/');                               // Определение директории с классами системы
-define('CONTROLLER', ROOT . '/app/controller/');                // Определение директории с классами контроллеров
-define('MODEL',      ROOT . '/app/model/');                     // Определение директории с классами модели
-
-define('BLOCKS',     ROOT . '/view/blocks/');                   // Константа директории блоков
+define('BLOCKS', ROOT . '/view/blocks/');                       // Константа директории блоков
 
 require 'core.php';                                             // Подключение ядра
 require ROOT . '/settings.php';                                 // Настройки работы фреймворка
