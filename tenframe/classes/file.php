@@ -16,6 +16,9 @@
     Чтение массива из файла:
         $content = ten\file::read_arr('/conf/settings.conf');
 
+    Создание директории:
+        ten\file::make_dir('/new/path/');
+
     Сохранение автогенерированного файла
         ten\file::autogen(
             '/my/path/file.name',                              // Обязательный. Путь к файлу (можно относительный, можно абсолютный)
@@ -60,7 +63,7 @@ class file extends core {
      * @param string $path Путь к папке или файлу
      * @return die || true
      */
-    protected static function make_dir($path) {
+    public static function make_dir($path) {
 
         if(substr($path, 0, -1) != '/')                              // Если в конце переданной строки нет слеша
             $path = implode('/', array_slice(                        // то это путь к файлу и нужно получить чистый путь без имени файла
