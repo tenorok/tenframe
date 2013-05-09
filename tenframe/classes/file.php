@@ -87,23 +87,22 @@ class file extends core {
      * @return string          Сформированный путь к сгенерированному файлу
      */
     public static function autogen($path, $content, $prefix = '__autogen__', $chmod = false) {
-        
-        if(!preg_match('/^' . str_replace('/', '\/', ROOT) . '/', $path))            // Если в пути не указана корневая директория
-            $path = ROOT . $path;                                                    // то её надо добавить
 
-        $path_arr = explode('/', $path);
-        $last     = count($path_arr) - 1;
-        $path_arr[$last] = $prefix . $path_arr[$last];
+        $clear_path = core::resolve_path($path);                     // Приведение пути к корректному виду
 
-        $final_path = implode('/', $path_arr);
+        $path_arr = explode('/', $clear_path);                       // Разбивка пути на массив
+        $last = $prefix . array_pop($path_arr);                      // Получение последнего элемента и добавление ему префикса
+        array_push($path_arr, $last);                                // Возвращение последнего элемента с префиксом
 
-        self::make_dir($final_path);
-        file_put_contents($final_path, $content);
+        $final_path = implode('/', $path_arr);                       // Вновь объединение массива в строку
 
-        if($chmod && !chmod($final_path, $chmod)) {
-            message::error('can\'t set chmod in file: ' . $final_path);
+        self::make_dir($final_path);                                 // Создание директории
+        file_put_contents($final_path, $content);                    // Сохранение файла
+
+        if($chmod && !chmod($final_path, $chmod)) {                  // Установление прав на файл, если это требуется
+            message::error('can\'t set chmod to file: ' . $final_path);
         }
 
-        return $final_path;
+        return $final_path;                                          // Путь до созданного файла
     }
 }
