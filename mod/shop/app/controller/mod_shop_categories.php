@@ -123,7 +123,7 @@ class mod_shop_categories {
             'parse' => array(
 
                 'title' => 'Административная панель &mdash; ' . $info['title'],
-                'files' => ten\core::includes('libs, developer, require', '__autogen__'),
+                'files' => ten\core::includes('libs, developer, require', ten\file::$autoprefix),
 
                 'body'  => ten\tpl::block(array(
 

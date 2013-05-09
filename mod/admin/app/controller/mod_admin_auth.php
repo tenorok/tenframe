@@ -19,7 +19,7 @@ class mod_admin_auth {
             'parse' => array(
 
                 'title' => 'Вход в административную панель',
-                'files' => ten\core::includes('libs, developer, require', '__autogen__'),
+                'files' => ten\core::includes('libs, developer, require', ten\file::$autoprefix),
 
                 'body'  => ten\tpl::block(array(
 

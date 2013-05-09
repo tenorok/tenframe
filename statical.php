@@ -10,7 +10,7 @@ ten\statical::involve(array(                            // Markdown для мо�
         'js'  => '/assets/js/'
     ),
     'output_file' => '/view/include/markdown.tpl',
-    'prefix' => '__autogen__',
+    'prefix' => ten\file::$autoprefix,
     'hash' => false
 ));
 
@@ -28,7 +28,7 @@ ten\statical::involve(array(                            // Файлы библи
         'js' => '/assets/js/'
     ),
     'output_file' => '/view/include/libs.tpl',
-    'prefix' => '__autogen__',
+    'prefix' => ten\file::$autoprefix,
     'hash' => false
 ));
 
@@ -50,7 +50,7 @@ ten\statical::involve(array(                            // Файлы для р�
         'js'   => '/assets/js/'
     ),
     'output_file' => '/view/include/developer.tpl',
-    'prefix' => '__autogen__',
+    'prefix' => ten\file::$autoprefix,
     'hash' => false
 ));
 
@@ -63,5 +63,5 @@ ten\statical::involve(array(                            // Основные фа
         'js'  => '/assets/js/'
     ),
     'output_file' => '/view/include/require.tpl',
-    'prefix' => '__autogen__'
+    'prefix' => ten\file::$autoprefix
 ));

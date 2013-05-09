@@ -75,7 +75,7 @@ class core {
             $path = self::remove_path_slashes(ROOT . $path);               // то её надо добавить
 
         return $path . (                                                   // Приведённый путь
-            ($arguments[strlen($arguments) - 1] == '/') ?                  // Если последним символом был слеш
+            (substr($arguments, 0, -1) == '/') ?                           // Если последним символом был слеш
                 '/' :                                                      // то его надо оставить
                 ''
         );

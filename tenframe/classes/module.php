@@ -71,7 +71,7 @@ class module extends core {
             'parse' => array(
 
                 'title' => 'Модуль — ' . $mod,
-                'files' => parent::includes('markdown', '__autogen__'),
+                'files' => parent::includes('markdown', file::$autoprefix),
                 'body'  => Markdown(file_get_contents(ROOT . '/mod/' . $mod . '/readme.md'))
             )
         ));
