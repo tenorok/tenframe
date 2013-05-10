@@ -16,7 +16,7 @@ class index {
 
             'parse' => array(
                 'title' => 'Готов?',
-                'files' => ten\core::includes('libs, developer, require', ten\file::$autoprefix),
+                'files' => ten\core::includes('libs, developer, require', GEN),
                 'body'  => 'Поехали!'
             )
         ));
