@@ -111,10 +111,13 @@ class core {
                 $mysql['password']
             );
 
-            orm::db($mysql['database']);                                   // Выбор базы данных
+            if(isset($mysql['database'])) {
+                orm::db($mysql['database']);                               // Выбор базы данных
+            }
         }
 
         module::init();                                                    // Инициализация модулей
+        self::define_require();                                            // Подключение файлов
     }
 
     /**
@@ -149,6 +152,7 @@ class core {
 
     /**
      * Определение константы DEV (флаг режима разработчика)
+     *
      */
     private static function define_DEV() {
 
@@ -158,6 +162,22 @@ class core {
             error_reporting(0);                                            // Отключение отображения ошибок интерпретатора
         else
             error_reporting(E_ALL);                                        // Включение отображения всех ошибок интерпретатора
+    }
+
+    /**
+     * Подключение файлов
+     *
+     */
+    private static function define_require() {
+
+        if(self::dev(DEV)) {                                    // Если включен режим разработчика
+
+            require '../join.php';                              // Сборка файлов
+            require '../statical.php';                          // Подключение файлов
+        }
+
+        require 'request.php';                                  // Подключение функций обработки маршрутов
+        require '../routes.php';                                // Подключение файла маршрутизации
     }
 
     /**
