@@ -222,7 +222,7 @@ class image extends file {
                 9 => 'jpc', 10 => 'jp2', 11 => 'jpx'
             );
 
-            self::make_dir($options['path']);                                    // Создание пути, если его не существует
+            file::make_dir($options['path']);                                    // Создание пути, если его не существует
 
             $func_imagecreatefrom = 'imagecreatefrom' . $type[1];                // Создание имени функции в соответствии с типом изображения
             $base_image = $func_imagecreatefrom($file['tmp_name']);              // Создание нового изображения из добавленного файла
