@@ -26,9 +26,8 @@ class module extends core {
     /**
      * Функция инициализации модулей
      *
-     * @param array $mods Массив имён модулей
      */
-    public static function init($mods) {
+    public static function init() {
 
         array_push(                                                    // Добавление маршрута отображения документации по модулю
             route::$routes,
@@ -39,7 +38,7 @@ class module extends core {
             )
         );
 
-        foreach($mods as $mod) {                                       // Цикл по перечисленным именам модулей
+        foreach(parent::$settings['modules'] as $mod) {                // Цикл по перечисленным именам модулей
 
             $path = '/mod/' . $mod;                                    // Относительный путь к модулю
 

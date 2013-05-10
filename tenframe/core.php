@@ -52,13 +52,112 @@ class core {
                 strtolower($class)
             );
 
-            $file = self::resolve_path($dir, $path . '.php');               // Приведение пути к корректному виду
+            $file = self::resolve_path($dir, $path . '.php');              // Приведение пути к корректному виду
 
             if(is_file($file)) {                                           // Если файл существует
                 require $file;                                             // его нужно подключить
                 break;
             }
         }
+    }
+
+    public static $define = array();                                       // Константы
+
+    /**
+     * Объявление константы
+     *
+     * @param $name  Имя константы
+     * @param $value Значение константы
+     */
+    private static function define($name, $value) {
+        define($name, $value);
+        self::$define[$name] = $value;
+    }
+
+    /**
+     * Инициализация, применение настроек tenframe
+     *
+     */
+    public static function init() {
+
+        self::define('TEN_PATH', 'tenframe');                              // Константа директории tenframe
+        self::define('TEN_CLASSES', TEN_PATH . '/classes/');               // Константа директории для хранения классов tenframe
+
+        spl_autoload_register(array('self', 'auto_load'));                 // Включение автоподгрузки классов
+        register_shutdown_function(array('ten\core', 'shutdown'));         // Указание метода, который будет вызван по окончании выполнения всего скрипта
+
+        self::define_ROOT_and_URI();                                       // Определение констант ROOT и URI
+
+        self::define('BLOCKS', self::resolve_path(ROOT, '/view/blocks/')); // Константа директории блоков
+
+        require ROOT . '/settings.php';                                    // Подключение настроек работы tenframe
+
+        self::define_DEV();                                                // Определение константы DEV
+
+        if(isset(self::$settings['autoload'])) {                           // Добавление путей автоматической загрузки классов
+            self::$paths = array_merge(
+                self::$paths,
+                self::$settings['autoload']
+            );
+        }
+
+        if(isset(self::$settings['mysql'])) {                              // Подключение к mysql
+
+            $mysql = self::$settings['mysql'];
+
+            orm::connect(                                                  // Подключение
+                $mysql['host'],
+                $mysql['user'],
+                $mysql['password']
+            );
+
+            orm::db($mysql['database']);                                   // Выбор базы данных
+        }
+
+        module::init();                                                    // Инициализация модулей
+    }
+
+    /**
+     * Определение констант ROOT и URI
+     *
+     */
+    private static function define_ROOT_and_URI() {
+
+        if(stripos($_SERVER['PHP_SELF'], TEN_PATH . '/index.php')) {       // Если выполняется обычный запрос
+            list($root, $query) = explode(
+                TEN_PATH . '/index.php',
+                $_SERVER['PHP_SELF']
+            );
+        }
+        else {                                                             // Иначе выполняется ajax-запрос
+            $root = '';
+            $query = $_SERVER['PHP_SELF'];
+        }
+
+        self::define('ROOT', $_SERVER['DOCUMENT_ROOT'] . $root);           // Константа корневого пути
+
+        if(self::$settings['clearURI']) {                                  // Если задана маршрутизация только относительного пути
+
+            $uri = $query . (($_SERVER['QUERY_STRING']) ?                  // Константа чистого запроса
+                '?' . $_SERVER['QUERY_STRING'] : '');
+        } else {
+            $uri = $_SERVER['REQUEST_URI'];                                // Константа полного запроса
+        }
+
+        self::define('URI', $uri);                                         // Путь до приложения
+    }
+
+    /**
+     * Определение константы DEV (флаг режима разработчика)
+     */
+    private static function define_DEV() {
+
+        self::define('DEV', self::$settings['develop']);                   // Вкл/выкл режима разработчика
+
+        if(DEV)                                                            // Если выключен режим разработчика
+            error_reporting(0);                                            // Отключение отображения ошибок интерпретатора
+        else
+            error_reporting(E_ALL);                                        // Включение отображения всех ошибок интерпретатора
     }
 
     /**
@@ -75,7 +174,7 @@ class core {
             $path = self::remove_path_slashes(ROOT . $path);               // то её надо добавить
 
         return $path . (                                                   // Приведённый путь
-            (substr($arguments, 0, -1) == '/') ?                           // Если последним символом был слеш
+            (substr($arguments, -1) == '/') ?                              // Если последним символом был слеш
                 '/' :                                                      // то его надо оставить
                 ''
         );
