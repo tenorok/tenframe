@@ -117,6 +117,14 @@ class core {
             }
         }
 
+        if(isset(self::$settings['tenhtml'])) {
+            html::setTenhtmlFolder(self::$settings['tenhtml']);
+        }
+
+        if(isset(self::$settings['compressHTML'])) {
+            tpl::setCompressTplFolder(self::$settings['compressHTML']);
+        }
+
         module::init();                                                    // Инициализация модулей
         self::define_require();                                            // Подключение файлов
     }

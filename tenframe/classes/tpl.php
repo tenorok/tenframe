@@ -69,7 +69,22 @@ namespace ten;
 
 class tpl extends core {
 
-    private static $compressTplFolder = '/assets/__autogen__compressed';                // Директория для хранения сжатых шаблонов
+    public static $compressTplFolder;                                                   // Директория для хранения сжатых шаблонов
+
+    /**
+     * Установка директории для сжатых шаблонов
+     *
+     * @param $folder Директория для хранения сгенерированных сжатых шаблонов
+     */
+    public static function setCompressTplFolder($folder) {
+
+        if(is_string($folder)) {
+            self::$compressTplFolder = $folder;
+        }
+        else {
+            self::$compressTplFolder = '/assets/' . GEN . 'compressed/';
+        }
+    }
 
     /**
      * Функция парсинга блоков

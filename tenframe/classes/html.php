@@ -111,7 +111,22 @@ namespace ten;
 
 class html extends core {
 
-    private static $tenhtmlFolder = '/assets/__autogen__tenhtml';                       // Директория для хранения шаблонов, сгенерированных из tenhtml
+    public static $tenhtmlFolder;                                                       // Директория для хранения шаблонов, сгенерированных из tenhtml
+
+    /**
+     * Установка директории для tenhtml
+     *
+     * @param $folder Директория для хранения сгенерированных шаблонов
+     */
+    public static function setTenhtmlFolder($folder) {
+
+        if(is_string($folder)) {
+            self::$tenhtmlFolder = $folder;
+        }
+        else {
+            self::$tenhtmlFolder = '/assets/' . GEN . 'tenhtml/';
+        }
+    }
 
     private static $spec = array(                                                       // Массив зарезервированных специальных символов
         'block'   => '%',                                                               // Блок
