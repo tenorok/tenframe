@@ -65,7 +65,7 @@ class file extends core {
      */
     public static function make_dir($path) {
 
-        if(substr($path, 0, -1) != '/')                              // Если в конце переданной строки нет слеша
+        if(substr($path, -1) != '/')                                 // Если в конце переданной строки нет слеша
             $path = implode('/', array_slice(                        // то это путь к файлу и нужно получить чистый путь без имени файла
                 explode('/', $path), 0, -1
             ));
