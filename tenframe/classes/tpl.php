@@ -110,12 +110,9 @@ class tpl extends core {
 
             if($ext == 'tenhtml' && self::$settings['tenhtml']) {                       // Если рассматриваемое расширение tenhtml и включена его настройка
 
-                if(DEV && file_exists($file)) {                                         // Если включен режим разработчика и шаблон существует
-                    $file = html::savetenhtml($file);                                   // то его нужно преобразовать в простой шаблон
-                }
-                else {                                                                  // Иначе нужно просто взять уже сгенерированный простой шаблон
-                    $file = ROOT . self::$compressTplFolder . text::ldel($file, ROOT);
-                }
+                $file = (DEV) ?                                                         // Если включен режим разработчика
+                    html::savetenhtml(core::resolve_path($file)) :                      // то его нужно преобразовать в простой шаблон
+                    ROOT . html::$tenhtmlFolder . text::ldel($file, ROOT);              // иначе просто взять уже сгенерированный шаблон
 
                 if(file_exists($file)) {                                                // Если этот уже сгенерированный простой шаблон существует
                     break;                                                              // то рассматривать менее приоритетные расширения не нужно
