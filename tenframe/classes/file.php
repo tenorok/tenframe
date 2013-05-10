@@ -88,12 +88,12 @@ class file extends core {
      * @param  number $chmod   Права на создаваемый файл
      * @return string          Сформированный путь к сгенерированному файлу
      */
-    public static function autogen($path, $content, $prefix = false, $chmod = false) {
+    public static function autogen($path, $content, $prefix = null, $chmod = false) {
 
         $clear_path = core::resolve_path($path);                     // Приведение пути к корректному виду
 
         $path_arr = explode('/', $clear_path);                       // Разбивка пути на массив
-        $prefix = ($prefix !== false) ? $prefix : self::$autoprefix; // Установить стандартный префикс, если он не задан
+        $prefix = (is_null($prefix)) ? GEN : $prefix;                // Установить стандартный префикс, если он не задан
         $last = $prefix . array_pop($path_arr);                      // Получение последнего элемента и добавление ему префикса
         array_push($path_arr, $last);                                // Возвращение последнего элемента с префиксом
 
