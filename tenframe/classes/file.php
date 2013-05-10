@@ -80,6 +80,15 @@ class file extends core {
     public static $autoprefix = '__autogen__';                       // Префикс автоматически сгенерированных файлов
 
     /**
+     * Установить префикс для автоматически сгенерированных файлов
+     *
+     * @param $prefix Префикс
+     */
+    public static function setAutoprefix($prefix) {
+        self::$autoprefix = $prefix;
+    }
+
+    /**
      * Функция сохранения автоматически сгенерированных файлов
      *
      * @param  string $path    Путь к файлу

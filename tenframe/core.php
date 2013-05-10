@@ -89,7 +89,6 @@ class core {
         self::define_ROOT_and_URI();                                       // Определение констант ROOT и URI
 
         self::define('BLOCKS', self::resolve_path(ROOT, '/view/blocks/')); // Константа директории блоков
-        self::define('GEN', file::$autoprefix);                            // Константа префикса автоматически сгенерированных файлов
 
         require ROOT . '/settings.php';                                    // Подключение настроек работы tenframe
 
@@ -116,6 +115,12 @@ class core {
                 orm::db($mysql['database']);                               // Выбор базы данных
             }
         }
+
+        if(isset(self::$settings['autoprefix'])) {
+            file::setAutoprefix(self::$settings['autoprefix']);
+        }
+
+        self::define('GEN', file::$autoprefix);                            // Константа префикса автоматически сгенерированных файлов
 
         if(isset(self::$settings['tenhtml'])) {
             html::setTenhtmlFolder(self::$settings['tenhtml']);
