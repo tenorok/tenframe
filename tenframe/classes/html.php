@@ -153,6 +153,15 @@ class html extends core {
      */
     public static function savetenhtml($file) {
 
+        $tenhtmlPath = core::resolve_path(                                              // Приведение пути к корректному виду
+            self::$tenhtmlFolder,                                                       // Путь до папки хранения tenhtml
+            text::ldel($file, ROOT)                                                     // Относительный путь до tenhtml-шаблона
+        );
+
+        if(in_array($tenhtmlPath, file::$debugAutogen)) {                               // Если этот шаблон уже был сгенерирован
+            return $tenhtmlPath;                                                        // то повторная генерация не требуется
+        }
+
         $tenhtml = preg_replace(                                                        // Удаление комментариев
             '/(\/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/)|(\/\/.*)/',
             '', file_get_contents($file)
@@ -208,7 +217,7 @@ class html extends core {
         }
 
         return file::autogen(
-            self::$tenhtmlFolder . text::ldel($file, ROOT),
+            $tenhtmlPath,
             $gentpl,
             ''
         );
