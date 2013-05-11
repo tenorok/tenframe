@@ -172,7 +172,7 @@ class core {
 
         self::define('DEV', self::$settings['develop']);                   // Вкл/выкл режима разработчика
 
-        if(DEV)                                                            // Если выключен режим разработчика
+        if(!DEV)                                                           // Если выключен режим разработчика
             error_reporting(0);                                            // Отключение отображения ошибок интерпретатора
         else
             error_reporting(E_ALL);                                        // Включение отображения всех ошибок интерпретатора
@@ -287,63 +287,11 @@ class core {
             'sysauto' => true                                              // Опция символизирует возврат автоматической страницы 404
         ));
 
-        if(self::$settings['debug']) {
-            self::show_debug(self::$settings['debug']);
+        if(isset(self::$settings['debug']) && self::$settings['debug']) {  // Если включена отладка
+            debug::init(self::$settings['debug']);                         // Напечатать отладочную информацию в соответствии с переданными опциями
         }
 
         if(isset(orm::$mysqli))
             orm::$mysqli->close();                                         // Разрыв соединения с базой данных
-    }
-
-    public static function debug($info) {
-
-        $text = '';
-
-        foreach($info as $key => $val) {
-            if(is_string($key)) {
-                $text .= self::print_debug($key, $val);
-            } else if(is_array($val)) {
-                foreach($val as $subKey => $subVal) {
-                    $text .= self::print_debug($subKey, $subVal);
-                }
-            }
-        }
-
-        echo '<pre style="padding: 10px; background: #F5F5EA;">' . $text . '</pre>';
-    }
-
-    private static function print_debug($key, $val) {
-        switch($key) {
-            case 'h1':
-                return '<b style="font-size: 20px;">' . $val . '</b>' . "\n";
-            case 'h2':
-                return '<b style="font-size: 16px;">' . $val . '</b>' . "\n";
-            case 'list':
-                $len = strlen(count($val));                             // Количество разрядов последнего элемента массива
-                $text = '';
-                foreach($val as $listKey => $listVal) {
-                    $index = $listKey + 1;                              // Отсчёт начинается с единицы
-                    for($s = 0; $s < $len - strlen($index); $s++) {     // Выравнивание пробелами
-                        $text .= ' ';
-                    }
-                    $text .= $index . " -> " . $listVal . "\n";
-                }
-                return $text;
-        }
-    }
-
-    public static function show_debug($options = true) {
-
-        self::debug(array(
-            'h1' => 'Tenframe debuger',
-            array(
-                'h2' => 'Templates:',
-                'list' => tpl::$debugTemplates,
-            ),
-            array(
-                'h2' => 'Autogen:',
-                'list' => file::$debugAutogen
-            )
-        ));
     }
 }
