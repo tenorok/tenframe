@@ -88,6 +88,8 @@ class file extends core {
         self::$autoprefix = $prefix;
     }
 
+    public static $debugAutogen = array();                           // Массив автоматически-сгенерированных файлов
+
     /**
      * Функция сохранения автоматически сгенерированных файлов
      *
@@ -110,6 +112,7 @@ class file extends core {
 
         self::make_dir($final_path);                                 // Создание директории
         file_put_contents($final_path, $content);                    // Сохранение файла
+        array_push(self::$debugAutogen, $final_path);                // Добавление файла в массив автоматически-сгенерированных
 
         if($chmod && !chmod($final_path, $chmod)) {                  // Установление прав на файл, если это требуется
             message::error('can\'t set chmod to file: ' . $final_path);

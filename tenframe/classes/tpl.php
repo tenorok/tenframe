@@ -86,6 +86,8 @@ class tpl extends core {
         }
     }
 
+    public static $debugTemplates = array();                                            // Массив использованных файлов-шаблонов
+
     /**
      * Функция парсинга блоков
      *
@@ -108,19 +110,18 @@ class tpl extends core {
 
             $file = $blocks . $block . '/view/' . $view . '.' . $ext;                   // Полный путь к шаблону
 
-            if($ext == 'tenhtml' && self::$settings['tenhtml']) {                       // Если рассматриваемое расширение tenhtml и включена его настройка
+            if($ext == 'tenhtml' && parent::$settings['tenhtml']) {                     // Если рассматриваемое расширение tenhtml и включена его настройка
 
                 $file = (DEV) ?                                                         // Если включен режим разработчика
-                    html::savetenhtml(core::resolve_path($file)) :                      // то его нужно преобразовать в простой шаблон
-                    ROOT . html::$tenhtmlFolder . text::ldel($file, ROOT);              // иначе просто взять уже сгенерированный шаблон
-
+                    html::savetenhtml(core::resolve_path($file)) :                      // то tenhtml-шаблон нужно преобразовать в простой шаблон
+                    core::resolve_path(html::$tenhtmlFolder, text::ldel($file, ROOT));  // иначе просто взять уже сгенерированный шаблон
                 if(file_exists($file)) {                                                // Если этот уже сгенерированный простой шаблон существует
                     break;                                                              // то рассматривать менее приоритетные расширения не нужно
                 }
             }
         }
 
-        if(self::$settings['compressHTML'] && $ext != 'tenhtml') {                      // Если HTML нужно сжимать
+        if($ext != 'tenhtml' && parent::$settings['compressHTML']) {                    // Если HTML нужно сжимать
 
             if(DEV) {                                                                   // Если включен режим разработчика
                 file::autogen(                                                          // Сохранение сжатого шаблона
@@ -141,6 +142,7 @@ class tpl extends core {
             }
         }
 
+        array_push(self::$debugTemplates, $file);                                       // Добавление файла в массив использованных шаблонов
         $tpl = new \Blitz($file);                                                       // Получение шаблона
 
         if(isset($context))                                                             // Если требуется контекст begin-end
