@@ -66,10 +66,11 @@ namespace ten;
 class join extends file {
 
     private static $folders = array();                                               // Массив директорий
-    private static $input_files  = array();                                          // Массив путей объединённых файлов
+    private static $input_files = array();                                           // Массив путей объединённых файлов
     private static $output_file;                                                     // Строка, в которую собираются файлы
 
-    public  static $input_path   = array('/view/');                                  // Массив входящих директорий
+    public  static $input_path = array('/view/');                                    // Массив входящих директорий
+    public  static $debugJoin  = array();                                            // Массив объединённых файлов
 
     private static $options = array(                                                 // Дефолтные параметры объединения файлов
         'before'    => '',
@@ -136,10 +137,13 @@ class join extends file {
         $input = self::$input_files;
         self::$input_files = array();                                                // Обнуление файла путей объединённых файлов
 
-        return array(
+        $result = array(
             'input'  => $input,
             'output' => $output
         );
+
+        array_push(self::$debugJoin, $result);
+        return $result;
     }
 
     /**
@@ -191,7 +195,9 @@ class join extends file {
                 self::$output_file = trim(jsmin::minify(self::$output_file));
         }
 
-        $output_file = str_replace('{ext}', $extension, $options['output_file']);
+        $output_file = parent::resolve_path(                                         // Установление корректного пути до файла
+            str_replace('{ext}', $extension, $options['output_file'])
+        );
 
         parent::make_dir($output_file);                                              // Создание пути, если его не существует
 
@@ -267,8 +273,7 @@ class join extends file {
 
         foreach($files as $file) {                                                   // Цикл по файлам
 
-            if(!preg_match('/^' . str_replace('/', '\/', ROOT) . '/', $file))        // Если в пути не указана корневая директория
-                $file = ROOT . $file;                                                // то её надо добавить
+            $file = core::resolve_path($file);                                       // Установление корректного пути до файла
 
             if(in_array($file, self::$input_files))                                  // Если файл уже был прилеплен
                 return;                                                              // то его уже не нужно прилеплять
@@ -277,8 +282,8 @@ class join extends file {
 
             self::$output_file .=                                                    // Добавление
                 str_replace('{filename}', $file, $options['before']) .               // предваряющей строки
-                    file_get_contents($file)                             .           // к содержанию текущего файла
-                    str_replace('{filename}', $file, $options['after']);             // и последующей строки
+                file_get_contents($file)                             .               // к содержанию текущего файла
+                str_replace('{filename}', $file, $options['after']);                 // и последующей строки
         }
     }
 }
