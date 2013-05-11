@@ -17,7 +17,7 @@
 
 namespace ten;
 
-class secure {
+class secure extends core {
 
     /**
      * Функция проверки первичных ключей
