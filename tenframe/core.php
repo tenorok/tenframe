@@ -9,13 +9,13 @@
 
     Приведение путей к корректному виду:
         Корневой путь добавится автоматически:
-            ten\core::resolvePath(                      // Путь до папки: /Users/name/project/one/two/third/four/
+            ten\core::resolve_path(                     // Путь до папки: /Users/name/project/one/two/third/four/
                 'one//two///',
                 'third',
                 'four/'
             );
         Корневой путь не добавится, если он уже есть:
-            ten\core::resolvePath(                      // Путь до файла: /Users/name/project/one/two/third/four
+            ten\core::resolve_path(                     // Путь до файла: /Users/name/project/one/two/third/four
                 ROOT,
                 'one//two///',
                 'third',
@@ -287,7 +287,63 @@ class core {
             'sysauto' => true                                              // Опция символизирует возврат автоматической страницы 404
         ));
 
+        if(self::$settings['debug']) {
+            self::show_debug(self::$settings['debug']);
+        }
+
         if(isset(orm::$mysqli))
             orm::$mysqli->close();                                         // Разрыв соединения с базой данных
+    }
+
+    public static function debug($info) {
+
+        $text = '';
+
+        foreach($info as $key => $val) {
+            if(is_string($key)) {
+                $text .= self::print_debug($key, $val);
+            } else if(is_array($val)) {
+                foreach($val as $subKey => $subVal) {
+                    $text .= self::print_debug($subKey, $subVal);
+                }
+            }
+        }
+
+        echo '<pre style="padding: 10px; background: #F5F5EA;">' . $text . '</pre>';
+    }
+
+    private static function print_debug($key, $val) {
+        switch($key) {
+            case 'h1':
+                return '<b style="font-size: 20px;">' . $val . '</b>' . "\n";
+            case 'h2':
+                return '<b style="font-size: 16px;">' . $val . '</b>' . "\n";
+            case 'list':
+                $len = strlen(count($val));                             // Количество разрядов последнего элемента массива
+                $text = '';
+                foreach($val as $listKey => $listVal) {
+                    $index = $listKey + 1;                              // Отсчёт начинается с единицы
+                    for($s = 0; $s < $len - strlen($index); $s++) {     // Выравнивание пробелами
+                        $text .= ' ';
+                    }
+                    $text .= $index . " -> " . $listVal . "\n";
+                }
+                return $text;
+        }
+    }
+
+    public static function show_debug($options = true) {
+
+        self::debug(array(
+            'h1' => 'Tenframe debuger',
+            array(
+                'h2' => 'Templates:',
+                'list' => tpl::$debugTemplates,
+            ),
+            array(
+                'h2' => 'Autogen:',
+                'list' => file::$debugAutogen
+            )
+        ));
     }
 }
