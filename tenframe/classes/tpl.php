@@ -132,10 +132,12 @@ class tpl extends core {
             }
 
             $blocks = (isset($mod)) ?
-                ROOT . self::$compressTplFolder . '/mod/' . $mod . '/view/blocks/' :
-                ROOT . self::$compressTplFolder . '/view/blocks/';
+                file::resolve_path(self::$compressTplFolder, '/mod/', $mod, '/view/blocks/') :
+                file::resolve_path(self::$compressTplFolder, '/view/blocks/');
 
-            $compressedFile = $blocks . $block . '/view/' . $view . '.tpl';             // Полный путь к сжатому шаблону
+            $compressedFile = file::resolve_path(                                       // Полный путь к сжатому шаблону
+                $blocks, $block, '/view/', $view . '.tpl'
+            );
 
             if(file_exists($compressedFile)) {
                 $file = $compressedFile;
