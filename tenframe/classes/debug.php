@@ -27,6 +27,8 @@ namespace ten;
 
 class debug extends core {
 
+    private static $blockname = 'tenframe-debug';                       // Имя блока отладочной информации
+
     /**
      * Вывести отладочную информацию
      *
@@ -46,7 +48,105 @@ class debug extends core {
             }
         }
 
-        echo '<pre style="padding: 10px; background: #F5F5EA;">' . $text . '</pre>';
+        echo
+            self::print_style() .
+            self::print_tag('pre', $text);
+    }
+
+    private static $style = array(                                      // Стили для отображения отладочной информации
+        'block' => array(
+            'padding' => '10px',
+            'background' => '#F5F5EA'
+        ),
+        'elems' => array(
+            'h1' => array(
+                'font-size' => '20px',
+                'font-weight' => 'bold',
+                'margin' => '6px 0'
+            ),
+            'h2' => array(
+                'font-size' => '16px',
+                'font-weight' => 'bold',
+                'margin' => '6px 0 4px'
+            ),
+            'p' => array(
+                'font-size' => '12px',
+                'margin' => '2px 0'
+            ),
+            'list' => array(
+                'font-size' => '12px',
+                'margin' => '0'
+            )
+        )
+    );
+
+    /**
+     * Печать стилей
+     *
+     * @return string Стили
+     */
+    private static function print_style() {
+        return
+            '<style type="text/css">' .
+                self::print_style_rule(self::$style['block'], self::$blockname) .
+                self::print_style_rule(self::$style['elems']) .
+            '</style>';
+    }
+
+    /**
+     * Печать стилевых правил
+     *
+     * @param  array         $rules     Массив стилей блока или элементов
+     * @param  string | bool $blockname Имя блока
+     * @return string                   Список стилей
+     */
+    private static function print_style_rule($rules, $blockname = false) {
+
+        $ruleslist = '';
+
+        if($blockname) {
+            $ruleslist = self::print_style_block(
+                $blockname,
+                self::print_style_rules($rules)
+            );
+        } else {
+            foreach($rules as $elem => $props) {
+                $ruleslist .= self::print_style_block(
+                    self::$blockname . '__' . $elem,
+                    self::print_style_rules($props)
+                );
+            }
+        }
+
+        return $ruleslist;
+    }
+
+    /**
+     * Печать селектора
+     *
+     * @param  string $selector Селектор
+     * @param  string $rules    Правила
+     * @return string           Блок селектора
+     */
+    private static function print_style_block($selector, $rules) {
+        return
+            '.' . $selector . '{' .
+                $rules .
+            '}';
+    }
+
+    /**
+     * Печать правил для блока селектора
+     *
+     * @param  array $rules Массив стилей
+     * @return string       Список правил
+     */
+    private static function print_style_rules($rules) {
+        $style = '';
+        foreach($rules as $prop => $val) {
+            $style .= $prop . ':' . $val . ';';
+        }
+        return $style;
     }
 
     /**
@@ -57,17 +157,20 @@ class debug extends core {
     public static function init($options = true) {
 
         self::show(array(
-            'h1' => 'Tenframe debuger',
+            'h1' => 'Tenframe debugger',
             array(
                 'h2' => 'Templates:',
+                'p' => 'Шаблоны, использованные для формирования страницы.',
                 'list' => tpl::$debugTemplates,
             ),
             array(
                 'h2' => 'Autogen:',
+                'p' => 'Все автоматически сгенерированные файлы.',
                 'list' => file::$debugAutogen
             ),
             array(
                 'h2' => 'Join:',
+                'p' => 'Объединённые файлы.',
                 'list' => join::$debugJoin
             )
         ));
@@ -83,12 +186,29 @@ class debug extends core {
     private static function print_keys($key, $val) {
         switch($key) {
             case 'h1':
-                return '<b style="font-size: 20px;">' . $val . '</b>' . "\n";
             case 'h2':
-                return '<b style="font-size: 16px;">' . $val . '</b>' . "\n";
+            case 'p':
+                return self::print_tag('p', $val, $key);
             case 'list':
-                return self::print_array($val, 0);
+                return self::print_tag('p', self::print_array($val, 0), $key);
         }
+    }
+
+    /**
+     * Печать тега
+     *
+     * @param  string        $tag  Имя тега
+     * @param  string        $val  Контент тега
+     * @param  string | bool $elem Имя элемента
+     * @return string              Готовый тег
+     */
+    private static function print_tag($tag, $val, $elem = false) {
+        return
+            '<' . $tag . ' class="' . self::$blockname .
+            (($elem) ? '__' . $elem : '') .                             // Если элемент указан, то его надо напечатать
+            '">' .
+                $val .
+            '</' . $tag . '>';
     }
 
     private static $separator = ' -> ';                                 // Разделитель ключей и значений
@@ -103,7 +223,7 @@ class debug extends core {
     private static function print_array($array, $level) {
 
         if(!count($array)) {                                            // Если массив пустой
-            return 'array()' . "\n";
+            return 'NULL' . "\n";
         }
 
         $longest = max(array_map('strlen', array_keys($array)));        // Количество разрядов последнего элемента массива
