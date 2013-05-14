@@ -83,7 +83,6 @@
 
     Отладка:
         ten\orm::result($result);                                      // Печать результатов выборки в удобочитаемом виде
-        ten\orm::debug();                                              // Статистика проведённых до этого момента запросов
 */
 
 namespace ten;
@@ -634,13 +633,12 @@ class orm extends core {
      */
     public static function debug() {
 
-        echo "<pre><b>Queries debuger:</b>\n\n";
-
+        $print = '';
         $duration_sum = 0;
 
         foreach(self::$queries as $key => $val) {
 
-            echo $key + 1 . " -> " . $val->name . " [\n"
+            $print .= $key + 1 . " -> " . $val->name . " [\n"
                 . "\t"   . "file     -> " . $val->file
                 . "\n\t" . "line     -> " . $val->line
                 . "\n\t" . "query    -> " . $val->query
@@ -651,7 +649,7 @@ class orm extends core {
             $duration_sum += $val->duration;
         }
 
-        echo "total [\n"
+        return $print .= "total [\n"
             . "\t" .   "count    -> " . count(self::$queries)
             . "\n\t" . "duration -> " . $duration_sum
             . "\n]</pre>";
