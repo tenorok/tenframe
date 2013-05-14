@@ -11,7 +11,14 @@
         ten\debug::show(array(
             'h1' => 'Header 1',                                         // Заголовок первого уровня
             'h2' => 'Header 2',                                         // Заголовок второго уровня
+
             'p'  => 'Paragraph',                                        // Обычный текст
+            // или
+            'p' => array(                                               // Можно указывать несколько значений для 'h1', 'h2' и 'p'
+                'Paragraph 1',                                          // тогда для каждого значения будет сгенерирован отдельный тег
+                'Paragraph 2'
+            ),
+
             'list' => array(),                                          // Вывод массива списком (допускаются многоуровневые массивы)
             array(                                                      // В массив можно обернуть другие данные
                 'h2' => 'Header 2.1',                                   // чтобы ключи не переприсваивались
@@ -62,7 +69,7 @@ class debug extends core {
                 'h2' => array(
                     'font-size' => '16px',
                     'font-weight' => 'bold',
-                    'margin' => '6px 0 4px'
+                    'margin' => '8px 0 2px'
                 ),
                 'p' => array(
                     'font-size' => '12px',
@@ -129,8 +136,10 @@ class debug extends core {
             ),
             'orm' => array(
                 'h2' => 'ORM:',
-                'p' => 'Выполненные SQL-запросы.',
-                'p' => orm::debug(),
+                'p' => array(
+                    'Выполненные SQL-запросы.',
+                    orm::debug()
+                )
             )
 
         );
@@ -163,7 +172,15 @@ class debug extends core {
             case 'h1':
             case 'h2':
             case 'p':
-                return $viewer->tag('p', $val, $key);
+                if(is_string($val)) {                                   // Если значением ключа является строка
+                    return $viewer->tag('p', $val, $key);               // то можно просто вернуть сгенерированный тег
+                } else if(is_array($val)) {                             // Иначе, если значением ключа является массив
+                    $tags = '';
+                    foreach($val as $tag) {
+                        $tags .= $viewer->tag('p', $tag, $key);         // то нужно сгенерировать тег для каждого элемента массива
+                    }
+                    return $tags;
+                }
             case 'list':
                 return $viewer->tag('p', self::print_array($val, 0), $key);
         }
