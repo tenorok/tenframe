@@ -53,6 +53,8 @@ namespace ten;
 
 class statical extends file {
 
+    public static $debugStatical = array();                                          // Массив автоматически-сгенерированных подключений
+
     /**
      * Функция формирования строки подключения CSS- и JS-файлов к HTML
      *
@@ -81,7 +83,7 @@ class statical extends file {
                 (!empty($options['prefix'])) ? $options['prefix'] : ''               // Префикс для сохраняемого файла
             );
 
-            @chmod($output_file, 0644);                                              // Присвоение необходимых прав на файл
+            array_push(self::$debugStatical, $output_file);
         }
 
         return $included;                                                            // Возвращение строки подключения всех файлов

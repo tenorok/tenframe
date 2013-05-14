@@ -90,6 +90,21 @@ class debug extends core {
     public static function init($options = true) {
 
         $info = array(
+            'autogen' => array(
+                'h2' => 'Autogen:',
+                'p' => 'Все автоматически сгенерированные файлы.',
+                'list' => file::$debugAutogen
+            ),
+            'statical' => array(
+                'h2' => 'Statical:',
+                'p' => 'Сгенерированные подключения статических файлов.',
+                'list' => statical::$debugStatical
+            ),
+            'join' => array(
+                'h2' => 'Join:',
+                'p' => 'Объединённые файлы.',
+                'list' => join::$debugJoin
+            ),
             'tenhtml' => array(
                 'h2' => 'Tenhtml:',
                 'p' => 'Шаблоны, сгенерированные из tenhtml.',
@@ -99,17 +114,8 @@ class debug extends core {
                 'h2' => 'Templates:',
                 'p' => 'Шаблоны, использованные для формирования страницы.',
                 'list' => tpl::$debugTemplates,
-            ),
-            'autogen' => array(
-                'h2' => 'Autogen:',
-                'p' => 'Все автоматически сгенерированные файлы.',
-                'list' => file::$debugAutogen
-            ),
-            'join' => array(
-                'h2' => 'Join:',
-                'p' => 'Объединённые файлы.',
-                'list' => join::$debugJoin
             )
+
         );
 
         $toShow = array(
