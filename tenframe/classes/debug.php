@@ -11,6 +11,7 @@
         ten\debug::show(array(
             'h1' => 'Header 1',                                         // Заголовок первого уровня
             'h2' => 'Header 2',                                         // Заголовок второго уровня
+            'p'  => 'Paragraph',                                        // Обычный текст
             'list' => array(),                                          // Вывод массива списком (допускаются многоуровневые массивы)
             array(                                                      // В массив можно обернуть другие данные
                 'h2' => 'Header 2.1',                                   // чтобы ключи не переприсваивались
@@ -27,8 +28,6 @@ namespace ten;
 
 class debug extends core {
 
-    private static $blockname = 'tenframe-debug';                       // Имя блока отладочной информации
-
     /**
      * Вывести отладочную информацию
      *
@@ -36,117 +35,51 @@ class debug extends core {
      */
     public static function show($info) {
 
+        $viewer = new viewer(
+            'tenframe-debug',                                           // Имя блока отладочной информации
+            array(                                                      // Стили блока
+                'padding' => '10px',
+                'background' => '#F5F5EA'
+            ),
+            array(                                                      // Стили элементов блока
+                'h1' => array(
+                    'font-size' => '20px',
+                    'font-weight' => 'bold',
+                    'margin' => '6px 0'
+                ),
+                'h2' => array(
+                    'font-size' => '16px',
+                    'font-weight' => 'bold',
+                    'margin' => '6px 0 4px'
+                ),
+                'p' => array(
+                    'font-size' => '12px',
+                    'margin' => '2px 0'
+                ),
+                'list' => array(
+                    'font-size' => '12px',
+                    'margin' => '0'
+                )
+            )
+        );
+
         $text = '';
 
         foreach($info as $key => $val) {                                // Цикл по информационному массиву
             if(is_string($val)) {                                       // Если значение является строкой
-                $text .= self::print_keys($key, $val);                  // Можно просто вывести этот ключ
+                $text .= self::print_keys($viewer, $key, $val);         // Можно просто вывести этот ключ
             } else if(is_array($val)) {                                 // Иначе если значением элемента является массив
                 foreach($val as $subKey => $subVal) {                   // Цикл по элементам этого подмассива
-                    $text .= self::print_keys($subKey, $subVal);        // Вывод информации по каждому ключу
+                    $text .= self::print_keys(                          // Вывод информации по каждому ключу
+                        $viewer, $subKey, $subVal
+                    );
                 }
             }
         }
 
         echo
-            self::print_style() .
-            self::print_tag('pre', $text);
-    }
-
-    private static $style = array(                                      // Стили для отображения отладочной информации
-        'block' => array(
-            'padding' => '10px',
-            'background' => '#F5F5EA'
-        ),
-        'elems' => array(
-            'h1' => array(
-                'font-size' => '20px',
-                'font-weight' => 'bold',
-                'margin' => '6px 0'
-            ),
-            'h2' => array(
-                'font-size' => '16px',
-                'font-weight' => 'bold',
-                'margin' => '6px 0 4px'
-            ),
-            'p' => array(
-                'font-size' => '12px',
-                'margin' => '2px 0'
-            ),
-            'list' => array(
-                'font-size' => '12px',
-                'margin' => '0'
-            )
-        )
-    );
-
-    /**
-     * Печать стилей
-     *
-     * @return string Стили
-     */
-    private static function print_style() {
-        return
-            '<style type="text/css">' .
-                self::print_style_rule(self::$style['block'], self::$blockname) .
-                self::print_style_rule(self::$style['elems']) .
-            '</style>';
-    }
-
-    /**
-     * Печать стилевых правил
-     *
-     * @param  array         $rules     Массив стилей блока или элементов
-     * @param  string | bool $blockname Имя блока
-     * @return string                   Список стилей
-     */
-    private static function print_style_rule($rules, $blockname = false) {
-
-        $ruleslist = '';
-
-        if($blockname) {
-            $ruleslist = self::print_style_block(
-                $blockname,
-                self::print_style_rules($rules)
-            );
-        } else {
-            foreach($rules as $elem => $props) {
-                $ruleslist .= self::print_style_block(
-                    self::$blockname . '__' . $elem,
-                    self::print_style_rules($props)
-                );
-            }
-        }
-
-        return $ruleslist;
-    }
-
-    /**
-     * Печать селектора
-     *
-     * @param  string $selector Селектор
-     * @param  string $rules    Правила
-     * @return string           Блок селектора
-     */
-    private static function print_style_block($selector, $rules) {
-        return
-            '.' . $selector . '{' .
-                $rules .
-            '}';
-    }
-
-    /**
-     * Печать правил для блока селектора
-     *
-     * @param  array $rules Массив стилей
-     * @return string       Список правил
-     */
-    private static function print_style_rules($rules) {
-        $style = '';
-        foreach($rules as $prop => $val) {
-            $style .= $prop . ':' . $val . ';';
-        }
-        return $style;
+            $viewer->style() .                                          // Печать стилей
+            $viewer->tag('pre', $text);                                 // Печать блока
     }
 
     /**
@@ -179,39 +112,21 @@ class debug extends core {
     /**
      * Вывод значений ключей массива отладочной информации
      *
-     * @param  string $key Ключ массива
-     * @param  mixed  $val Значение массива
-     * @return string      Сформированная строка
+     * @param  viewer $viewer Объект viewer
+     * @param  string $key    Ключ массива
+     * @param  mixed  $val    Значение массива
+     * @return string         Сформированная строка
      */
-    private static function print_keys($key, $val) {
+    private static function print_keys($viewer, $key, $val) {
         switch($key) {
             case 'h1':
             case 'h2':
             case 'p':
-                return self::print_tag('p', $val, $key);
+                return $viewer->tag('p', $val, $key);
             case 'list':
-                return self::print_tag('p', self::print_array($val, 0), $key);
+                return $viewer->tag('p', self::print_array($val, 0), $key);
         }
     }
-
-    /**
-     * Печать тега
-     *
-     * @param  string        $tag  Имя тега
-     * @param  string        $val  Контент тега
-     * @param  string | bool $elem Имя элемента
-     * @return string              Готовый тег
-     */
-    private static function print_tag($tag, $val, $elem = false) {
-        return
-            '<' . $tag . ' class="' . self::$blockname .
-            (($elem) ? '__' . $elem : '') .                             // Если элемент указан, то его надо напечатать
-            '">' .
-                $val .
-            '</' . $tag . '>';
-    }
-
-    private static $separator = ' -> ';                                 // Разделитель ключей и значений
 
     /**
      * Формирование строки к выводу из массива
@@ -260,6 +175,8 @@ class debug extends core {
         }
         return $indent;
     }
+
+    private static $separator = ' -> ';                                 // Разделитель ключей и значений
 
     /**
      * Выравнивание по длине ключа
