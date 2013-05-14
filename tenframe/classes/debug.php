@@ -90,6 +90,11 @@ class debug extends core {
     public static function init($options = true) {
 
         $info = array(
+            'tenhtml' => array(
+                'h2' => 'Tenhtml:',
+                'p' => 'Шаблоны, сгенерированные из tenhtml.',
+                'list' => html::$debugTemplates,
+            ),
             'tpl' => array(
                 'h2' => 'Templates:',
                 'p' => 'Шаблоны, использованные для формирования страницы.',

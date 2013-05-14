@@ -112,6 +112,7 @@ namespace ten;
 class html extends core {
 
     public static $tenhtmlFolder;                                                       // Директория для хранения шаблонов, сгенерированных из tenhtml
+    public static $debugTemplates = array();                                            // Массив автоматически-сгенерированных шаблонов
 
     /**
      * Установка директории для tenhtml
@@ -216,11 +217,14 @@ class html extends core {
             $gentpl .= self::parsetenhtml($key, $content);
         }
 
-        return file::autogen(
+        $tpl = file::autogen(
             $tenhtmlPath,
             $gentpl,
             ''
         );
+
+        array_push(self::$debugTemplates, $tpl);
+        return $tpl;
     }
 
     private static $singleTags = array(                                                 // Список непарных html-тегов
