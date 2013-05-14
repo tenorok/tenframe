@@ -89,24 +89,37 @@ class debug extends core {
      */
     public static function init($options = true) {
 
-        self::show(array(
-            'h1' => 'Tenframe debugger',
-            array(
+        $info = array(
+            'tpl' => array(
                 'h2' => 'Templates:',
                 'p' => 'Шаблоны, использованные для формирования страницы.',
                 'list' => tpl::$debugTemplates,
             ),
-            array(
+            'autogen' => array(
                 'h2' => 'Autogen:',
                 'p' => 'Все автоматически сгенерированные файлы.',
                 'list' => file::$debugAutogen
             ),
-            array(
+            'join' => array(
                 'h2' => 'Join:',
                 'p' => 'Объединённые файлы.',
                 'list' => join::$debugJoin
             )
-        ));
+        );
+
+        $toShow = array(
+            'h1' => 'Tenframe debugger',
+        );
+
+        if(is_array($options)) {
+            foreach($options as $item) {
+                array_push($toShow, $info[$item]);
+            }
+        } else {
+            $toShow = array_merge($toShow, $info);
+        }
+
+        self::show($toShow);
     }
 
     /**
