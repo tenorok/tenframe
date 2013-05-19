@@ -9,7 +9,7 @@ ten\statical::involve(array(                            // Markdown для мо�
         'css' => '/assets/css/',
         'js'  => '/assets/js/'
     ),
-    'output_file' => '/view/include/markdown.tpl',
+    'output_file' => 'markdown.tpl',
     'prefix' => GEN,
     'hash' => false
 ));
@@ -27,7 +27,7 @@ ten\statical::involve(array(                            // Файлы библи
     'path' => array(
         'js' => '/assets/js/'
     ),
-    'output_file' => '/view/include/libs.tpl',
+    'output_file' => 'libs.tpl',
     'prefix' => GEN,
     'hash' => false
 ));
@@ -49,7 +49,7 @@ ten\statical::involve(array(                            // Файлы для р�
         'less' => '/assets/css/',
         'js'   => '/assets/js/'
     ),
-    'output_file' => '/view/include/developer.tpl',
+    'output_file' => 'developer.tpl',
     'prefix' => GEN,
     'hash' => false
 ));
@@ -62,6 +62,6 @@ ten\statical::involve(array(                            // Основные фа
         'css' => '/assets/css/',
         'js'  => '/assets/js/'
     ),
-    'output_file' => '/view/include/require.tpl',
+    'output_file' => 'require.tpl',
     'prefix' => GEN
 ));

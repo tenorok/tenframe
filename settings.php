@@ -15,6 +15,8 @@ ten\core::$settings = array(                // Параметры работы �
         '/app/model/'
     ),
 
+//    'statical' => '/view/statical/',        // Путь до путей к статическим файлам (По умолчанию: '/view/statical/')
+
     'mysql' => array(                       // Подключение к БД
         'host'     => 'localhost',
         'user'     => 'root',

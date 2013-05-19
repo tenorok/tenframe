@@ -7,6 +7,11 @@
 
 /* Использование
 
+    Задание пути до хранения путей статических файлов:
+        ten\core::$settings = array(
+            'statical' => '/view/statical/'                    // Значение по умолчанию
+        );
+
     Подключение статических файлов в HTML-шаблон:
         Простое подключение одного файла:
             echo ten\statical::involve('/assets/css/style.css');
@@ -37,7 +42,7 @@
                     'xml' => '/assets/xml/',
                     'ico' => '/assets/'
                 ),
-                'output_file' => '/view/include.tpl',          // Файл для сохранения строк подключений файлов
+                'output_file' => 'include.tpl',                // Файл для сохранения строк подключений файлов
                 'prefix'      => '__autogen__',                // Префикс для сохраняемого файла (по умолчанию не добавляется)
 
                 'hash'        => true | false                  // Флаг добавления хеш-метки к файлу (по умолчанию включено и длина = 7)
@@ -87,7 +92,7 @@ class statical extends file {
         if(!empty($options['output_file'])) {                                        // Если указан файл для сохранения результата
 
             $output_file = parent::autogen(                                          // Сохранение файла
-                $options['output_file'],
+                self::$path . $options['output_file'],
                 (core::$settings['compressHTML']) ? tpl::compressHTML($included) : $included,
                 (!empty($options['prefix'])) ? $options['prefix'] : ''               // Префикс для сохраняемого файла
             );
@@ -99,6 +104,16 @@ class statical extends file {
     }
 
     private static $include_dev = array('developer', 'dev');                         // Массив имён файлов, которые подключаются только при включенном режиме разработчика
+    private static $path = '/view/statical/';                                        // Путь для хранения путей к статическим файлам
+
+    /**
+     * Установление пути для хранения путей к статическим файлам
+     *
+     * @param string $path Путь
+     */
+    public static function setPath($path) {
+        self::$path = $path;
+    }
 
     /**
      * Функция подключения include-файлов
@@ -119,7 +134,7 @@ class statical extends file {
                 continue;                                                            // то его подключать не нужно и выполняется переход к следующему файлу
 
             $includes .= file_get_contents(                                          // Конкатенация содержимого текущего файла
-                parent::resolve_path('/view/include/', $prefix . $file . '.tpl')     // Корректный вид пути
+                parent::resolve_path(self::$path, $prefix . $file . '.tpl')          // Корректный вид пути
             );
         }
 

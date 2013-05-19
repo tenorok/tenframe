@@ -113,8 +113,12 @@ class core {
             }
         }
 
-        if(isset(self::$settings['autoprefix'])) {
+        if(isset(self::$settings['autoprefix'])) {                         // Если задан префикс для автоматически сгенерированных файлов
             file::setAutoprefix(self::$settings['autoprefix']);
+        }
+
+        if(isset(self::$settings['statical'])) {                           // Если задан путь для хранения путей к статическим файлам
+            statical::setPath(self::$settings['statical']);
         }
 
         self::define('GEN', file::$autoprefix);                            // Константа префикса автоматически сгенерированных файлов
