@@ -652,7 +652,7 @@ class orm extends core {
         return $print .= "total [\n"
             . "\t" .   "count    -> " . count(self::$queries)
             . "\n\t" . "duration -> " . $duration_sum
-            . "\n]</pre>";
+            . "\n]";
     }
 
     /**
