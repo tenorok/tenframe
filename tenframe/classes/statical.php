@@ -39,7 +39,10 @@
                 ),
                 'output_file' => '/view/include.tpl',          // Файл для сохранения строк подключений файлов
                 'prefix'      => '__autogen__',                // Префикс для сохраняемого файла (по умолчанию не добавляется)
-                'hash'        => true | false                  // Флаг добавления хеш-метки к файлу (по умолчанию включено)
+
+                'hash'        => true | false                  // Флаг добавления хеш-метки к файлу (по умолчанию включено и длина = 7)
+                // или
+                'hash'        => 7                             // Длина хеш-метки, от 0 до 32 (по умолчанию = 7)
             ));
 
             Если имя передаётся в виде строки и это не JS-файл, то он автоматически подключается с помощью тега link.
@@ -196,8 +199,7 @@ class statical extends file {
         if(isset($options['path']))
             $attrs[$url] = $options['path'][$type] . $attrs[$url];                   // Добавление пути к файлу
 
-        if(!isset($options['hash']) || $options['hash'])                             // Если нужно добавить хеш файла
-            $attrs[$url] .= '?' . md5_file(ROOT . $attrs[$url]);                     // добавление хеша в строку пути файла
+        $attrs[$url] .= self::getHash($options, $attrs[$url]);                       // Добавление хеша в строку пути файла
 
         $attrs_str = '';
 
@@ -213,5 +215,31 @@ class statical extends file {
             case 'link':                                                             // Если тег link
                 return '<link' . $attrs_str . '>';
         }
+    }
+
+    private static $hashlen = 7;                                                     // Дефолтная длина добавочного хеша
+
+    /**
+     * Добавление метки в виде хеша файла
+     *
+     * @param  array  $options Параметры формирования строки подключения
+     * @param  string $file    Относительный путь до файла
+     * @return string          Строка метки
+     */
+    private static function getHash($options, $file) {
+
+        if(!isset($options['hash'])) {                                               // Если опция хеша не задана
+            $option = self::$hashlen;                                                // то хеш добавляется по стандартной длине
+        } else {                                                                     // Иначе опция хеша задана
+            if(is_numeric($options['hash'])) {                                       // В виде числа
+                $option = $options['hash'];                                          // и надо добавить заданную длину
+            } else if(is_bool($options['hash'])) {                                   // Или в виде булева значения
+                $option = ($options['hash']) ? self::$hashlen : 0;                   // и надо добавить стандартную длину или не добавлять совсем
+            }
+        }
+
+        return ($option) ?                                                           // Если метку надо добавлять
+            '?' . substr(md5_file(core::resolve_path($file)), 0, $option) :          // Добавление метки с заданной длиной
+            '';                                                                      // Иначе метку добавлять не нужно
     }
 }
