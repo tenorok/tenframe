@@ -36,6 +36,7 @@ class core {
     public static $settings;                                               // Параметры работы фреймворка
     public static $get;                                                    // Объект, который используется из приложения для обращения к GET-переменным
     public static $paths = array('/');                                     // Массив с директориями классов
+    public static $startTime;                                              // Время начала выполнения скрипта
     
     /**
      * Функция автоматической подгрузки необходимых файлов
@@ -79,6 +80,8 @@ class core {
      *
      */
     public static function init() {
+
+        self::$startTime = microtime(true);                                // Сохранение времени начала выполнения скрипта
 
         self::define('TEN_PATH', 'tenframe');                              // Константа директории tenframe
         self::define('TEN_CLASSES', TEN_PATH . '/classes/');               // Константа директории для хранения классов tenframe
@@ -170,7 +173,10 @@ class core {
      */
     private static function define_DEV() {
 
-        self::define('DEV', self::$settings['develop']);                   // Вкл/выкл режима разработчика
+        self::define(                                                      // Вкл/выкл режима разработчика
+            'DEV',
+            (isset(self::$settings['develop'])) ? self::$settings['develop'] : false
+        );
 
         if(!DEV)                                                           // Если выключен режим разработчика
             error_reporting(0);                                            // Отключение отображения ошибок интерпретатора
@@ -286,11 +292,11 @@ class core {
             'sysauto' => true                                              // Опция символизирует возврат автоматической страницы 404
         ));
 
+        if(isset(orm::$mysqli))
+            orm::$mysqli->close();                                         // Разрыв соединения с базой данных
+
         if(isset(self::$settings['debug']) && self::$settings['debug']) {  // Если включена отладка
             debug::init(self::$settings['debug']);                         // Напечатать отладочную информацию в соответствии с переданными опциями
         }
-
-        if(isset(orm::$mysqli))
-            orm::$mysqli->close();                                         // Разрыв соединения с базой данных
     }
 }

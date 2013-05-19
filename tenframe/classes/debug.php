@@ -40,7 +40,8 @@
             'tenhtml',                                                  // Шаблоны, сгенерированные из tenhtml
             'tpl',                                                      // Шаблоны, использованные для формирования страницы
             'orm',                                                      // Выполненные SQL-запросы
-            'define'                                                    // Константы
+            'define',                                                   // Константы
+            'time'                                                      // Время выполнения всего скрипта
         );
 */
 
@@ -146,6 +147,10 @@ class debug extends core {
                 'h2' => 'Define:',
                 'p' => 'Константы.',
                 'list' => core::$define
+            ),
+            'time' => array(
+                'h2' => 'Time:',
+                'p' => 'Время выполнения всего скрипта = ' . self::getTime()
             )
 
         );
@@ -265,5 +270,14 @@ class debug extends core {
             $spaces .= ' ';
         }
         return $spaces . $key . self::$separator;
+    }
+
+    /**
+     * Получение времени выполнения всего скрипта
+     *
+     * @return string время в секундах
+     */
+    private static function getTime() {
+        return microtime(true) - core::$startTime . ' секунд';
     }
 }
