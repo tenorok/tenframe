@@ -21,12 +21,6 @@
                 'third',
                 'four'
             );
-
-    Подключение include-файлов:
-        echo ten\core::includes(
-            'libs, developer, require',                 // Обязательный. Файлы с именами 'developer' и 'dev' подключаются только при включенном режиме разработчика
-            '__autogen__'                               // Префикс перед именами файлов (по умолчанию отсутствует)
-        );
 */
 
 namespace ten;
@@ -252,32 +246,6 @@ class core {
         $_SESSION['DEV'] = $dev;                                           // Присваивание текущего значения флага режима разработчика
 
         return $ret;
-    }
-
-    private static $include_dev = array('developer', 'dev');               // Массив имён файлов, которые подключаются только при включенном режиме разработчика
-
-    /**
-     * Функция подключения include-файлов
-     * 
-     * @param  string $files  Имена include-файлов
-     * @param  string $prefix Префикс перед именами include-файлов
-     * @return string
-     */
-    public static function includes($files, $prefix = '') {
-
-        $includes = '';                                                    // Переменная для конкатенации содержимого файлов
-
-        foreach(explode(',', $files) as $file) {                           // Цикл по массиву переданных имён файлов
-
-            $file = trim($file);                                           // Обрезание пробелов с обеих сторон имени текущего файла
-            
-            if(in_array($file, self::$include_dev) && !DEV)                // Если текущий файл требуется для режима разработчика и режим разработчика выключен
-                continue;                                                  // то его подключать не нужно и выполняется переход к следующему файлу
-            
-            $includes .= file_get_contents(ROOT . '/view/include/' . $prefix . $file . '.tpl');		// Конкатенация содержимого текущего файла
-        }
-
-        return $includes;                                                  // Возвращение результата конкатенации содержимого файлов
     }
 
     /**

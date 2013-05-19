@@ -16,7 +16,7 @@ class index {
 
             'parse' => array(
                 'title' => 'Готов?',
-                'files' => ten\core::includes('libs, developer, require', GEN),
+                'files' => ten\statical::includes('libs, developer, require', GEN),
                 'body'  => 'Поехали!'
             )
         ));

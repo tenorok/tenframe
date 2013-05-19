@@ -54,7 +54,7 @@ class mod_admin_page {
             'parse' => array(
 
                 'title' => 'Административная панель &mdash; ' . $content['title'],
-                'files' => ten\core::includes('libs, developer, require', GEN),
+                'files' => ten\statical::includes('libs, developer, require', GEN),
 
                 'body'  => ten\tpl::block(array(
 
