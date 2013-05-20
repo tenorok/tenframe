@@ -31,7 +31,7 @@ class secure extends core {
         if(is_int($id) && $id > 0) {
 
             if(!is_null($table))
-                if(count(ten\orm::select($table)->where($id)) > 0)
+                if(count(orm::select($table)->where($id)) > 0)
                     return true;
                 else
                     return false;
