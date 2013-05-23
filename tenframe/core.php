@@ -69,7 +69,40 @@ class core {
     }
 
     protected static $settings = array(                                    // Параметры работы фреймворка
-        'develop' => false
+        'develop'  => false,                                               // Режим разработки
+        'clearURI' => true,                                                // Маршрутизировать относительный путь
+        'autoprefix' => '__autogen__',                                     // Префикс для автоматически сгенерированных файлов
+
+        // Для compressHTML и tenhtml в качестве значения можно указать путь до директории, в которой будут храниться сгенерированные шаблоны
+        'compressHTML' => true,                                            // Сжимать отдаваемый HTML (для tpl-шаблонов)
+        'tenhtml'  => true,                                                // Использовать tenhtml-шаблоны (автоматически сжимаются)
+
+        'autoload' => array(                                               // Пути для автоматической загрузки классов в порядке приоритета
+            '/app/controller/',
+            '/app/model/'
+        ),
+
+        'statical' => '/view/statical/',                                   // Путь до путей к статическим файлам
+
+        'mysql' => array(                                                  // Подключение к БД
+            'host'     => 'localhost',
+            'user'     => 'root',
+            'password' => '',
+            'database' => ''
+        ),
+
+        'modules' => array(),                                              // Подключаемые модули
+        'debug' => false,                                                  // Включить вывод всей отладочной информации
+//        'debug' => array(                                                  // Выводить только заданную отладочную информацию
+//            'autogen',                                                     // Все автоматически сгенерированные файлы
+//            'statical',                                                    // Сгенерированные подключения статических файлов
+//            'join',                                                        // Объединённые файлы
+//            'tenhtml',                                                     // Шаблоны, сгенерированные из tenhtml
+//            'tpl',                                                         // Шаблоны, использованные для формирования страницы
+//            'orm',                                                         // Выполненные SQL-запросы
+//            'define',                                                      // Константы
+//            'time'                                                         // Время выполнения всего скрипта
+//        )
     );
 
     /**
@@ -103,45 +136,28 @@ class core {
         self::define_URI($query);                                          // Определение константы URI
         self::define_DEV();                                                // Определение константы DEV
 
-        if(isset(self::$settings['autoload'])) {                           // Добавление путей автоматической загрузки классов
-            self::$paths = array_merge(
-                self::$paths,
-                self::$settings['autoload']
-            );
-        }
+        self::$paths = array_merge(                                        // Добавление путей автоматической загрузки классов
+            self::$paths,
+            self::$settings['autoload']
+        );
 
-        if(isset(self::$settings['mysql'])) {                              // Подключение к mysql
 
-            $mysql = self::$settings['mysql'];
-
-            orm::connect(                                                  // Подключение
-                $mysql['host'],
-                $mysql['user'],
-                $mysql['password']
-            );
-
-            if(isset($mysql['database'])) {
-                orm::db($mysql['database']);                               // Выбор базы данных
-            }
-        }
-
-        if(isset(self::$settings['autoprefix'])) {                         // Если задан префикс для автоматически сгенерированных файлов
-            file::setAutoprefix(self::$settings['autoprefix']);
-        }
-
-        if(isset(self::$settings['statical'])) {                           // Если задан путь для хранения путей к статическим файлам
-            statical::setPath(self::$settings['statical']);
+        $mysql = self::$settings['mysql'];                                 // Подключение к mysql
+        orm::connect(                                                      // Подключение
+            $mysql['host'],
+            $mysql['user'],
+            $mysql['password']
+        );
+        if(isset($mysql['database'])) {
+            orm::db($mysql['database']);                                   // Выбор базы данных
         }
 
         self::define('GEN', file::$autoprefix);                            // Константа префикса автоматически сгенерированных файлов
 
-        if(isset(self::$settings['tenhtml'])) {
-            html::setTenhtmlFolder(self::$settings['tenhtml']);
-        }
-
-        if(isset(self::$settings['compressHTML'])) {
-            tpl::setCompressTplFolder(self::$settings['compressHTML']);
-        }
+        html::setTenhtmlFolder(self::$settings['tenhtml']);                // Использование tenhtml
+        tpl::setCompressTplFolder(self::$settings['compressHTML']);        // Компрессия отдаваемого HTML
+        file::setAutoprefix(self::$settings['autoprefix']);                // Префикс для автоматически сгенерированных файлов
+        statical::setPath(self::$settings['statical']);                    // Путь для хранения путей к статическим файлам
 
         module::init();                                                    // Инициализация модулей
         self::require_options();                                           // Подключение файлов опций
@@ -210,13 +226,13 @@ class core {
      */
     private static function require_options() {
 
-        if(self::dev(DEV)) {                                    // Если включен режим разработчика
-            require self::resolve_path('/join.php');            // Сборка файлов
-            require self::resolve_path('/statical.php');        // Подключение файлов
+        if(self::dev(DEV)) {                                               // Если включен режим разработчика
+            require self::resolve_path('/join.php');                       // Сборка файлов
+            require self::resolve_path('/statical.php');                   // Подключение файлов
         }
 
-        require 'request.php';                                  // Подключение функций обработки маршрутов
-        require self::resolve_path('/routes.php');              // Подключение файла маршрутизации
+        require 'request.php';                                             // Подключение функций обработки маршрутов
+        require self::resolve_path('/routes.php');                         // Подключение файла маршрутизации
     }
 
     /**
