@@ -26,8 +26,7 @@
 namespace ten;
 
 class core {
-    
-    public static $settings;                                               // Параметры работы фреймворка
+
     public static $get;                                                    // Объект, который используется из приложения для обращения к GET-переменным
     public static $paths = array('/');                                     // Массив с директориями классов
     public static $startTime;                                              // Время начала выполнения скрипта
@@ -69,6 +68,19 @@ class core {
         self::$define[$name] = $value;
     }
 
+    protected static $settings = array(                                    // Параметры работы фреймворка
+        'develop' => false
+    );
+
+    /**
+     * Слияние стандартных настроек и заданных пользователем
+     *
+     * @param array $settings Настройки пользователя
+     */
+    public static function settings($settings) {
+        self::$settings = array_merge(self::$settings, $settings);
+    }
+
     /**
      * Инициализация, применение настроек tenframe
      *
@@ -83,12 +95,12 @@ class core {
         spl_autoload_register(array('self', 'auto_load'));                 // Включение автоподгрузки классов
         register_shutdown_function(array('ten\core', 'shutdown'));         // Указание метода, который будет вызван по окончании выполнения всего скрипта
 
-        self::define_ROOT_and_URI();                                       // Определение констант ROOT и URI
+        $query = self::define_ROOT();                                      // Определение константы ROOT
+        self::define('BLOCKS', self::resolve_path('/view/blocks/'));       // Константа директории блоков
 
-        self::define('BLOCKS', self::resolve_path(ROOT, '/view/blocks/')); // Константа директории блоков
+        require self::resolve_path('/settings.php');                       // Подключение настроек работы tenframe
 
-        require ROOT . '/settings.php';                                    // Подключение настроек работы tenframe
-
+        self::define_URI($query);                                          // Определение константы URI
         self::define_DEV();                                                // Определение константы DEV
 
         if(isset(self::$settings['autoload'])) {                           // Добавление путей автоматической загрузки классов
@@ -132,14 +144,15 @@ class core {
         }
 
         module::init();                                                    // Инициализация модулей
-        self::define_require();                                            // Подключение файлов
+        self::require_options();                                           // Подключение файлов опций
     }
 
     /**
-     * Определение констант ROOT и URI
+     * Определение константы ROOT
      *
+     * @return string Строка запроса
      */
-    private static function define_ROOT_and_URI() {
+    private static function define_ROOT() {
 
         if(stripos($_SERVER['PHP_SELF'], TEN_PATH . '/index.php')) {       // Если выполняется обычный запрос
             list($root, $query) = explode(
@@ -154,8 +167,17 @@ class core {
 
         self::define('ROOT', $_SERVER['DOCUMENT_ROOT'] . $root);           // Константа корневого пути
 
-        if(self::$settings['clearURI']) {                                  // Если задана маршрутизация только относительного пути
+        return $query;
+    }
 
+    /**
+     * Определение константы URI
+     *
+     * @param string $query Строка запроса
+     */
+    private static function define_URI($query) {
+
+        if(self::$settings['clearURI']) {                                  // Если задана маршрутизация только относительного пути
             $uri = $query . (($_SERVER['QUERY_STRING']) ?                  // Константа чистого запроса
                 '?' . $_SERVER['QUERY_STRING'] : '');
         } else {
@@ -186,16 +208,15 @@ class core {
      * Подключение файлов
      *
      */
-    private static function define_require() {
+    private static function require_options() {
 
         if(self::dev(DEV)) {                                    // Если включен режим разработчика
-
-            require '../join.php';                              // Сборка файлов
-            require '../statical.php';                          // Подключение файлов
+            require self::resolve_path('/join.php');            // Сборка файлов
+            require self::resolve_path('/statical.php');        // Подключение файлов
         }
 
         require 'request.php';                                  // Подключение функций обработки маршрутов
-        require '../routes.php';                                // Подключение файла маршрутизации
+        require self::resolve_path('/routes.php');              // Подключение файла маршрутизации
     }
 
     /**
