@@ -78,16 +78,6 @@ class file extends core {
     }
 
     public static $autoprefix = '__autogen__';                       // Префикс автоматически сгенерированных файлов
-
-    /**
-     * Установить префикс для автоматически сгенерированных файлов
-     *
-     * @param $prefix Префикс
-     */
-    public static function setAutoprefix($prefix) {
-        self::$autoprefix = $prefix;
-    }
-
     public static $debugAutogen = array();                           // Массив автоматически-сгенерированных файлов
 
     /**

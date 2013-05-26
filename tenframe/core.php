@@ -154,7 +154,7 @@ class core {
 
         html::$tenhtmlFolder = self::$settings['tenhtml'];                 // Использование tenhtml
         tpl::$compressTplFolder = self::$settings['compressHTML'];         // Компрессия отдаваемого HTML
-        file::setAutoprefix(self::$settings['autoprefix']);                // Префикс для автоматически сгенерированных файлов
+        file::$autoprefix = self::$settings['autoprefix'];                 // Префикс для автоматически сгенерированных файлов
         statical::setPath(self::$settings['statical']);                    // Путь для хранения путей к статическим файлам
 
         module::init();                                                    // Инициализация модулей
