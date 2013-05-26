@@ -18,5 +18,7 @@ ten\core::settings(array(
     'modules' => array(
         'admin',
         'shop'
-    )
+    ),
+    'debug' => true,
+    'tenhtml' => '/assets/' . GEN . 'tenhtml/'
 ));

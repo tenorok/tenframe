@@ -69,13 +69,13 @@ class core {
     }
 
     protected static $settings = array(                                    // Параметры работы фреймворка
-        'develop'  => false,                                               // Режим разработки
+        'develop' => false,                                                // Режим разработки
         'clearURI' => true,                                                // Маршрутизировать относительный путь
         'autoprefix' => '__autogen__',                                     // Префикс для автоматически сгенерированных файлов
 
-        // Для compressHTML и tenhtml в качестве значения можно указать путь до директории, в которой будут храниться сгенерированные шаблоны
+        // Для compressHTML и tenhtml в качестве значения нужно указать путь до директории, в которой будут храниться сгенерированные шаблоны
         'compressHTML' => true,                                            // Сжимать отдаваемый HTML (для tpl-шаблонов)
-        'tenhtml'  => true,                                                // Использовать tenhtml-шаблоны (автоматически сжимаются)
+        'tenhtml' => false,                                                // Использовать tenhtml-шаблоны (автоматически сжимаются)
 
         'autoload' => array(                                               // Пути для автоматической загрузки классов в порядке приоритета
             '/app/controller/',
@@ -130,6 +130,7 @@ class core {
 
         $query = self::define_ROOT();                                      // Определение константы ROOT
         self::define('BLOCKS', self::resolve_path('/view/blocks/'));       // Константа директории блоков
+        self::define('GEN', file::$autoprefix);                            // Константа префикса автоматически сгенерированных файлов
 
         require self::resolve_path('/settings.php');                       // Подключение настроек работы tenframe
 
@@ -141,7 +142,6 @@ class core {
             self::$settings['autoload']
         );
 
-
         $mysql = self::$settings['mysql'];                                 // Подключение к mysql
         orm::connect(                                                      // Подключение
             $mysql['host'],
@@ -152,9 +152,7 @@ class core {
             orm::db($mysql['database']);                                   // Выбор базы данных
         }
 
-        self::define('GEN', file::$autoprefix);                            // Константа префикса автоматически сгенерированных файлов
-
-        html::setTenhtmlFolder(self::$settings['tenhtml']);                // Использование tenhtml
+        html::$tenhtmlFolder = self::$settings['tenhtml'];                 // Использование tenhtml
         tpl::setCompressTplFolder(self::$settings['compressHTML']);        // Компрессия отдаваемого HTML
         file::setAutoprefix(self::$settings['autoprefix']);                // Префикс для автоматически сгенерированных файлов
         statical::setPath(self::$settings['statical']);                    // Путь для хранения путей к статическим файлам

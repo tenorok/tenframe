@@ -114,21 +114,6 @@ class html extends core {
     public static $tenhtmlFolder;                                                       // Директория для хранения шаблонов, сгенерированных из tenhtml
     public static $debugTemplates = array();                                            // Массив автоматически-сгенерированных шаблонов
 
-    /**
-     * Установка директории для tenhtml
-     *
-     * @param $folder Директория для хранения сгенерированных шаблонов
-     */
-    public static function setTenhtmlFolder($folder) {
-
-        if(is_string($folder)) {
-            self::$tenhtmlFolder = $folder;
-        }
-        else {
-            self::$tenhtmlFolder = '/assets/' . GEN . 'tenhtml/';
-        }
-    }
-
     private static $spec = array(                                                       // Массив зарезервированных специальных символов
         'block'   => '%',                                                               // Блок
         'elemmod' => '.',                                                               // Элемент или модификатор
