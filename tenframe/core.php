@@ -74,7 +74,7 @@ class core {
         'autoprefix' => '__autogen__',                                     // Префикс для автоматически сгенерированных файлов
 
         // Для compressHTML и tenhtml в качестве значения нужно указать путь до директории, в которой будут храниться сгенерированные шаблоны
-        'compressHTML' => true,                                            // Сжимать отдаваемый HTML (для tpl-шаблонов)
+        'compressHTML' => false,                                           // Сжимать отдаваемый HTML (для tpl-шаблонов)
         'tenhtml' => false,                                                // Использовать tenhtml-шаблоны (автоматически сжимаются)
 
         'autoload' => array(                                               // Пути для автоматической загрузки классов в порядке приоритета
@@ -153,7 +153,7 @@ class core {
         }
 
         html::$tenhtmlFolder = self::$settings['tenhtml'];                 // Использование tenhtml
-        tpl::setCompressTplFolder(self::$settings['compressHTML']);        // Компрессия отдаваемого HTML
+        tpl::$compressTplFolder = self::$settings['compressHTML'];         // Компрессия отдаваемого HTML
         file::setAutoprefix(self::$settings['autoprefix']);                // Префикс для автоматически сгенерированных файлов
         statical::setPath(self::$settings['statical']);                    // Путь для хранения путей к статическим файлам
 

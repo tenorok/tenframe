@@ -20,5 +20,6 @@ ten\core::settings(array(
         'shop'
     ),
     'debug' => true,
-    'tenhtml' => '/assets/' . GEN . 'tenhtml/'
+    'tenhtml' => '/assets/' . GEN . 'tenhtml/',
+    'compressHTML' => '/assets/' . GEN . 'compressed/'
 ));

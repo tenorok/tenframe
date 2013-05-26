@@ -70,22 +70,6 @@ namespace ten;
 class tpl extends core {
 
     public static $compressTplFolder;                                                   // Директория для хранения сжатых шаблонов
-
-    /**
-     * Установка директории для сжатых шаблонов
-     *
-     * @param $folder Директория для хранения сгенерированных сжатых шаблонов
-     */
-    public static function setCompressTplFolder($folder) {
-
-        if(is_string($folder)) {
-            self::$compressTplFolder = $folder;
-        }
-        else {
-            self::$compressTplFolder = '/assets/' . GEN . 'compressed/';
-        }
-    }
-
     public static $debugTemplates = array();                                            // Массив использованных файлов-шаблонов
 
     /**
