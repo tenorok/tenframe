@@ -104,16 +104,7 @@ class statical extends file {
     }
 
     private static $include_dev = array('developer', 'dev');                         // Массив имён файлов, которые подключаются только при включенном режиме разработчика
-    private static $path = '/view/statical/';                                        // Путь для хранения путей к статическим файлам
-
-    /**
-     * Установление пути для хранения путей к статическим файлам
-     *
-     * @param string $path Путь
-     */
-    public static function setPath($path) {
-        self::$path = $path;
-    }
+    public static $path;                                                             // Путь для хранения путей к статическим файлам
 
     /**
      * Функция подключения include-файлов
