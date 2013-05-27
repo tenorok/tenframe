@@ -110,6 +110,8 @@ class debug extends core {
      */
     public static function init($options = true) {
 
+        if(!$options) return;                                           // Если отладка выключена
+
         $info = array(
             'autogen' => array(
                 'h2' => 'Autogen:',

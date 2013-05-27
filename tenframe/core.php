@@ -84,12 +84,13 @@ class core {
 
         'statical' => '/view/statical/',                                   // Путь до путей к статическим файлам
 
-        'mysql' => array(                                                  // Подключение к БД
-            'host'     => 'localhost',
-            'user'     => 'root',
-            'password' => '',
-            'database' => ''
-        ),
+        'mysql' => false,
+//        'mysql' => array(                                                  // Подключение к БД
+//            'host'     => 'localhost',
+//            'user'     => 'root',
+//            'password' => '',
+//            'database' => ''
+//        ),
 
         'modules' => array(),                                              // Подключаемые модули
         'debug' => false,                                                  // Включить вывод всей отладочной информации
@@ -142,14 +143,16 @@ class core {
             self::$settings['autoload']
         );
 
-        $mysql = self::$settings['mysql'];                                 // Подключение к mysql
-        orm::connect(                                                      // Подключение
-            $mysql['host'],
-            $mysql['user'],
-            $mysql['password']
-        );
-        if(isset($mysql['database'])) {
-            orm::db($mysql['database']);                                   // Выбор базы данных
+        if(self::$settings['mysql']) {
+            $mysql = self::$settings['mysql'];                             // Подключение к mysql
+            orm::connect(                                                  // Подключение
+                $mysql['host'],
+                $mysql['user'],
+                $mysql['password']
+            );
+            if(isset($mysql['database'])) {
+                orm::db($mysql['database']);                               // Выбор базы данных
+            }
         }
 
         html::$tenhtmlFolder = self::$settings['tenhtml'];                 // Использование tenhtml
@@ -207,10 +210,7 @@ class core {
      */
     private static function define_DEV() {
 
-        self::define(                                                      // Вкл/выкл режима разработчика
-            'DEV',
-            (isset(self::$settings['develop'])) ? self::$settings['develop'] : false
-        );
+        self::define('DEV', self::$settings['develop']);                   // Вкл/выкл режима разработчика
 
         if(!DEV)                                                           // Если выключен режим разработчика
             error_reporting(0);                                            // Отключение отображения ошибок интерпретатора
@@ -302,8 +302,6 @@ class core {
         if(isset(orm::$mysqli))
             orm::$mysqli->close();                                         // Разрыв соединения с базой данных
 
-        if(isset(self::$settings['debug']) && self::$settings['debug']) {  // Если включена отладка
-            debug::init(self::$settings['debug']);                         // Напечатать отладочную информацию в соответствии с переданными опциями
-        }
+        debug::init(self::$settings['debug']);                             // Напечатать отладочную информацию в соответствии с переданными опциями
     }
 }
