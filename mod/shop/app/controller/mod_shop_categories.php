@@ -90,6 +90,8 @@ class mod_shop_categories {
 
         mod_shop_categories::get_categories_access();                      // Проверка доступа к страницам работы с категориями
 
+        ten\orm::db('tmod_shop');
+
         $fieldslist = ten\orm::join('tmod_shop_categories', array(         // Получение списка существующих полей
             array(
                 'table' => 'tmod_shop_fields'

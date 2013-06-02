@@ -164,6 +164,8 @@ class mod_shop_m_categories {
      */
     public static function get_info() {
 
+        ten\orm::db('tmod_shop');
+
         $categoryid = (isset(ten\core::$get->categoryid)) ? ten\core::$get->categoryid : null;   // Если в адресной строке есть идентификатор категории
         $parentid   = (isset(ten\core::$get->parentid))   ? ten\core::$get->parentid   : null;   // Если в адресной строке есть идентификатор родительской категории
 
@@ -209,6 +211,8 @@ class mod_shop_m_categories {
      */
     private static function get_categories_query($category_id) {
 
+        ten\orm::db('tmod_shop');
+
         if((int) $category_id > 0) {                                                     // Если вместо адреса страницы админки передан идентификатор категории
 
             $categories =
@@ -244,6 +248,8 @@ class mod_shop_m_categories {
      * @return array
      */
     public static function get_fields($category_id) {
+
+        ten\orm::db('tmod_shop');
 
         $fields =
             ten\orm::join('tmod_shop_fields', array(

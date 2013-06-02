@@ -10,9 +10,7 @@ ten\core::settings(array(
 
     'mysql' => array(
         'host'     => 'localhost',
-        'user'     => 'root',
-        'password' => '',
-        'database' => 'tmod_shop'
+        'user'     => 'root'
     ),
 
     'modules' => array(

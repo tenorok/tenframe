@@ -148,7 +148,7 @@ class core {
             orm::connect(                                                  // Подключение
                 $mysql['host'],
                 $mysql['user'],
-                $mysql['password']
+                (isset($mysql['password'])) ? $mysql['password'] : false
             );
             if(isset($mysql['database'])) {
                 orm::db($mysql['database']);                               // Выбор базы данных
