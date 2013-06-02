@@ -85,7 +85,7 @@ class core {
         'statical' => '/view/statical/',                                   // Путь до путей к статическим файлам
 
         'mysql' => false,
-//        'mysql' => array(                                                  // Подключение к БД
+//        'mysql' => array(                                                  // Подключение к БД (true | array())
 //            'host'     => 'localhost',
 //            'user'     => 'root',
 //            'password' => '',
@@ -104,6 +104,13 @@ class core {
 //            'define',                                                      // Константы
 //            'time'                                                         // Время выполнения всего скрипта
 //        )
+    );
+
+    private static $default = array(                                       // Стандартные параметры работы фреймворка
+        'mysql' => array(
+            'host' => 'localhost',
+            'user' => 'root'
+        )
     );
 
     /**
@@ -143,8 +150,11 @@ class core {
             self::$settings['autoload']
         );
 
-        if(self::$settings['mysql']) {
-            $mysql = self::$settings['mysql'];                             // Подключение к mysql
+        if(self::$settings['mysql']) {                                     // Подключение к mysql
+            $mysql = array_merge(
+                self::$default['mysql'],
+                (is_array(self::$settings['mysql'])) ? self::$settings['mysql'] : array()
+            );
             orm::connect(                                                  // Подключение
                 $mysql['host'],
                 $mysql['user'],

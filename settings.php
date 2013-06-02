@@ -7,17 +7,13 @@
 ten\core::settings(array(
 
     'develop' => true,
+    'debug' => true,
 
-    'mysql' => array(
-        'host'     => 'localhost',
-        'user'     => 'root'
-    ),
-
+    'mysql' => true,
+    'tenhtml' => '/assets/' . GEN . 'tenhtml/',
+    'compressHTML' => '/assets/' . GEN . 'compressed/',
     'modules' => array(
         'admin',
         'shop'
-    ),
-    'debug' => true,
-    'tenhtml' => '/assets/' . GEN . 'tenhtml/',
-    'compressHTML' => '/assets/' . GEN . 'compressed/'
+    )
 ));
