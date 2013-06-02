@@ -134,18 +134,19 @@ class route extends core {
      */
     private static function callback($type, $callback, $args = array()) {
 
-        $call = explode('->', $callback);                                  // Разбор callback на две части: 1) До стрелки и 2) После стрелки
+        list($class, $method) = explode('->', $callback);                  // Разбор callback на класс и метод
 
-        if(method_exists($call[0], $call[1]))                              // Если метод существует
+        if(method_exists($class, $method)) {                               // Если метод существует
             call_user_func_array(                                          // Вызов
-                array($call[0], $call[1]),                                 // из класса $call[0] метода с именем $call[1]
+                array($class, $method),                                    // из класса $class метода с именем $method
                 $args                                                      // и параметрами из массива $args
             );
-        else
+        } else {
             message::error(                                                // Иначе метод не существует
                 '[' . $type . '] Route error: Function is undefined: '
-                . $call[0] . '->' . $call[1]
+                . $class . '->' . $method
             );
+        }
     }
 
     private static $routes_default = array(                                // Умолчания для системных маршрутов
