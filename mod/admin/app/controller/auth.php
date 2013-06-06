@@ -2,7 +2,10 @@
 
 // Авторизация в административной панели
 
-class mod_admin_auth {
+namespace ten\mod\admin\ctr;
+use ten\mod\admin\mod as mod;
+
+class auth {
 
     /**
      * Отображение формы авторизации
@@ -12,22 +15,22 @@ class mod_admin_auth {
 
         require ROOT . '/mod/admin/conf/settings.php';
 
-        return ten\tpl::block(array(
+        return \ten\tpl::block(array(
 
             'block' => 'html',
 
             'parse' => array(
 
                 'title' => 'Вход в административную панель',
-                'files' => ten\statical::includes('libs, developer, require', GEN),
+                'files' => \ten\statical::includes('libs, developer, require', GEN),
 
-                'body'  => ten\tpl::block(array(
+                'body'  => \ten\tpl::block(array(
 
                     'mod'   => 'admin',
                     'block' => 'logon',
 
                     'parse' => array(
-                        'action' => ten\text::rgum($settings['urls']['page'], '/') . 'auth/',
+                        'action' => \ten\text::rgum($settings['urls']['page'], '/') . 'auth/',
                         'error'  => (isset($_SESSION['mod_admin_auth_logon']) && !$_SESSION['mod_admin_auth_logon']) ? 'Неверный логин или пароль' : ''
                     )
                 ))
@@ -41,7 +44,7 @@ class mod_admin_auth {
      */
     public static function auth() {
 
-        mod_admin_m_auth::auth();
+        mod\auth::auth();
 
         require ROOT . '/mod/admin/conf/settings.php';
 
@@ -54,7 +57,7 @@ class mod_admin_auth {
      */
     public static function quit() {
 
-        mod_admin_m_auth::quit();
+        mod\auth::quit();
 
         require ROOT . '/mod/admin/conf/settings.php';
 

@@ -2,7 +2,10 @@
 
 // Работа с категориями магазина
 
-class mod_shop_categories {
+namespace ten\mod\shop\ctr;
+use ten\mod\shop\mod as mod;
+
+class categories {
 
     /**
      * Отображение категорий
@@ -12,9 +15,9 @@ class mod_shop_categories {
 
         require ROOT . '/mod/admin/conf/settings.php';
 
-        $page = ten\text::del($settings['urls']['page'], '/');
+        $page = \ten\text::del($settings['urls']['page'], '/');
 
-        return ten\tpl::block(array(
+        return \ten\tpl::block(array(
 
             'mod'   => 'shop',
             'block' => 'categories',
@@ -22,7 +25,7 @@ class mod_shop_categories {
             'parse' => array(
 
                 'page'       => $page,
-                'categories' => mod_shop_m_categories::get_categories_list($page)
+                'categories' => mod\categories::get_categories_list($page)
             )
         ));
     }
@@ -65,17 +68,18 @@ class mod_shop_categories {
      */
     private static function get_categories_access() {
 
-        $admin_info = mod_admin_m_auth::get_admin_info();                  // Получение данных об администраторе
+        $admin_info = \ten\mod\admin\mod\auth::get_admin_info();           // Получение данных об администраторе
 
         require ROOT . '/mod/shop/conf/pages.php';
 
         if(
             !$admin_info ||                                                // Если администратор не авторизован
-            !mod_admin_m_menu::get_access(                                 // Или если администратор не имеет доступа к текущей странице
+            !\ten\mod\admin\mod\menu::get_access(                          // Или если администратор не имеет доступа к текущей странице
                 $pages['categories']
             )
-        )
-            ten\core::not_found();                                         // то страница не найдена
+        ) {
+            \ten\tpl::not_found();                                         // то страница не найдена
+        }
     }
 
     /**
@@ -86,66 +90,66 @@ class mod_shop_categories {
 
         require ROOT . '/mod/admin/conf/settings.php';
 
-        $admin_info = mod_admin_m_auth::get_admin_info();                  // Получение данных об администраторе
+        $admin_info = \ten\mod\admin\mod\auth::get_admin_info();           // Получение данных об администраторе
 
-        mod_shop_categories::get_categories_access();                      // Проверка доступа к страницам работы с категориями
+        self::get_categories_access();                                     // Проверка доступа к страницам работы с категориями
 
-        ten\orm::db('tmod_shop');
+        \ten\orm::db('tmod_shop');
 
-        $fieldslist = ten\orm::join('tmod_shop_categories', array(         // Получение списка существующих полей
+        $fieldslist = \ten\orm::join('tmod_shop_categories', array(        // Получение списка существующих полей
             array(
                 'table' => 'tmod_shop_fields'
             )
         ))->where('isnull(tmod_shop_fields.tmod_shop_fields_fk)');
 
-        $info = mod_shop_m_categories::get_info();                         // Получение массива с информацией для парсинга
+        $info = mod\categories::get_info();                                // Получение массива с информацией для парсинга
 
-        if(isset(ten\core::$get->categoryid)) {
+        if(isset(\ten\core::$get->categoryid)) {
 
-            $edit = ten\tpl::block(array(
+            $edit = \ten\tpl::block(array(
                 'mod'   => 'shop',
                 'block' => 'categories',
                 'view'  => 'edit',
 
                 'parse' => array(
                     'hided'      => $info['hided'],
-                    'categories' => mod_shop_m_categories::get_categories_list(ten\core::$get->categoryid)
+                    'categories' => mod\categories::get_categories_list(\ten\core::$get->categoryid)
                 )
             ));
 
-            mod_shop_m_categories::get_fields(ten\core::$get->categoryid);
+            mod\categories::get_fields(\ten\core::$get->categoryid);
         }
         else
             $edit = '';
 
-        echo ten\tpl::block(array(                                         // Парсинг всей страницы
+        echo \ten\tpl::block(array(                                        // Парсинг всей страницы
 
             'block' => 'html',
 
             'parse' => array(
 
                 'title' => 'Административная панель &mdash; ' . $info['title'],
-                'files' => ten\statical::includes('libs, developer, require', GEN),
+                'files' => \ten\statical::includes('libs, developer, require', GEN),
 
-                'body'  => ten\tpl::block(array(
+                'body'  => \ten\tpl::block(array(
 
                     'mod'   => 'admin',
                     'block' => 'page',
 
                     'parse' => array(
 
-                        'header' => ten\tpl::block(array(
+                        'header' => \ten\tpl::block(array(
 
                             'mod'   => 'admin',
                             'block' => 'header',
 
                             'parse' => array(
                                 'login'  => $admin_info['login'],
-                                'action' => ten\text::rgum($settings['urls']['page'], '/') . 'quit/'
+                                'action' => \ten\text::rgum($settings['urls']['page'], '/') . 'quit/'
                             )
                         )),
 
-                        'menu' => ten\tpl::block(array(
+                        'menu' => \ten\tpl::block(array(
 
                             'mod'   => 'admin',
                             'block' => 'menu',
@@ -154,7 +158,7 @@ class mod_shop_categories {
 
                                 'items' => array(
 
-                                    'array' => mod_admin_m_menu::get_menu(),
+                                    'array' => \ten\mod\admin\mod\menu::get_menu(),
                                     'parse' => array(
                                         'title'  => 'title',
                                         'active' => 'active'
@@ -194,7 +198,7 @@ class mod_shop_categories {
                             )
                         )),
 
-                        'content' => ten\tpl::block(array(
+                        'content' => \ten\tpl::block(array(
 
                             'mod'   => 'admin',
                             'block' => 'content',
@@ -203,13 +207,13 @@ class mod_shop_categories {
 
                                 'title'   => $info['title'],
 
-                                'content' => ten\tpl::block(array(
+                                'content' => \ten\tpl::block(array(
                                     'mod'   => 'shop',
                                     'block' => 'categories',
                                     'view'  => 'add',
 
                                     'parse' => array(
-                                        'page'   => ten\text::del($settings['urls']['page'], '/'),
+                                        'page'   => \ten\text::del($settings['urls']['page'], '/'),
                                         'action' => $info['action'],
                                         'parent' => $info['parentid'],
                                         'name'   => $info['name'],
@@ -231,7 +235,7 @@ class mod_shop_categories {
 
                                         'types' => array(
 
-                                            'array' => mod_shop_categories::$types,
+                                            'array' => self::$types,
                                             'parse' => array(
                                                 'value' => 'val',
                                                 'text'  => 'txt'
@@ -255,7 +259,9 @@ class mod_shop_categories {
 
         require ROOT . '/mod/admin/conf/settings.php';
 
-        mod_shop_categories::get_categories_access();                      // Проверка доступа к страницам работы с категориями
+        \ten\orm::db('tmod_shop');
+
+        self::get_categories_access();                                     // Проверка доступа к страницам работы с категориями
 
         array_pop($_POST['existfield']);                                   // Удаление последнего элемента подмассива, так как это всегда незполенное поле
 
@@ -265,7 +271,7 @@ class mod_shop_categories {
 
             $serial =                                                      // Получение сортировочного номера для новой категории
                 array_shift(
-                    ten\orm::select('tmod_shop_categories')
+                    \ten\orm::select('tmod_shop_categories')
                         ->fields('count(*) as serial')
                         ->where('tmod_shop_categories_fk = ' . $catparent)
                 )->serial;
@@ -276,13 +282,13 @@ class mod_shop_categories {
 
             $serial =                                                      // Получение сортировочного номера для новой категории
                 array_shift(
-                    ten\orm::select('tmod_shop_categories')
+                    \ten\orm::select('tmod_shop_categories')
                         ->fields('count(*) as serial')
                         ->where('all')
                 )->serial;
         }
 
-        $category_id = ten\orm::insert('tmod_shop_categories', array(      // Добавление записи о категории
+        $category_id = \ten\orm::insert('tmod_shop_categories', array(     // Добавление записи о категории
             'name'   => $_POST['catname'],
             'alias'  => $_POST['catalias'],
             'serial' => $serial,
@@ -296,7 +302,7 @@ class mod_shop_categories {
                 !empty($_POST['name'][$i])                                 // у которого заполнено имя
             ) {
 
-                $field_id = ten\orm::insert('tmod_shop_fields', array(     // Добавление записи о поле
+                $field_id = \ten\orm::insert('tmod_shop_fields', array(    // Добавление записи о поле
                     'name'  => $_POST['name'][$i],
                     'type'  => $_POST['type'][$i],
                     'count' => $_POST['count'][$i],
@@ -310,21 +316,21 @@ class mod_shop_categories {
                 );
 
                 foreach($options as $option)                               // Цикл по значениям выпадающего списка
-                    ten\orm::insert('tmod_shop_values', array(             // Добавление записи значения выпадающего списка
+                    \ten\orm::insert('tmod_shop_values', array(            // Добавление записи значения выпадающего списка
                         'val_' . $_POST['type'][$i] => $option,
                         'tmod_shop_fields_fk' => $field_id
                     ));
             }
             else if(is_numeric($existfield)) {                             // Иначе не нужно создавать новое поле, а привязать уже существующее по его номеру
 
-                ten\orm::insert('tmod_shop_fields', array(                 // Добавление записи связанного поля
+                \ten\orm::insert('tmod_shop_fields', array(                // Добавление записи связанного поля
                     'tmod_shop_fields_fk'     => $existfield,
                     'tmod_shop_categories_fk' => $category_id
                 ));
             }
         }
 
-        header('location: ' . ten\text::gum($settings['urls']['page'], '/'));
+        header('location: ' . \ten\text::gum($settings['urls']['page'], '/'));
     }
 
     /**

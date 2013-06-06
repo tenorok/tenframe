@@ -2,7 +2,9 @@
 
 // Авторизация в административной панели
 
-class mod_admin_m_auth {
+namespace ten\mod\admin\mod;
+
+class auth {
 
     /**
      * Выполнение авторизации
@@ -73,7 +75,7 @@ class mod_admin_m_auth {
 
         require ROOT . '/mod/admin/conf/roles.php';
 
-        $admin_info = mod_admin_m_auth::get_admin_info();            // Получение информации об авторизованном администраторе
+        $admin_info = self::get_admin_info();                        // Получение информации об авторизованном администраторе
 
         foreach($roles as $role)                                     // Цикл по ролям
             if($role['name'] == $admin_info['role'])                 // Если имя роли совпадает с текущим именем роли администратора

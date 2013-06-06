@@ -2,22 +2,22 @@
 
 require 'conf/settings.php';
 
+$page = $settings['urls']['page'];
+$ctr = 'ten\mod\admin\ctr\\';
+
 array_push(ten\route::$routes, array(
-
     'url'      => array(
-        $settings['urls']['page'],
-        $settings['urls']['page'] . '{page}/',
-        $settings['urls']['page'] . '{page}/{tab}/'
+        $page,
+        $page . '{page}/',
+        $page . '{page}/{tab}/'
     ),
-    'callback' => 'mod_admin_page->page'
+    'callback' => $ctr . 'page->page'
 ), array(
-
-    'url'      => $settings['urls']['page'] . 'auth/',
-    'callback' => 'mod_admin_auth->auth',
+    'url'      => $page . 'auth/',
+    'callback' => $ctr . 'auth->auth',
     'type'     => 'POST'
 ), array(
-
-    'url'      => $settings['urls']['page'] . 'quit/',
-    'callback' => 'mod_admin_auth->quit',
+    'url'      => $page . 'quit/',
+    'callback' => $ctr . 'auth->quit',
     'type'     => 'POST'
 ));

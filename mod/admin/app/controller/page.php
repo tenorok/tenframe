@@ -2,7 +2,10 @@
 
 // Отображение административной панели
 
-class mod_admin_page {
+namespace ten\mod\admin\ctr;
+use ten\mod\admin\mod as mod;
+
+class page {
 
     /**
      * Формирование страницы авторизации
@@ -12,13 +15,13 @@ class mod_admin_page {
 
         require ROOT . '/mod/admin/conf/settings.php';
 
-        $admin_info = mod_admin_m_auth::get_admin_info();                // Получение данных об администраторе
+        $admin_info = mod\auth::get_admin_info();                        // Получение данных об администраторе
 
         if($admin_info) {                                                // Если администратор авторизован
 
             if(!$page) {                                                 // Если страница не указана
 
-                $index = explode('/', ten\text::del(                     // Нужно открыть главную страницу
+                $index = explode('/', \ten\text::del(                    // Нужно открыть главную страницу
                     $settings['urls']['index'], '/'                      // указанную в настройках
                 ));
 
@@ -26,13 +29,13 @@ class mod_admin_page {
                 $tab = (isset($index[1])) ? $index[1] : '';              // Если в настройках задана подстраница
             }
 
-            mod_admin_page::view_page(                                   // Отображение главной страницы административной панели
+            self::view_page(                                             // Отображение главной страницы административной панели
                 $admin_info['login'], $page, $tab
             );
         }
         else {                                                           // Иначе не авторизован
 
-            echo mod_admin_auth::view_auth();                            // Отображение формы авторизации
+            echo auth::view_auth();                                      // Отображение формы авторизации
             unset($_SESSION['mod_admin_auth_logon']);                    // Удаление переменной с результатом авторизации
         }
     }
@@ -45,36 +48,36 @@ class mod_admin_page {
 
         require ROOT . '/mod/admin/conf/settings.php';
 
-        $content = mod_admin_m_content::get_content($page, $tab);        // Получение массива наполнения текущей страницы
+        $content = mod\content::get_content($page, $tab);                // Получение массива наполнения текущей страницы
 
-        echo ten\tpl::block(array(                                       // Парсинг всей страницы
+        echo \ten\tpl::block(array(                                      // Парсинг всей страницы
 
             'block' => 'html',
 
             'parse' => array(
 
                 'title' => 'Административная панель &mdash; ' . $content['title'],
-                'files' => ten\statical::includes('libs, developer, require', GEN),
+                'files' => \ten\statical::includes('libs, developer, require', GEN),
 
-                'body'  => ten\tpl::block(array(
+                'body'  => \ten\tpl::block(array(
 
                     'mod'   => 'admin',
                     'block' => 'page',
 
                     'parse' => array(
 
-                        'header' => ten\tpl::block(array(
+                        'header' => \ten\tpl::block(array(
 
                             'mod'   => 'admin',
                             'block' => 'header',
 
                             'parse' => array(
                                 'login'  => $login,
-                                'action' => ten\text::rgum($settings['urls']['page'], '/') . 'quit/'
+                                'action' => \ten\text::rgum($settings['urls']['page'], '/') . 'quit/'
                             )
                         )),
 
-                        'menu' => ten\tpl::block(array(
+                        'menu' => \ten\tpl::block(array(
 
                             'mod'   => 'admin',
                             'block' => 'menu',
@@ -83,7 +86,7 @@ class mod_admin_page {
 
                                 'items' => array(
 
-                                    'array' => mod_admin_m_menu::get_menu($page, $tab),
+                                    'array' => mod\menu::get_menu($page, $tab),
 
                                     'deactive' => array(
 
@@ -96,7 +99,7 @@ class mod_admin_page {
 
                                     'active' => array(
 
-                                        'if'   => 'active',
+                                        'if' => 'active',
                                         'parse' => array(
                                             'title' => 'title'
                                         )
@@ -104,7 +107,7 @@ class mod_admin_page {
 
                                     'sub' => array(
 
-                                        'if'       => 'tabs',
+                                        'if' => 'tabs',
 
                                         'subitems' => array(
 
@@ -132,7 +135,7 @@ class mod_admin_page {
                             )
                         )),
 
-                        'content' => ten\tpl::block(array(
+                        'content' => \ten\tpl::block(array(
 
                             'mod'   => 'admin',
                             'block' => 'content',

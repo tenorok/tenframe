@@ -2,7 +2,9 @@
 
 // Отображение меню административной панели
 
-class mod_admin_m_menu {
+namespace ten\mod\admin\mod;
+
+class menu {
 
     private static $menu_conf = null;                                                    // Переменная для хранения файла настроек меню
 
@@ -13,13 +15,13 @@ class mod_admin_m_menu {
      */
     public static function get_menu_conf() {
 
-        if(is_null(mod_admin_m_menu::$menu_conf)) {                                      // Если конфигурационный файл ещё не был получен
+        if(is_null(self::$menu_conf)) {                                                  // Если конфигурационный файл ещё не был получен
 
             require ROOT . '/mod/admin/conf/menu.php';                                   // Подключение файла
-            mod_admin_m_menu::$menu_conf = $menu;                                        // Присваивание его содержания
+            self::$menu_conf = $menu;                                                    // Присваивание его содержания
         }
 
-        return mod_admin_m_menu::$menu_conf;                                             // Возвращение содержания конфигурационного файла
+        return self::$menu_conf;                                                         // Возвращение содержания конфигурационного файла
     }
 
     /**
@@ -33,22 +35,22 @@ class mod_admin_m_menu {
 
         require ROOT . '/mod/admin/conf/settings.php';
 
-        $menu = mod_admin_m_menu::get_menu_conf();
+        $menu = self::get_menu_conf();
 
         foreach($menu as $key => $item) {                                                // Цикл по элементам меню
 
-            $main_url = ten\text::rgum($settings['urls']['page'], '/');                  // Адрес главной страницы административной панели
+            $main_url = \ten\text::rgum($settings['urls']['page'], '/');                 // Адрес главной страницы административной панели
 
             $menuInfo = $menu[$key];                                                     // Заведение информационной переменной для удобства
 
-            if(!mod_admin_m_menu::get_access($menuInfo['name'])) {                       // Если администратор не имеет доступ к текущей странице
+            if(!self::get_access($menuInfo['name'])) {                                   // Если администратор не имеет доступ к текущей странице
 
                 unset($menu[$key]);                                                      // то страница удаляется
                 continue;                                                                // и нужно перейти к следующей странице
             }
 
             $menu[$key]['active'] = (                                                    // Задание активного класса
-                ten\text::del($page . '/' . $tab, '/') == $item['name']                  // Если текущий адрес соответствует адресу ссылки меню
+                \ten\text::del($page . '/' . $tab, '/') == $item['name']                 // Если текущий адрес соответствует адресу ссылки меню
             ) ? ' mod-admin-menu__item_active' : '';
 
             if(isset($menuInfo['tabs'])) {                                               // Если у меню существует подменю
@@ -57,7 +59,7 @@ class mod_admin_m_menu {
 
                     $tabInfo = $menuInfo['tabs'][$i];                                    // Заведение информационной переменной для удобства
 
-                    if(!mod_admin_m_menu::get_access(                                    // Если администратор не имеет доступ к текущей подстранице
+                    if(!self::get_access(                                                // Если администратор не имеет доступ к текущей подстранице
                         $menuInfo['name'], $tabInfo['name']
                     )) {
 
@@ -68,7 +70,7 @@ class mod_admin_m_menu {
                     $pageAndTab = $menuInfo['name'] . '/' . $tabInfo['name'];
 
                     $menu[$key]['tabs'][$i]['active'] = (                                // Задание активного класса
-                        ten\text::del($page . '/' . $tab, '/') == $pageAndTab            // Если текущий адрес соответствует адресу ссылки подменю
+                        \ten\text::del($page . '/' . $tab, '/') == $pageAndTab           // Если текущий адрес соответствует адресу ссылки подменю
                     ) ? ' mod-admin-menu__item_active' : '';
 
                     $menu[$key]['tabs'][$i]['href'] = $main_url . $pageAndTab;           // Изменение адреса ссылки подменю
@@ -93,7 +95,7 @@ class mod_admin_m_menu {
      */
     public static function get_access($page, $tab = null) {
 
-        $roleInfo = mod_admin_m_auth::get_role_info();                                   // Получение информации о роли текущего администратора
+        $roleInfo = auth::get_role_info();                                               // Получение информации о роли текущего администратора
 
         if(!$roleInfo)                                                                   // Если информация о роли не была получена
             return false;                                                                // значит такой роли нет

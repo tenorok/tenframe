@@ -2,7 +2,9 @@
 
 // Работа с категориями магазина
 
-class mod_shop_m_categories {
+namespace ten\mod\shop\mod;
+
+class categories {
 
     /**
      * Получение списка категорий с учётом вложенностей
@@ -12,7 +14,7 @@ class mod_shop_m_categories {
      */
     public static function get_categories_list($page) {
 
-        $categories = mod_shop_m_categories::get_categories_query($page);                // Получение списка категорий
+        $categories = self::get_categories_query($page);                                 // Получение списка категорий
 
         $items = '';                                                                     // Переменная для вывода категорий
 
@@ -22,7 +24,7 @@ class mod_shop_m_categories {
 
                 if(!$category->tmod_shop_categories_fk) {                                // Если категория не имеет родителя
 
-                    $items .= mod_shop_m_categories::parse_category_item(                // Парсинг блока категории
+                    $items .= self::parse_category_item(                                 // Парсинг блока категории
                         $page,
                         $category->tmod_shop_categories_id,
                         $category->name,
@@ -30,7 +32,7 @@ class mod_shop_m_categories {
                         (bool) $category->hide
                     );
 
-                    $items = mod_shop_m_categories::get_category(                        // Получение дочерних категорий
+                    $items = self::get_category(                                         // Получение дочерних категорий
                         $page,
                         $categories,
                         $category->tmod_shop_categories_id,
@@ -58,7 +60,7 @@ class mod_shop_m_categories {
 
             if($category->tmod_shop_categories_fk == $current) {                         // Если категория является дочерней для текущей
 
-                $item = mod_shop_m_categories::parse_category_item(                      // Парсинг блока категории
+                $item = self::parse_category_item(                                       // Парсинг блока категории
                     $page,
                     $category->tmod_shop_categories_id,
                     $category->name,
@@ -70,7 +72,7 @@ class mod_shop_m_categories {
 
                 $template = str_replace($child_tmp, $item . $child_tmp, $template);      // Замена переменной шаблона на дочерний блок категории
 
-                $template = mod_shop_m_categories::get_category(                         // Рекурсивный вызов функции для получения дочерних категорий
+                $template = self::get_category(                                          // Рекурсивный вызов функции для получения дочерних категорий
                     $page,
                     $categories,
                     $category->tmod_shop_categories_id,
@@ -95,7 +97,7 @@ class mod_shop_m_categories {
     private static function parse_category_item($page, $id, $name, $parent, $hidden) {
 
         if((int) $page > 0)                                                              // Если вместо адреса страницы админки передан идентификатор категории
-            return ten\tpl::block(array(                                                 // Значит нужно парсить список категорий для изменения родительской категории
+            return \ten\tpl::block(array(                                                // Значит нужно парсить список категорий для изменения родительской категории
 
                 'mod'   => 'shop',
                 'block' => 'categories',
@@ -121,11 +123,11 @@ class mod_shop_m_categories {
                 ),
 
                 'parse' => array(
-                    'id'       => $id
+                    'id' => $id
                 )
             ));
         else                                                                             // Иначе нужно парсить список категорий для главной страницы категорий
-            return ten\tpl::block(array(
+            return \ten\tpl::block(array(
 
                 'mod'   => 'shop',
                 'block' => 'categories',
@@ -164,10 +166,10 @@ class mod_shop_m_categories {
      */
     public static function get_info() {
 
-        ten\orm::db('tmod_shop');
+        \ten\orm::db('tmod_shop');
 
-        $categoryid = (isset(ten\core::$get->categoryid)) ? ten\core::$get->categoryid : null;   // Если в адресной строке есть идентификатор категории
-        $parentid   = (isset(ten\core::$get->parentid))   ? ten\core::$get->parentid   : null;   // Если в адресной строке есть идентификатор родительской категории
+        $categoryid = (isset(\ten\core::$get->categoryid)) ? \ten\core::$get->categoryid : null;   // Если в адресной строке есть идентификатор категории
+        $parentid   = (isset(\ten\core::$get->parentid))   ? \ten\core::$get->parentid   : null;   // Если в адресной строке есть идентификатор родительской категории
 
         $info = array(                                                                   // Массив возможных полей с дефолтными значениями
             'title'    => '',
@@ -180,13 +182,13 @@ class mod_shop_m_categories {
 
         if(!is_null($parentid)) {                                                        // Если задана родительская категория
 
-            $info['title']    = 'Добавление подкатегории в &laquo;' . ten\orm::select('tmod_shop_categories')->where($parentid)->name . '&raquo;';
+            $info['title']    = 'Добавление подкатегории в &laquo;' . \ten\orm::select('tmod_shop_categories')->where($parentid)->name . '&raquo;';
             $info['parentid'] = $parentid;
             $info['action']   = 'insert';
         }
         else if(!is_null($categoryid)) {                                                 // Если задана конкретная категория на изменение
 
-            $catinfo = ten\orm::select('tmod_shop_categories')->where($categoryid);
+            $catinfo = \ten\orm::select('tmod_shop_categories')->where($categoryid);
 
             $info['title']  = 'Изменение категории &laquo;' . $catinfo->name . '&raquo;';
             $info['action'] = 'edit/' . $categoryid;
@@ -211,12 +213,12 @@ class mod_shop_m_categories {
      */
     private static function get_categories_query($category_id) {
 
-        ten\orm::db('tmod_shop');
+        \ten\orm::db('tmod_shop');
 
         if((int) $category_id > 0) {                                                     // Если вместо адреса страницы админки передан идентификатор категории
 
             $categories =
-                ten\orm::select('tmod_shop_categories')                                  // Запрос на получение всех категорий с подзапросом на определение родителя текущей категории
+                \ten\orm::select('tmod_shop_categories')                                 // Запрос на получение всех категорий с подзапросом на определение родителя текущей категории
                     ->sub(array(
                         'select tmod_shop_categories_fk from tmod_shop_categories where tmod_shop_categories_id = ' . $category_id => 'parent'
                     ))
@@ -236,7 +238,7 @@ class mod_shop_m_categories {
         else                                                                             // Иначе передан адрес страницы админки (значит сейчас не страница редактирования категории)
             return
                 $categories =
-                    ten\orm::select('tmod_shop_categories')                              // Получение списка существующих категорий
+                    \ten\orm::select('tmod_shop_categories')                             // Получение списка существующих категорий
                         ->order('serial')
                         ->where('all');
     }
@@ -249,10 +251,10 @@ class mod_shop_m_categories {
      */
     public static function get_fields($category_id) {
 
-        ten\orm::db('tmod_shop');
+        \ten\orm::db('tmod_shop');
 
         $fields =
-            ten\orm::join('tmod_shop_fields', array(
+            \ten\orm::join('tmod_shop_fields', array(
                 array(
                     'table' => 'tmod_shop_values',
                     'join'  => 'left',
@@ -264,6 +266,6 @@ class mod_shop_m_categories {
         echo '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
         print_r($fields);
 
-        ten\orm::debug();
+        \ten\orm::debug();
     }
 }
