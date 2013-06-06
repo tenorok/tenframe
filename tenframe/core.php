@@ -41,8 +41,8 @@ class core {
         foreach(self::$paths as $dir) {
             
             $path = str_replace(                                           // Замена символов в строке вызова метода tenframe
-                array('__', 'ten\\', '\\'),
-                array('/', TEN_CLASSES . '/', '/'),
+                array('__', 'ten\\mod\\', 'ctr\\',           'mod\\',      'ten\\',     '\\'),
+                array('/',  TEN_MODULES,  'app/controller/', 'app/model/', TEN_CLASSES, '/'),
                 strtolower($class)
             );
 
@@ -132,6 +132,7 @@ class core {
 
         self::define('TEN_PATH', 'tenframe');                              // Константа директории tenframe
         self::define('TEN_CLASSES', TEN_PATH . '/classes/');               // Константа директории для хранения классов tenframe
+        self::define('TEN_MODULES', '/mod/');                              // Константа директории модулей
 
         spl_autoload_register(array('self', 'auto_load'));                 // Включение автоподгрузки классов
         register_shutdown_function(array('ten\core', 'shutdown'));         // Указание метода, который будет вызван по окончании выполнения всего скрипта

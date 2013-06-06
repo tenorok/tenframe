@@ -39,17 +39,8 @@ class module extends core {
         );
 
         foreach(parent::$settings['modules'] as $mod) {                // Цикл по перечисленным именам модулей
-
-            $path = '/mod/' . $mod;                                    // Относительный путь к модулю
-
+            $path = TEN_MODULES . $mod;                                // Относительный путь к модулю
             array_push(join::$input_path, $path . '/view/');           // Добавление пути к представлениям модуля для объединения файлов
-
-            array_push(                                                // Добавление путей для автоподключения файлов модуля
-                parent::$paths,
-                ROOT . $path . '/app/controller/',
-                ROOT . $path . '/app/model/'
-            );
-
             require ROOT . $path . '/init.php';                        // Подключение файла инициализации модуля
         }
     }
