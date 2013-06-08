@@ -187,7 +187,7 @@ class join extends file {
         if($extension == 'css' || $output_extension == 'css') {                      // Если текущее расширение или расширение выходящего файла является CSS
 
             if(is_null($options['compress']) || $options['compress'])                // Если сжатие конечного файла не отключено
-                self::$output_file = trim(str_replace('; ',';',str_replace(' }','}',str_replace('{ ','{',str_replace(array("\r\n","\r","\n","\t",'  ','    ','    '),"",preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!','',self::$output_file))))));
+                self::$output_file = css::minify(self::$output_file);
         }
         else if($extension == 'js' || $output_extension == 'js') {                   // Если текущее расширение или расширение выходящего файла является JS
 
