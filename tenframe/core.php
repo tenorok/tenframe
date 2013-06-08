@@ -47,14 +47,25 @@ class core {
                 strtolower($class)
             );
 
-            $file = self::resolve_path($dir, $path . '.php');              // Приведение пути к корректному виду
-
-            if(is_file($file)) {                                           // Если файл существует
-                require $file;                                             // его нужно подключить
-                array_push(self::$required, $file);                        // и добавить в массив подключенных файлов классов
-                break;
-            }
+            if(self::requireFile($dir . $path . '.php')) break;            // Подключение файла
         }
+    }
+
+    /**
+     * Подключение файлов
+     *
+     * @param  string  $file Путь до файла
+     * @return boolean       Успех подключения
+     */
+    public static function requireFile($file) {
+
+        $file = self::resolve_path($file);                                 // Приведение пути к корректному виду
+
+        if(is_file($file)) {                                               // Если файл существует
+            require $file;                                                 // его нужно подключить
+            array_push(self::$required, $file);                            // Добавление в массив подключенных файлов классов
+            return true;
+        } else return false;
     }
 
     public static $define = array();                                       // Константы
@@ -144,7 +155,7 @@ class core {
         self::define('BLOCKS', self::resolve_path('/view/blocks/'));       // Константа директории блоков
         self::define('GEN', file::$autoprefix);                            // Константа префикса автоматически сгенерированных файлов
 
-        require self::resolve_path('/settings.php');                       // Подключение настроек работы tenframe
+        self::requireFile('/settings.php');                                // Подключение настроек работы tenframe
 
         self::define_URI($query);                                          // Определение константы URI
         self::define_DEV();                                                // Определение константы DEV
@@ -239,12 +250,12 @@ class core {
     private static function require_options() {
 
         if(self::dev(DEV)) {                                               // Если включен режим разработчика
-            require self::resolve_path('/join.php');                       // Сборка файлов
-            require self::resolve_path('/statical.php');                   // Подключение файлов
+            self::requireFile('/join.php');                                // Сборка файлов
+            self::requireFile('/statical.php');                            // Подключение файлов
         }
 
-        require 'request.php';                                             // Подключение функций обработки маршрутов
-        require self::resolve_path('/routes.php');                         // Подключение файла маршрутизации
+        self::requireFile(TEN_PATH . '/request.php');                      // Подключение функций обработки маршрутов
+        self::requireFile('/routes.php');                                  // Подключение файла маршрутизации
     }
 
     /**
