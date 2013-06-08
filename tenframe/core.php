@@ -252,6 +252,7 @@ class core {
 
         if(self::dev(DEV)) {                                               // Если включен режим разработчика
             self::requireFile('/join.php');                                // Сборка файлов
+            self::requireFile('/css.php');                                 // CSS препроцессоры
             self::requireFile('/statical.php');                            // Подключение файлов
         }
 
