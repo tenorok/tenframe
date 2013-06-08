@@ -155,6 +155,7 @@ class core {
         self::define('BLOCKS', self::resolve_path('/view/blocks/'));       // Константа директории блоков
         self::define('GEN', file::$autoprefix);                            // Константа префикса автоматически сгенерированных файлов
 
+        self::requireFile('/vendor/autoload.php');                         // Composer autoloader
         self::requireFile('/settings.php');                                // Подключение настроек работы tenframe
 
         self::define_URI($query);                                          // Определение константы URI
