@@ -1,5 +1,10 @@
 .DS_Store
 .idea
+
+composer.lock
+composer.phar
+/vendor/
+
 *__autogen__*
 /assets/css/main.css
 /assets/css/main.less
