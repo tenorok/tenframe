@@ -19,13 +19,23 @@
     Создание директории:
         ten\file::make_dir('/new/path/');
 
-    Сохранение автогенерированного файла
+    Сохранение автогенерированного файла:
         ten\file::autogen(
             '/my/path/file.name',                              // Обязательный. Путь к файлу (можно относительный, можно абсолютный)
             'content',                                         // Обязательный. Контент файла
             '__prefix__'                                       // По умолчанию: "__autogen__" - префикс, который будет добавлен к имени файла
         );
         Возвращается полный путь к сохранённому файлу, например: /Users/name/my/path/__prefix__file.name
+
+    Получение информации о файле:
+        $info = ten\file::getInfo('/path/to/file.ext');
+        Возвращает массив:
+        array(
+            'path' => '/path/to/',
+            'file' => 'file.ext',
+            'name' => 'file',
+            'extension' => 'ext'
+        )
 */
 
 namespace ten;
@@ -109,5 +119,27 @@ class file extends core {
         }
 
         return $final_path;                                          // Путь до созданного файла
+    }
+
+    /**
+     * Получение информации о файле
+     *
+     * @param  string $file Путь до файла
+     * @return array        Информация о файле
+     */
+    public static function getInfo($file) {
+
+        $pathParts = explode('/', $file);
+        $filename = array_pop($pathParts);
+
+        $filenameParts = explode('.', $filename);
+        $extension = array_pop($filenameParts);
+
+        return array(
+            'path' => implode('/', $pathParts) . '/',
+            'file' => $filename,
+            'name' => implode('.', $filenameParts),
+            'extension' => $extension
+        );
     }
 }
