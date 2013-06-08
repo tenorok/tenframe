@@ -32,28 +32,6 @@ ten\statical::involve(array(                            // Файлы библи
     'hash' => false
 ));
 
-ten\statical::involve(array(                            // Файлы для режима разработчика
-    array(
-        'href'      => 'main.less',
-        'rel'       => 'stylesheet/less',
-        'data-file' => 'main.css'
-    ),
-    array(
-        'href'      => 'print.less',
-        'rel'       => 'stylesheet/less',
-        'data-file' => 'print.css'
-    ),
-    'less-1.3.0.min.js'
-), array(
-    'path' => array(
-        'less' => '/assets/css/',
-        'js'   => '/assets/js/'
-    ),
-    'output_file' => 'developer.tpl',
-    'prefix' => GEN,
-    'hash' => false
-));
-
 ten\statical::involve(array(                            // Основные файлы
     'main.css',
     'main.js'
