@@ -85,7 +85,16 @@ class css extends core {
             }
 
             $lessc = new \lessc;
-            $less = $lessc->compileFile($lessFilePath);                             // Компиляция LESS в CSS
+            try {
+                $less = $lessc->compileFile($lessFilePath);                         // Компиляция LESS в CSS
+            } catch(\Exception $e) {
+                message::error(array(
+                    'LESS compiler:' => array(
+                        'style'=> 'b',
+                    ),
+                    $e->getMessage()
+                ));
+            }
 
             if($options['compress']) {                                              // Если CSS требуется сжать
                 $less = self::minify($less);
