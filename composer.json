@@ -16,6 +16,7 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "leafo/lessphp": "0.3.9"
+        "leafo/lessphp": "0.3.9",
+        "linkorb/jsmin-php": "dev-master"
     }
 }

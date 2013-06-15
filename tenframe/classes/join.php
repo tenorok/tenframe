@@ -187,12 +187,12 @@ class join extends file {
         if($extension == 'css' || $output_extension == 'css') {                      // Если текущее расширение или расширение выходящего файла является CSS
 
             if(is_null($options['compress']) || $options['compress'])                // Если сжатие конечного файла не отключено
-                self::$output_file = css::minify(self::$output_file);
+                self::$output_file = \CssMin::minify(self::$output_file);
         }
         else if($extension == 'js' || $output_extension == 'js') {                   // Если текущее расширение или расширение выходящего файла является JS
 
             if(is_null($options['compress']) || $options['compress'])                // Если сжатие конечного файла не отключено
-                self::$output_file = trim(jsmin::minify(self::$output_file));
+                self::$output_file = trim(\JSMin::minify(self::$output_file));       // Обрезать первую пустую строку, которую оставляет JSMin
         }
 
         $output_file = parent::resolve_path(                                         // Установление корректного пути до файла
