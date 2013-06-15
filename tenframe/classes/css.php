@@ -7,9 +7,6 @@
 
 /* Использование
 
-    Минификация CSS:
-        $minifyCSS = ten\css::minify($css);
-
     Сохранение LESS в CSS:
         Указывать расширения less и css не обязательно.
         Можно использовать разные формы записи.
@@ -86,7 +83,7 @@ class css extends core {
 
             $lessc = new \lessc;
             try {
-                $less = $lessc->compileFile($lessFilePath);                         // Компиляция LESS в CSS
+                $css = $lessc->compileFile($lessFilePath);                          // Компиляция LESS в CSS
             } catch(\Exception $e) {
                 message::error(array(
                     'LESS compiler:' => array(
@@ -97,20 +94,10 @@ class css extends core {
             }
 
             if($options['compress']) {                                              // Если CSS требуется сжать
-                $less = self::minify($less);
+                $css = \CssMin::minify($css);
             }
 
-            file::autogen($cssFilePath, $less, false);                              // Сохранение CSS-файла
+            file::autogen($cssFilePath, $css, false);                               // Сохранение CSS-файла
         }
-    }
-
-    /**
-     * Минификация CSS
-     *
-     * @param  string $css Строка CSS
-     * @return string      Минифицированный CSS
-     */
-    public static function minify($css) {
-        return trim(str_replace('; ',';',str_replace(' }','}',str_replace('{ ','{',str_replace(array("\r\n","\r","\n","\t",'  ','    ','    '),"",preg_replace('!/\*[^*]*\*+([^/][^*]*\*+)*/!','',$css))))));
     }
 }
