@@ -1,7 +1,6 @@
 <?php
 
-$users = array(
-
+return array(
     array(
         'role'     => 'admin',
         'login'    => 'admin',

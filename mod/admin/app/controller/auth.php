@@ -13,7 +13,7 @@ class auth {
      */
     public static function view_auth() {
 
-        require ROOT . '/mod/admin/conf/settings.php';
+        $settings = \ten\core::requireFile('/mod/admin/conf/settings.php');
 
         return \ten\tpl::block(array(
 
@@ -46,7 +46,7 @@ class auth {
 
         mod\auth::auth();
 
-        require ROOT . '/mod/admin/conf/settings.php';
+        $settings = \ten\core::requireFile('/mod/admin/conf/settings.php');
 
         header('location: ' . $settings['urls']['page']);
     }
@@ -59,7 +59,7 @@ class auth {
 
         mod\auth::quit();
 
-        require ROOT . '/mod/admin/conf/settings.php';
+        $settings = \ten\core::requireFile('/mod/admin/conf/settings.php');
 
         header('location: ' . $settings['urls']['page']);
     }

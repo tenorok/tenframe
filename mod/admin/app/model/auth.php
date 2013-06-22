@@ -12,7 +12,7 @@ class auth {
      */
     public static function auth() {
 
-        require ROOT . '/mod/admin/conf/users.php';
+        $users = \ten\core::requireFile('/mod/admin/conf/users.php');
 
         $_SESSION['mod_admin_auth_logon'] = false;                   // Заранее предполагается, что авторизация не будет выполнена
 
@@ -73,7 +73,7 @@ class auth {
      */
     public static function get_role_info() {
 
-        require ROOT . '/mod/admin/conf/roles.php';
+        $roles = \ten\core::requireFile('/mod/admin/conf/roles.php');
 
         $admin_info = self::get_admin_info();                        // Получение информации об авторизованном администраторе
 

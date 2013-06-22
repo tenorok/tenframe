@@ -15,7 +15,7 @@ class content {
      */
     public static function get_content($page, $tab) {
 
-        require ROOT . '/mod/admin/conf/settings.php';
+        $settings = \ten\core::requireFile('/mod/admin/conf/settings.php');
 
         $menu = menu::get_menu_conf();
 
@@ -63,6 +63,6 @@ class content {
             }
         }
 
-        \ten\core::not_found();                                                          // Если не найдено соответствие или нет прав
+        \ten\tpl::not_found();                                                           // Если не найдено соответствие или нет прав
     }
 }

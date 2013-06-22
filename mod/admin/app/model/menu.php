@@ -17,7 +17,7 @@ class menu {
 
         if(is_null(self::$menu_conf)) {                                                  // Если конфигурационный файл ещё не был получен
 
-            require ROOT . '/mod/admin/conf/menu.php';                                   // Подключение файла
+            $menu = \ten\core::requireFile('/mod/admin/conf/menu.php');                  // Подключение файла
             self::$menu_conf = $menu;                                                    // Присваивание его содержания
         }
 
@@ -33,7 +33,7 @@ class menu {
      */
     public static function get_menu($page = null, $tab = null) {
 
-        require ROOT . '/mod/admin/conf/settings.php';
+        $settings = \ten\core::requireFile('/mod/admin/conf/settings.php');
 
         $menu = self::get_menu_conf();
 

@@ -1,7 +1,6 @@
 <?php
 
-$roles = array(
-
+return array(
     array(
         'name'  => 'admin'
     )

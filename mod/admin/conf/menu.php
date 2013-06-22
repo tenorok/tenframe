@@ -1,7 +1,6 @@
 <?php
 
-$menu = array(
-
+return array(
     array(
         'name'    => 'categories',
         'title'   => 'Категории',

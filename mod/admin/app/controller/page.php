@@ -13,7 +13,7 @@ class page {
      */
     public static function page($page = null, $tab = '') {
 
-        require ROOT . '/mod/admin/conf/settings.php';
+        $settings = \ten\core::requireFile('/mod/admin/conf/settings.php');
 
         $admin_info = mod\auth::get_admin_info();                        // Получение данных об администраторе
 
@@ -46,7 +46,7 @@ class page {
      */
     private static function view_page($login, $page, $tab) {
 
-        require ROOT . '/mod/admin/conf/settings.php';
+        $settings = \ten\core::requireFile('/mod/admin/conf/settings.php');
 
         $content = mod\content::get_content($page, $tab);                // Получение массива наполнения текущей страницы
 

@@ -1,6 +1,6 @@
 <?php
 
-require 'conf/settings.php';
+$settings = \ten\core::requireFile('/mod/admin/conf/settings.php');
 
 $page = $settings['urls']['page'];
 $ctr = 'ten\mod\admin\ctr\\';
