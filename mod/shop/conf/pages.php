@@ -1,6 +1,5 @@
 <?php
 
-$pages = array(
-
+return array(
     'categories' => 'categories'
 );

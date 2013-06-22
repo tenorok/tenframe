@@ -13,7 +13,7 @@ class categories {
      */
     public static function view_categories() {
 
-        require ROOT . '/mod/admin/conf/settings.php';
+        $settings = \ten\core::requireFile('/mod/admin/conf/settings.php');
 
         $page = \ten\text::del($settings['urls']['page'], '/');
 
@@ -70,7 +70,7 @@ class categories {
 
         $admin_info = \ten\mod\admin\mod\auth::get_admin_info();           // Получение данных об администраторе
 
-        require ROOT . '/mod/shop/conf/pages.php';
+        $pages = \ten\core::requireFile('/mod/shop/conf/pages.php');
 
         if(
             !$admin_info ||                                                // Если администратор не авторизован
@@ -88,7 +88,7 @@ class categories {
      */
     public static function add_category_form() {
 
-        require ROOT . '/mod/admin/conf/settings.php';
+        $settings = \ten\core::requireFile('/mod/admin/conf/settings.php');
 
         $admin_info = \ten\mod\admin\mod\auth::get_admin_info();           // Получение данных об администраторе
 
@@ -257,7 +257,7 @@ class categories {
      */
     public static function insert_category() {
 
-        require ROOT . '/mod/admin/conf/settings.php';
+        $settings = \ten\core::requireFile('/mod/admin/conf/settings.php');
 
         \ten\orm::db('tmod_shop');
 

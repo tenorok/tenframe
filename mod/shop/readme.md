@@ -24,7 +24,6 @@
 Файл `/conf/pages.php` содержит массив соответствий имён страниц магазина и страниц административной панели.
 Имена значений нужно брать из `/mod/admin/conf/menu.php`, опции `name`.
 
-    $pages = array(
-
-        'categories' => 'admin_categories_page'   // Страница категорий
+    return array(
+        'categories' => 'admin_categories_page'         // Страница категорий
     );

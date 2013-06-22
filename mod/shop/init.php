@@ -2,7 +2,7 @@
 
 // Формирование элемента для добавления в роутинг
 
-require ROOT . '/mod/admin/conf/settings.php';
+$settings = \ten\core::requireFile('/mod/admin/conf/settings.php');
 
 $adminpage = ten\text::del($settings['urls']['page'], '/') . '/modshop/categories/';
 $page = $settings['urls']['page'];
