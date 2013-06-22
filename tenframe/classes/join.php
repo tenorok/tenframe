@@ -2,7 +2,7 @@
 
 /**
  * Конкатенация файлов
- * @version 0.0.1
+ * @version 0.0.2
  */
 
 /* Использование
@@ -14,7 +14,7 @@
             // или
             'files'       => 'reg: /\.ctrl\.js$/',             //               Мод регулярного выражения
             // или
-            'files'       => array('file1', 'file2'),          //               Массив файлов к объединению
+            'files'       => array('file1', 'file2'),          //               Массив файлов к объединению (допускается указание URL)
 
             'output_file' => '/assets/{ext}/file.{ext}',       // Обязательный. Выходящий файл
                                                                   Это может быть маска формируемых на выходе файлов при передаче нескольких расширений.
@@ -99,7 +99,7 @@ class join extends file {
         if(!empty($options['priority']))                                             // Если указаны приоритетные файлы
             self::concat($options['priority'], $options);                            // нужно сперва прилепить их
 
-        if(gettype($options['files']) == 'array') {                                  // Если передан массив файлов
+        if(is_array($options['files'])) {                                            // Если передан массив файлов
 
             $output = self::join_files('fls', $options['files'], $options);          // Нужно просто их объединить
         }
@@ -160,11 +160,11 @@ class join extends file {
 
         if($mod == 'fls') {                                                          // Если переданы конкретные файлы для объединения
 
-            self::concat($file, $options);                                           // Непосредственное прилепливание текущего файла к конечному
+            self::concat($val, $options);                                            // Непосредственное прилепливание текущего файла к конечному
         }
         else {                                                                       // Иначе передано расширение или регулярное выражение
 
-            if(gettype($options['input_path']) == 'array')                           // Если указан массив входящих директорий
+            if(is_array($options['input_path']))                                     // Если указан массив входящих директорий
                 $input_path    = $options['input_path'];
             else                                                                     // Иначе указана одна входящая директория
                 $input_path[0] = $options['input_path'];
@@ -268,12 +268,14 @@ class join extends file {
      */
     private static function concat($files, $options) {
 
-        if(gettype($files) == 'string')                                              // Если передан один файл
+        if(is_string($files))                                                        // Если передан один файл
             $files = array($files);                                                  // нужно сделать из него массив
 
         foreach($files as $file) {                                                   // Цикл по файлам
 
-            $file = core::resolve_path($file);                                       // Установление корректного пути до файла
+            if(!filter_var($file, FILTER_VALIDATE_URL)) {                            // Если не URL до файла
+                $file = core::resolve_path($file);                                   // Установление корректного пути до файла
+            }
 
             if(in_array($file, self::$input_files))                                  // Если файл уже был прилеплен
                 return;                                                              // то его уже не нужно прилеплять
