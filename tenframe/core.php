@@ -55,16 +55,15 @@ class core {
      * Подключение файлов
      *
      * @param  string  $file Путь до файла
-     * @return boolean       Успех подключения
+     * @return mixed         Файл или false в случае его отсутствия
      */
     public static function requireFile($file) {
 
         $file = self::resolve_path($file);                                 // Приведение пути к корректному виду
 
         if(is_file($file)) {                                               // Если файл существует
-            require $file;                                                 // его нужно подключить
             array_push(self::$required, $file);                            // Добавление в массив подключенных файлов классов
-            return true;
+            return require $file;                                          // его нужно подключить
         } else return false;
     }
 
