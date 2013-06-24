@@ -250,6 +250,7 @@ class core {
     private static function require_options() {
 
         if(self::dev(DEV)) {                                               // Если включен режим разработчика
+            self::requireFile('/get.php');                                 // Выкачивание файлов
             self::requireFile('/join.php');                                // Сборка файлов
             self::requireFile('/css.php');                                 // CSS препроцессоры
             self::requireFile('/statical.php');                            // Подключение файлов
