@@ -90,7 +90,7 @@ class join extends file {
      */
     public static function files($options) {
 
-        $options['output_file'] = ROOT . $options['output_file'];                    // Абсолютный путь выходящего файла
+        $options['output_file'] = parent::resolve_path($options['output_file']);     // Установление корректного пути до выходящего файла
 
         foreach(self::$options as $key => $val)                                      // Установка значений по умолчанию
             if(!isset($options[$key]))                                               // для незаданных опций
@@ -171,7 +171,7 @@ class join extends file {
 
             foreach($input_path as $path) {                                          // Цикл по входящим директориям
 
-                $options['input_path'] = text::rgum(ROOT . $path, '/');              // Абсолютный путь входящей корневой директории и добавление слеша в конец пути, если его там нет
+                $options['input_path'] = parent::resolve_path($path);                // Установление корректного пути входящей корневой директории
 
                 self::get_folders($mod, $val, $options);                             // Вызов функции рекурсивного перебора директорий
             }
