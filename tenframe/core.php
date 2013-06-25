@@ -89,6 +89,9 @@ class core {
         'compressHTML' => false,                                           // Сжимать отдаваемый HTML (для tpl-шаблонов)
         'tenhtml' => false,                                                // Использовать tenhtml-шаблоны (автоматически сжимаются)
 
+        'devFiles' => array(),                                             // Файлы, подключаемые только в режиме разработчика
+        'files' => array(),                                                // Файлы, подключаемые всегда
+
         'autoload' => array(                                               // Пути для автоматической загрузки классов в порядке приоритета
             '/app/controller/',
             '/app/model/'
@@ -251,14 +254,16 @@ class core {
     private static function require_options() {
 
         if(self::dev(DEV)) {                                               // Если включен режим разработчика
-            self::requireFile('/get.php');                                 // Выкачивание файлов
-            self::requireFile('/join.php');                                // Сборка файлов
-            self::requireFile('/css.php');                                 // CSS препроцессоры
-            self::requireFile('/statical.php');                            // Подключение файлов
+            foreach(self::$settings['devFiles'] as $file) {                // Подключение файлов для разработки
+                self::requireFile($file . '.php');
+            }
         }
 
         self::requireFile(TEN_PATH . '/request.php');                      // Подключение функций обработки маршрутов
-        self::requireFile('/routes.php');                                  // Подключение файла маршрутизации
+
+        foreach(self::$settings['files'] as $file) {                       // Подключение общих файлов
+            self::requireFile($file . '.php');
+        }
     }
 
     /**
