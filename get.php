@@ -23,13 +23,13 @@ ten\get::files(array(                               // Выкачивание н
         'https://raw.github.com/necolas/normalize.css/master/normalize.css'
     ),
     'path' => array(
-        'css' => '/assets/css/',
-        'js'  => '/assets/js/'
+        'css' => '/assets/css/vendor/',
+        'js'  => '/assets/js/vendor/'
     )
 ));
 
 ten\join::files(array(                              // Сборка внешних библиотек
-    'files'       => 'ext: js',
-    'input_path'  => '/assets/js/vendor/',
-    'output_file' => '/assets/js/vendor.js'
+    'files'       => 'ext: css, js',
+    'input_path'  => array('/assets/css/vendor/', '/assets/js/vendor/'),
+    'output_file' => '/assets/{ext}/vendor.{ext}'
 ));
