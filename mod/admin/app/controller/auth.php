@@ -22,7 +22,7 @@ class auth {
             'parse' => array(
 
                 'title' => 'Вход в административную панель',
-                'files' => \ten\statical::includes('libs, developer, require', GEN),
+                'files' => \ten\statical::includes('libs, require', GEN),
 
                 'body'  => \ten\tpl::block(array(
 

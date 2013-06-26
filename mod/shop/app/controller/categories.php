@@ -129,7 +129,7 @@ class categories {
             'parse' => array(
 
                 'title' => 'Административная панель &mdash; ' . $info['title'],
-                'files' => \ten\statical::includes('libs, developer, require', GEN),
+                'files' => \ten\statical::includes('libs, require', GEN),
 
                 'body'  => \ten\tpl::block(array(
 
