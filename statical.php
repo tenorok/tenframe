@@ -15,14 +15,11 @@ ten\statical::involve(array(                            // Markdown для мо�
 ));
 
 ten\statical::involve(array(                            // Файлы библиотек и плагинов
-    'jquery-1.8.3.min.js',
+    'vendor.js',
     'jquery-ui-1.9.2.min.js',
-    'modernizr-2.5.3.js',
     'jquery-bem.js',
     'jquery.placeholder_ten.js',
-    'jquery.hoverDelay.js',
-    'jquery.maskedinput-1.3.js',
-    'handlebars-1.0.0.beta.6.js'
+    'jquery.hoverDelay.js'
 ), array(
     'path' => array(
         'js' => '/assets/js/'
