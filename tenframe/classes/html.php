@@ -105,6 +105,16 @@
             15) ie<9: { ... }                                       // <!--[if lt IE 9]> ... <![endif]-->
             16) body: { ... }                                       // <body> ... </body>
             17) ctx%blockname                                       // Установка контекста блока без DOM-узла
+            18) %block: {                                           // блоку можно передать свойство json
+                    json: true                                      // (По умолчанию) <div class="block i-bem" onclick="return { "block":{} }"></div>
+                    // или
+                    json: false                                     // <div class="block"></div>
+                    // или
+                    json: {                                         // <div class="block i-bem" onclick="return { "block":{"a":100,"b":"string"} }"></div>
+                        a: 100,
+                        b: 'string'
+                    }
+                }
 */
 
 namespace ten;
@@ -126,7 +136,7 @@ class html extends core {
         'title', 'lang', 'charset', 'favicon',
         'css', 'js',
         'ie', 'ie<8', 'ie<9',
-        'body'
+        'body', 'json'
     );
 
     private static $iterateSeparator = '___';                                           // Разделитель ключа и его порядкового номера
@@ -248,14 +258,74 @@ class html extends core {
     }
 
     /**
+     * Получение чистого имени ключа без порядкового постфикса
+     *
+     * @param  string $key Имя ключа
+     * @return string      Чистое имя ключа
+     */
+    private static function getClearKey($key) {
+        return array_shift(explode(self::$iterateSeparator, $key));                     // Вернуть первую часть ключа по разделителю
+    }
+
+    /**
+     * Проверка на необходимость инициализации блока
+     *
+     * @param  array $keyInfo Массив информации по ключу
+     * @return bool           Нужно инициализировать или нет
+     */
+    private static function needJson($keyInfo) {
+        return (
+            $keyInfo['block'] &&                                                        // Если узел является блоком
+            $keyInfo['tag'] != 'ctx' &&                                                 // не абстрактным
+            (
+                $keyInfo['json'] ||                                                     // и json задан в true или объект
+                is_null($keyInfo['json'])                                               // или json не задан
+            )
+        );
+    }
+
+    /**
+     * Установка атрибута onclick для передачи данных в i-bem
+     *
+     * @param  string       $inner   Строка, предваряющая парсингуемый контент
+     * @param  array        $keyInfo Массив информации по ключу
+     * @param  string|false $block   Имя контекстного блока
+     * @return string                Строка, предваряющая парсингуемый контент с установленным при необходимости атрибутом onclick
+     */
+    private static function setJson($inner, $keyInfo, $block) {
+
+        if(!self::needJson($keyInfo)) return $inner;                                    // Если блок не нужно инициализировать, можно вернуть полученную строку без добавления onclick
+
+        switch(gettype($keyInfo['json'])) {
+            case 'object':                                                              // Если json задан объектом
+                foreach(get_object_vars($keyInfo['json']) as $key => $val) {            // Цикл по значениям объекта json
+                    $keyInfo['json']->{self::getClearKey($key)} = $val;                 // Установка чистого ключа без порядкового постфикса
+                    unset($keyInfo['json']->{$key});                                    // Удаление грязного ключа с постфиксом
+                }
+                break;
+
+            case 'boolean':                                                             // Если json задан в true
+            case 'NULL':                                                                // или если json не задан
+                $keyInfo['json'] = new \stdClass();                                     // Достаточно передать пустой объект
+        }
+
+        return self::setAttrs($inner, (object)array(                                    // Установить атрибут onclick и заэкранировать кавычки
+            'onclick' => htmlspecialchars('return { "' . $block . '":' . json_encode($keyInfo['json']) . ' }', ENT_QUOTES)
+        ), $block);
+    }
+
+    /**
      * Рекурсивный парсинг контента
      *
      * @param  string              $inner   Строка, предваряющая парсингуемый контент
+     * @param  array               $keyInfo Массив информации по ключу
      * @param  string|object|array $content Содержимое блока
      * @param  string|false        $block   Имя контекстного блока
      * @return string                       Пропарсенный контент
      */
-    private static function parseContent($inner, $content, $block = false) {
+    private static function parseContent($inner, $keyInfo, $content, $block = false) {
+
+        $inner = self::setJson($inner, $keyInfo, $block);                               // Установить атрибут onclick
 
         switch(gettype($content)) {                                                     // Способ разбора зависит от типа данных
 
@@ -265,16 +335,17 @@ class html extends core {
             case 'object':                                                              // По объекту нужно пробежаться
                 foreach($content as $key => $content) {
 
-                    $clearKey = explode(self::$iterateSeparator, $key);                 // Получение чистого ключа объекта без порядкового номера
-
-                    switch($clearKey[0]) {                                              // Способ разбора зависит от ключа объекта
+                    switch(self::getClearKey($key)) {                                   // Способ разбора зависит от ключа объекта
 
                         case 'attr':                                                    // Объект атрибутов
                             $inner = self::setAttrs($inner, $content, $block);
                             break;
 
                         case 'content':                                                 // Массив контента
-                            $inner = self::parseContent($inner, $content, $block);
+                            $inner = self::parseContent($inner, $keyInfo, $content, $block);
+                            break;
+
+                        case 'json':                                                    // Наличие или отсутствие инициализации для i-bem
                             break;
 
                         default:                                                        // Произвольный ключ (селектор)
@@ -302,30 +373,49 @@ class html extends core {
 
         foreach($content as $attr => $val) {
 
-            $clearAttr = explode(self::$iterateSeparator, $attr);                                   // Получение чистого ключа атрибута без порядкового номера
+            $clearAttr = self::getClearKey($attr);                                                  // Получение чистого ключа атрибута без порядкового номера
 
             if(is_bool($val) && $val) {                                                             // Если атрибут = true
-                $attributes .= ' ' . $clearAttr[0];                                                 // то это одиночный атрибут
+                $attributes .= ' ' . $clearAttr;                                                    // то это одиночный атрибут
                 continue;
             }
 
-            switch($clearAttr[0]) {                                                                 // Обработка по имени атрибута
+            switch($clearAttr) {                                                                    // Обработка по имени атрибута
 
                 case 'bool':                                                                        // Одиночные атрибуты по переменной
                     if(is_object($val)) {                                                           // Одиночные атрибуты должны быть указаны в виде объекта
                         foreach($val as $name => $variable) {
-                            $clearBoolName = explode(self::$iterateSeparator, $name);
-                            $attributes .= ' {{ if($' . self::getVarName($variable) . ', "' . $clearBoolName[0] . '") }}';
+                            $attributes .= ' {{ if($' . self::getVarName($variable) . ', "' . self::getClearKey($name) . '") }}';
                         }
                         continue;
                     }
 
                 default:                                                                            // Обычный атрибут
-                    $attributes .= ' ' . $clearAttr[0] . '="' . self::setVar($val, $block) . '"';   // Формирование строки атрибутов
+                    $attributes .= ' ' . $clearAttr . '="' . self::setVar($val, $block) . '"';      // Формирование строки атрибутов
             }
         }
 
         return substr_replace($inner, $attributes, strlen($inner) -1, 0);                           // Вставка сформированной строки перед закрывающей скобкой
+    }
+
+    /**
+     * Поиск ключа на одном уровне объекта
+     *
+     * @param  string|object|array $content  Содержимое блока
+     * @param  string              $childKey Имя искомого ключа
+     * @return mixed|null                    Значение ключа или null, если ключ не найден
+     */
+    private static function getChildKey($content, $childKey) {
+
+        if(is_string($content)) return null;                                                        // Если содержимое блока является строкой, то ключ считается не найденным
+
+        foreach($content as $key => $val) {                                                         // Иначе содержимое блока является объектом или массивом
+            if(self::getClearKey($key) == $childKey) {                                              // Если найден искомый ключ
+                return $val;                                                                        // его нужно вернуть
+            }
+        }
+
+        return null;                                                                                // Иначе ключ не найден
     }
 
     /**
@@ -338,17 +428,22 @@ class html extends core {
      */
     private static function makeTag($keyInfo, $content, $block = false) {
 
-        $class = self::genClass($block, $keyInfo);                                      // Генерация атрибута class
-
         if(!empty($keyInfo['block']) && $keyInfo['tag'] == 'ctx') {                     // Если нужно добавить только контекст блока без DOM-узла
-            return self::parseContent('', (($content) ? $content : ''), $block);
+            return self::parseContent('', $keyInfo, (($content) ? $content : ''), $block);
         }
+
+        if($keyInfo['block']) {                                                         // Если текущий узел является блоком
+            $keyInfo['json'] = self::getChildKey($content, 'json');                     // нужно определить его атрибут json
+        }
+
+        $class = self::genClass($block, $keyInfo);                                      // Генерация атрибута class
 
         return self::parseContent(                                                      // Рекурсивный парсинг контента
             '<' .
                 $keyInfo['tag'] .
                 ((!empty($class)) ? ' class="' . $class . '"' : '') .
             '>',
+            $keyInfo,
             (($content) ? $content : ''),                                               // Если контент есть
             $block
         ) . (                                                                           // Если тег требуется закрыть
@@ -366,11 +461,9 @@ class html extends core {
      */
     private static function parsetenhtmlKey($key) {
 
-        $clearKey = explode(self::$iterateSeparator, $key);                             // Получение чистого ключа объекта без порядкового номера
-
         $info = preg_split(                                                             // Разбор ключа на массив
             '/([' . implode('', self::$spec) . '])/',
-            str_replace(' ', '', $clearKey[0]),                                         // Удаление всех пробелов из ключа
+            str_replace(' ', '', self::getClearKey($key)),                              // Удаление всех пробелов из ключа
             -1,
             PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
         );
@@ -456,6 +549,7 @@ class html extends core {
             case 'for':                                                                 // Ключевое слово for
                 return self::parseContent(
                     '{{ begin ' . $keyInfo['elemmod'][0] . ' }}',
+                    $keyInfo,
                     $content,
                     $block
                 ) .
@@ -519,18 +613,21 @@ class html extends core {
             case 'ie':
                 return self::parseContent(
                     '<!--[if IE]>',
+                    $keyInfo,
                     $content
                 ) . '<![endif]-->';
 
             case 'ie<8':
                 return self::parseContent(
                     '<!--[if lt IE 8]>',
+                    $keyInfo,
                     $content
                 ) . '<![endif]-->';
 
             case 'ie<9':
                 return self::parseContent(
                     '<!--[if lt IE 9]>',
+                    $keyInfo,
                     $content
                 ) . '<![endif]-->';
 
@@ -559,6 +656,10 @@ class html extends core {
             array_push($class, $info['block']);                                         // то нужно добавить его в атрибут class
         }
 
+        if(self::needJson($info)) {                                                     // Если текущий узел является блоком и его нужно инициализировать
+            array_push($class, 'i-bem');                                                // то нужно добавить ему класс i-bem
+        }
+
         foreach($info['elemmod'] as $elemmod) {                                         // Цикл по элементам и модификаторам
 
             if(substr($elemmod, 0, 2) == '__') {                                        // Элемент
@@ -584,6 +685,8 @@ class html extends core {
         return implode(' ', $class);
     }
 
+    private static $varRegexp = '/{\s*([a-z0-9_\-]+)\s*}/i';                            // Регулярное выражение поиска переменных
+
     /**
      * Установка переменных
      *
@@ -593,7 +696,7 @@ class html extends core {
      */
     private static function setVar($string, $block) {
         $string = str_replace(array('{this}'), array($block), $string);                 // Замена зарезервированных переменных
-        $string = preg_replace('/{\s*([a-z0-9_\-]*)\s*}/i', '{{ $$1 }}', $string);      // Замена переменных
+        $string = preg_replace(self::$varRegexp, '{{ $$1 }}', $string);                 // Замена переменных
         return str_replace(array('\{', '\}'), array('{', '}'), $string);                // Замена экранированных фигурных скобок
     }
 
@@ -604,7 +707,7 @@ class html extends core {
      * @return string         Имя переменной
      */
     private static function getVarName($string) {
-        return preg_replace('/{\s*([a-z0-9_\-]*)\s*}/i', '$1', $string);
+        return preg_replace(self::$varRegexp, '$1', $string);
     }
 
     /**
