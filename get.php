@@ -13,6 +13,7 @@ ten\join::files(array(                              // Сборка i-bem
         'https://raw.github.com/bem/bem-bl/0.3/blocks-common/i-bem/__dom/_init/i-bem__dom_init_auto.js'
     ),
     'output_file' => '/assets/js/vendor/i-bem.js',
+    'before'      => "\n\n/**\n * Load from:\n * {filename}\n */\n\n",
     'compress' => false
 ));
 
@@ -43,6 +44,5 @@ ten\join::files(array(                              // Сборка внешни
         '/assets/js/vendor/i-bem.js'
     ),
     'input_path'  => '/assets/js/vendor/',
-    'output_file' => '/assets/js/vendor.js',
-    'compress' => false
+    'output_file' => '/assets/js/vendor.js'
 ));
