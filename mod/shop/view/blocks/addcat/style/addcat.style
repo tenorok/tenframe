@@ -1,10 +1,10 @@
-.mod-shop-categories__addform {
+.mod-shop-addcat__addform {
     margin-bottom: 30px;
 }
-    .mod-shop-categories__fieldlist {
+    .mod-shop-addcat__fieldlist {
 
     }
-        .mod-shop-categories__fielditem {
+        .mod-shop-addcat__fielditem {
             margin: 20px 0 30px;
             border-bottom: 1px solid #ddd;
             padding-bottom: 20px;
@@ -14,30 +14,30 @@
                 border-bottom: none;
             }
         }
-            .mod-shop-categories__labellist {
+            .mod-shop-addcat__labellist {
 
             }
-                .mod-shop-categories__labelitem {
+                .mod-shop-addcat__labelitem {
                     margin: 10px 0;
                 }
 
                     @mod_shop_categories__input_padding_top_bottom: 2px;
 
-                    .mod-shop-categories__label {
+                    .mod-shop-addcat__label {
                         display: inline-block;
                         padding: @mod_shop_categories__input_padding_top_bottom + 1px 0;
                         width: 100px;
 
                         vertical-align: top;
                     }
-                    .mod-shop-categories__label_long {
+                    .mod-shop-addcat__label_long {
                         width: auto;
                     }
-                    .mod-shop-categories__label_left-column {
+                    .mod-shop-addcat__label_left-column {
                         float: left;
                     }
-                    .mod-shop-categories__textinput,
-                    .mod-shop-categories__numberinput {
+                    .mod-shop-addcat__textinput,
+                    .mod-shop-addcat__numberinput {
                         border: 1px solid #aaa;
                         padding: @mod_shop_categories__input_padding_top_bottom 4px;
 
@@ -53,36 +53,36 @@
                             color: @placeholder-color;
                         }
                     }
-                    .mod-shop-categories__textinput {
+                    .mod-shop-addcat__textinput {
                         width: 150px;
                     }
-                    .mod-shop-categories__textinput_right-column {
+                    .mod-shop-addcat__textinput_right-column {
                         display: block;
                         margin: 10px 0 10px 104px;
                     }
-                    .mod-shop-categories__numberinput {
+                    .mod-shop-addcat__numberinput {
                         width: 30px;
                     }
-                    .mod-shop-categories__checkboxinput {
+                    .mod-shop-addcat__checkboxinput {
                         float: left;
                         margin: 4px 7px 0 0;
                     }
 
-                    .mod-shop-categories__selectinput {
+                    .mod-shop-addcat__selectinput {
                         border: 1px solid #aaa;
 
                         color: #333;
                     }
-                    .mod-shop-categories__selectinput_right-column {
+                    .mod-shop-addcat__selectinput_right-column {
                         margin-left: 100px;
                     }
-                        .mod-shop-categories__optioninput {
+                        .mod-shop-addcat__optioninput {
                             padding: @mod_shop_categories__input_padding_top_bottom 4px;
                         }
-                .mod-shop-categories__hiddenitem {
+                .mod-shop-addcat__hiddenitem {
                     display: none;
                 }
 
-    .mod-shop-categories__submit {
+    .mod-shop-addcat__submit {
         padding: 3px 6px;
     }

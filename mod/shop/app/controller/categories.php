@@ -209,8 +209,7 @@ class categories {
 
                                 'content' => \ten\tpl::block(array(
                                     'mod'   => 'shop',
-                                    'block' => 'categories',
-                                    'view'  => 'add',
+                                    'block' => 'addcat',
 
                                     'parse' => array(
                                         'page'   => \ten\text::del($settings['urls']['page'], '/'),

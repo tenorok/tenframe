@@ -1,4 +1,4 @@
-%mod-shop-categories: {
+%mod-shop-addcat: {
     form.__addform: {
         attr: {
             action: '/{page}/modshop/categories/{action}/',
@@ -56,7 +56,9 @@
                 },
                 '{edit}'
             ],
-            h2.__h2: 'Поля',
+            h2
+                &mod-shop-categories__h2
+                .__h2: 'Поля',
             ul.__fieldlist: {
                 li.__fielditem: {
                     ul.__labellist: {
@@ -69,7 +71,7 @@
                                         select
                                             .__selectinput
                                             ._right-column
-                                            ._existfield: {
+                                            .__existfield: {
                                                 attr: {
                                                     name: 'existfield[]'
                                                 },
@@ -96,7 +98,7 @@
                             label.__label: 'Имя поля',
                             input
                                 .__textinput
-                                ._name: {
+                                .__name: {
                                     attr: {
                                         type: 'text',
                                         name: 'name[]',
@@ -162,7 +164,8 @@
                                     ._left_column: 'Значения',
                                 input
                                     .__textinput
-                                    ._right-column: {
+                                    ._right-column
+                                    .__classifier: {
                                         attr: {
                                             type: 'text',
                                             name: 'options_0[]',

@@ -309,7 +309,7 @@ class core {
             isset($_SESSION['DEV']) && $_SESSION['DEV'] && !$dev ||        // Если режим разработчика был включен, а сейчас его выключили
             $dev                                                           // или он просто включен
         ) {
-            file::autogen('/view/include/dev.js', 'core.dev=' . (($dev) ? 'true;' : 'false;'));
+            file::autogen('/view/include/dev.js', 'tenframe.dev=' . (($dev) ? 'true;' : 'false;'));
             $ret = true;                                                   // то надо вернуть true, чтобы собрать JS-файлы с новым значением
         }
         else                                                               // Иначе режим разработчика выключен

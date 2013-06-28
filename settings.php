@@ -10,7 +10,7 @@ ten\core::settings(array(
     'debug' => true,
 
     'devFiles' => array(
-        'get',              // Выкачивание файлов
+//        'get',              // Выкачивание файлов
         'join',             // Сборка файлов
         'css',              // CSS препроцессоры
         'statical'          // Подключение файлов
