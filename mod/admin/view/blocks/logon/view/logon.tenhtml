@@ -1,4 +1,5 @@
 form%mod-admin-logon: {
+    json: false,
     attr: {
         method: 'post',
         action: '{action}'

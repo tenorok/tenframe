@@ -1,4 +1,5 @@
 ul%mod-admin-menu: {
+    json: false,
     for.items: {
         li.__item: {
             for.deactive: {

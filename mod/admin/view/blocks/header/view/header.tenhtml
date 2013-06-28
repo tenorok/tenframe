@@ -1,4 +1,5 @@
 %mod-admin-header: {
+    json: false,
     a.__tosite: {
         attr: {
             href: '/'
