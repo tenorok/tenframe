@@ -88,13 +88,13 @@ class tpl extends core {
 
         $blocks = (isset($mod)) ? ROOT . '/mod/' . $mod . '/view/blocks/' : BLOCKS;     // Изменение начального пути, если указан модуль
 
-        $extensions = array('tenhtml', 'tpl');                                          // Расширения файлов шаблонов в порядке приоритета
+        $extensions = array('tenhtml', 'th', 'tpl');                                    // Расширения файлов шаблонов в порядке приоритета
 
         foreach($extensions as $ext) {                                                  // Поиск существующих шаблонов
 
             $file = $blocks . $block . '/view/' . $view . '.' . $ext;                   // Полный путь к шаблону
 
-            if($ext == 'tenhtml' && parent::$settings['tenhtml']) {                     // Если рассматриваемое расширение tenhtml и включена его настройка
+            if($ext == 'tenhtml' || $ext == 'th' && parent::$settings['tenhtml']) {     // Если рассматриваемое расширение tenhtml и включена его настройка
 
                 $file = (DEV) ?                                                         // Если включен режим разработчика
                     html::savetenhtml(core::resolve_path($file)) :                      // то tenhtml-шаблон нужно преобразовать в простой шаблон
