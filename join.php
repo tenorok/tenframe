@@ -8,7 +8,7 @@ ten\join::files(array(                            // Сборка всех js-ф
 ));
 
 ten\join::files(array(                            // Сборка основных стилей и необходимых библиотек
-    'files'       => 'reg: /\.style|\.import/',
+    'files'       => 'reg: /\.less|\.style|\.import/',
     'output_file' => '/assets/css/main.less',
     'after'       => "\n"
 ));
