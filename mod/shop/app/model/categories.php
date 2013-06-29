@@ -100,7 +100,7 @@ class categories {
             return \ten\tpl::block(array(                                                // Значит нужно парсить список категорий для изменения родительской категории
 
                 'mod'   => 'shop',
-                'block' => 'categories',
+                'block' => 'itemcat',
                 'view'  => 'parent',
 
                 'context' => array(
@@ -130,8 +130,7 @@ class categories {
             return \ten\tpl::block(array(
 
                 'mod'   => 'shop',
-                'block' => 'categories',
-                'view'  => 'item',
+                'block' => 'itemcat',
 
                 'context' => array(
 

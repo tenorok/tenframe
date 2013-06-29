@@ -1,0 +1,30 @@
+li%mod-shop-itemcat: {
+    attr: {
+        id: 'c_{id}'
+    },
+    .__name: {
+        span
+            &mod-shop-listcat__draggable
+            .__draggable: '',
+        for.visible: {
+            a.__cat: {
+                attr: {
+                    href: '/{page}/modshop/categories/{id}/'
+                },
+                content: '{name}'
+            }
+        },
+        for.hidden: {
+            a
+                .__cat
+                ._hided: {
+                    attr: {
+                        href: '/{page}/modshop/categories/{id}/',
+                        title: 'Скрытая категория'
+                    },
+                    content: '{name}'
+                }
+        }
+    },
+    ul%mod-shop-listcat: '[[child_{id}]]'
+}

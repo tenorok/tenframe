@@ -24,8 +24,16 @@ class categories {
 
             'parse' => array(
 
-                'page'       => $page,
-                'categories' => mod\categories::get_categories_list($page)
+                'page'    => $page,
+
+                'listcat' => \ten\tpl::block(array(
+                    'mod'   => 'shop',
+                    'block' => 'listcat',
+
+                    'parse' => array(
+                        'list' => mod\categories::get_categories_list($page)
+                    )
+                ))
             )
         ));
     }
