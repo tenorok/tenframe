@@ -16,8 +16,6 @@ ten\statical::involve(array(                            // Markdown для мо�
 
 ten\statical::involve(array(                            // Файлы библиотек и плагинов
     'vendor.js',
-    'jquery-ui-1.9.2.min.js',
-    'jquery-bem.js',
     'jquery.placeholder_ten.js',
     'jquery.hoverDelay.js'
 ), array(

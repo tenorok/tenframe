@@ -21,6 +21,7 @@ ten\get::files(array(                               // Выкачивание н
     'files' => array(
         'http://code.jquery.com/jquery-latest.js',
         'http://modernizr.com/downloads/modernizr-latest.js',
+        'http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.js',
         'https://raw.github.com/digitalBush/jquery.maskedinput/1.3.1/dist/jquery.maskedinput.min.js',
         'https://raw.github.com/necolas/normalize.css/master/normalize.css'
     ),
