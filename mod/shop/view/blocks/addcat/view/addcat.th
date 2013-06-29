@@ -1,0 +1,75 @@
+%mod-shop-addcat: {
+    form.__addform: {
+        attr: {
+            action: '/{page}/modshop/categories/{action}/',
+            method: 'post'
+        },
+        content: [
+            {
+                input.__catparent: {
+                    attr: {
+                        type: 'hidden',
+                        name: 'catparent',
+                        value: '{parent}'
+                    }
+                },
+                ul.__labellist: [
+                    {
+                        li&mod-shop-fielditem__labelitem: {
+                            label&mod-shop-fielditem__label: {
+                                attr: {
+                                    for: '{this}__catname'
+                                },
+                                content: 'Название'
+                            },
+                            input
+                                .__catname
+                                &mod-shop-fielditem__textinput: {
+                                    attr: {
+                                        type: 'text',
+                                        value: '{name}',
+                                        name: 'catname',
+                                        placeholder: 'Телевизоры',
+                                        id: '{this}__catname',
+                                        autofocus: true
+                                    }
+                                }
+                        },
+                        li&mod-shop-fielditem__labelitem: {
+                            label&mod-shop-fielditem__label: {
+                                attr: {
+                                    for: '{this}__catalias'
+                                },
+                                content: 'Алиас'
+                            },
+                            input
+                                .__catalias
+                                &mod-shop-fielditem__textinput: {
+                                    attr: {
+                                        type: 'text',
+                                        value: '{alias}',
+                                        name: 'catalias',
+                                        placeholder: 'tv',
+                                        id: '{this}__catalias'
+                                    }
+                                }
+                        }
+                    },
+                    '{edit}'
+                ],
+                h2
+                    &mod-shop-categories__h2
+                    .__h2: 'Поля'
+            },
+            '{fieldlist}',
+            {
+                input.__submit: {
+                    attr: {
+                        type: 'submit',
+                        value: 'Создать категорию'
+                    }
+                }
+            }
+        ]
+    }
+}

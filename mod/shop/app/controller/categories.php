@@ -217,29 +217,41 @@ class categories {
                                         'parent' => $info['parentid'],
                                         'name'   => $info['name'],
                                         'alias'  => $info['alias'],
-                                        'edit'   => $edit
-                                    ),
+                                        'edit'   => $edit,
 
-                                    'context' => array(
+                                        'fieldlist' => \ten\tpl::block(array(
+                                            'mod'   => 'shop',
+                                            'block' => 'fieldlist',
 
-                                        'existfields' => array(
-
-                                            'array' => $fieldslist,
                                             'parse' => array(
-                                                'id'       => 'tmod_shop_fields_id',
-                                                'category' => 'name',
-                                                'field'    => 'tmod_shop_fields_name'
-                                            )
-                                        ),
+                                                'fielditem' => \ten\tpl::block(array(
+                                                    'mod'   => 'shop',
+                                                    'block' => 'fielditem',
 
-                                        'types' => array(
+                                                    'context' => array(
 
-                                            'array' => self::$types,
-                                            'parse' => array(
-                                                'value' => 'val',
-                                                'text'  => 'txt'
+                                                        'existfields' => array(
+
+                                                            'array' => $fieldslist,
+                                                            'parse' => array(
+                                                                'id'       => 'tmod_shop_fields_id',
+                                                                'category' => 'name',
+                                                                'field'    => 'tmod_shop_fields_name'
+                                                            )
+                                                        ),
+
+                                                        'types' => array(
+
+                                                            'array' => self::$types,
+                                                            'parse' => array(
+                                                                'value' => 'val',
+                                                                'text'  => 'txt'
+                                                            )
+                                                        )
+                                                    )
+                                                ))
                                             )
-                                        )
+                                        ))
                                     )
                                 ))
                             )
