@@ -7,6 +7,5 @@
  * @version 0.0.1
  */
 
-session_start();
 require 'core.php';             // Подключение ядра
 ten\core::init();               // Инициализация ядра

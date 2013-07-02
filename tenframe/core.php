@@ -147,6 +147,8 @@ class core {
 
         self::$startTime = microtime(true);                                // Сохранение времени начала выполнения скрипта
 
+        session_start();
+
         self::define('TEN_PATH', 'tenframe');                              // Константа директории tenframe
         self::define('TEN_CLASSES', TEN_PATH . '/classes/');               // Константа директории для хранения классов tenframe
         self::define('TEN_MODULES', '/mod/');                              // Константа директории модулей
