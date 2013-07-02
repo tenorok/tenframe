@@ -261,8 +261,6 @@ class core {
             }
         }
 
-        self::requireFile(TEN_PATH . '/request.php');                      // Подключение функций обработки маршрутов
-
         foreach(self::$settings['files'] as $file) {                       // Подключение общих файлов
             self::requireFile($file . '.php');
         }
