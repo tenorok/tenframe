@@ -21,13 +21,24 @@
                 'third',
                 'four'
             );
+
+    Подключение файла.
+    Возвращает файл или false в случае его отсутствия.
+        core::requireFile('/path/to/file.php');
+
+    Подключение PHP-файлов из директории.
+    Возвращает массив путей подключенных файлов.
+        core::requireDir('/path/to/dir/');
+
+    Рекурсивное подключение PHP-файлов из всех директорий внутри директории.
+    Возвращает массив путей подключенных файлов.
+        core::requireDirRecursive('/path/to/dir/');
 */
 
 namespace ten;
 
 class core {
 
-    public static $get;                                                    // Объект, который используется из приложения для обращения к GET-переменным
     public static $paths = array('/');                                     // Массив с директориями классов
     public static $startTime;                                              // Время начала выполнения скрипта
     public static $required = array();                                     // Подключенные файлы классов
@@ -67,6 +78,69 @@ class core {
         } else return false;
     }
 
+    /**
+     * Декоратор для методов подключения php-файлов в директориях
+     *
+     * @param  string   $dir      Путь до директории
+     * @param  closure  $callback Инструкции к применению над каждым объектом в директории
+     * @return array              Массив путей
+     */
+    private static function requireDirDecorate($dir, $callback) {
+
+        $dirInfo = new \DirectoryIterator(self::resolve_path($dir));       // Получение информации об объектах директории
+        static $requiredFiles = array();                                   // Массив путей подключенных файлов
+
+        foreach($dirInfo as $object) {                                     // Цикл по объектам директории
+            $file = call_user_func($callback, $object);                    // Выполнение необходимых действий с объектом
+            $file && array_push($requiredFiles, $file);                    // Если был подключен файл, то его надо добавить в массив
+        }
+
+        return $requiredFiles;
+    }
+
+    /**
+     * Подключение всех php-файлов директории
+     *
+     * @param  string $dir Путь до директории
+     * @return array       Массив путей
+     */
+    public static function requireDir($dir) {
+        return self::requireDirDecorate($dir, function($object) {
+            return core::requireDirFile($object);
+        });
+    }
+
+    /**
+     * Рекурсивное подключение php-файлов всех вложенных директорий
+     *
+     * @param  string $dir Путь до базовой директории
+     * @return array       Массив путей
+     */
+    public static function requireDirRecursive($dir) {
+        return self::requireDirDecorate($dir, function($object) {
+            if($object->isDir() && !$object->isLink() && !$object->isDot()) {
+                core::requireDirRecursive($object->getPathname());
+            } else {
+                return core::requireDirFile($object);
+            }
+        });
+    }
+
+    /**
+     * Подключение файла в директории
+     * @private
+     *
+     * @param  object           $object Объект с информацией о файле
+     * @return string | boolean         Путь до подключенного файла или false в случае отказа подключения
+     */
+    public static function requireDirFile($object) {
+        if($object->isFile() && $object->getExtension() == 'php') {
+            $path = $object->getPathname();
+            self::requireFile($path);
+            return $path;
+        } else return false;
+    }
+
     public static $define = array();                                       // Константы
 
     /**
@@ -82,7 +156,6 @@ class core {
 
     protected static $settings = array(                                    // Параметры работы фреймворка
         'develop' => false,                                                // Режим разработки
-        'clearURI' => true,                                                // Маршрутизировать относительный путь
         'autoprefix' => '__autogen__',                                     // Префикс для автоматически сгенерированных файлов
 
         // Для compressHTML и tenhtml в качестве значения нужно указать путь до директории, в которой будут храниться сгенерированные шаблоны
@@ -148,22 +221,15 @@ class core {
         self::$startTime = microtime(true);                                // Сохранение времени начала выполнения скрипта
 
         session_start();
-
-        self::define('TEN_PATH', 'tenframe');                              // Константа директории tenframe
-        self::define('TEN_CLASSES', TEN_PATH . '/classes/');               // Константа директории для хранения классов tenframe
-        self::define('TEN_MODULES', '/mod/');                              // Константа директории модулей
-
         spl_autoload_register(array('self', 'auto_load'));                 // Включение автоподгрузки классов
         register_shutdown_function(array('ten\core', 'shutdown'));         // Указание метода, который будет вызван по окончании выполнения всего скрипта
 
-        $query = self::define_ROOT();                                      // Определение константы ROOT
-        self::define('BLOCKS', self::resolve_path('/view/blocks/'));       // Константа директории блоков
-        self::define('GEN', file::$autoprefix);                            // Константа префикса автоматически сгенерированных файлов
+        self::initStart();                                                 // Базовая инициализация
 
-        self::requireFile('/vendor/autoload.php');                         // Composer autoloader
+        self::define('GEN', file::$autoprefix);                            // Константа префикса автоматически сгенерированных файлов
         self::requireFile('/settings.php');                                // Подключение настроек работы tenframe
 
-        self::define_URI($query);                                          // Определение константы URI
+        self::define_URI();                                                // Определение константы URI
         self::define_DEV();                                                // Определение константы DEV
 
         self::$paths = array_merge(                                        // Добавление путей автоматической загрузки классов
@@ -196,43 +262,48 @@ class core {
     }
 
     /**
-     * Определение константы ROOT
+     * Инициализация для тестов
+     *
+     */
+    public static function initTest() {
+        self::initStart();
+        self::requireDir(TEN_PATH . '/classes/');
+    }
+
+    /**
+     * Базовая инициализация
      *
      * @return string Строка запроса
      */
-    private static function define_ROOT() {
+    private static function initStart() {
 
-        if(stripos($_SERVER['PHP_SELF'], TEN_PATH . '/index.php')) {       // Если выполняется обычный запрос
-            list($root, $query) = explode(
-                TEN_PATH . '/index.php',
-                $_SERVER['PHP_SELF']
-            );
-        }
-        else {                                                             // Иначе выполняется ajax-запрос
-            $root = '';
-            $query = $_SERVER['PHP_SELF'];
-        }
+        self::define('TEN_PATH', 'tenframe');                              // Константа директории tenframe
+        self::define('TEN_CLASSES', TEN_PATH . '/classes/');               // Константа директории для хранения классов tenframe
+        self::define('TEN_MODULES', '/mod/');                              // Константа директории модулей
 
-        self::define('ROOT', $_SERVER['DOCUMENT_ROOT'] . $root);           // Константа корневого пути
+        $query = self::define_ROOT();                                      // Определение константы ROOT
+        self::define('BLOCKS', self::resolve_path('/view/blocks/'));       // Константа директории блоков
+
+        self::requireFile('/vendor/autoload.php');                         // Composer autoloader
 
         return $query;
     }
 
     /**
+     * Определение константы ROOT
+     *
+     */
+    private static function define_ROOT() {
+        self::define('ROOT', implode('/', array_slice(explode('/', __DIR__), 0, -1)));
+    }
+
+    /**
      * Определение константы URI
      *
-     * @param string $query Строка запроса
      */
-    private static function define_URI($query) {
-
-        if(self::$settings['clearURI']) {                                  // Если задана маршрутизация только относительного пути
-            $uri = $query . (($_SERVER['QUERY_STRING']) ?                  // Константа чистого запроса
-                '?' . $_SERVER['QUERY_STRING'] : '');
-        } else {
-            $uri = $_SERVER['REQUEST_URI'];                                // Константа полного запроса
-        }
-
-        self::define('URI', $uri);                                         // Путь до приложения
+    private static function define_URI() {
+        // TODO: Проверка на AJAX-запрос
+        self::define('URI', $_SERVER['REQUEST_URI']);
     }
 
     /**
