@@ -32,7 +32,10 @@
 
     Рекурсивное подключение PHP-файлов из всех директорий внутри директории.
     Возвращает массив путей подключенных файлов.
-        core::requireDirRecursive('/path/to/dir/');
+        core::requireDirRecursive(
+            '/path/to/dir/',
+            0                                           // Количество уровней вложенности, начиная с нуля. По умолчанию: -1
+        );
 */
 
 namespace ten;
@@ -79,66 +82,49 @@ class core {
     }
 
     /**
-     * Декоратор для методов подключения php-файлов в директориях
-     *
-     * @param  string   $dir      Путь до директории
-     * @param  closure  $callback Инструкции к применению над каждым объектом в директории
-     * @return array              Массив путей
-     */
-    private static function requireDirDecorate($dir, $callback) {
-
-        $dirInfo = new \DirectoryIterator(self::resolve_path($dir));       // Получение информации об объектах директории
-        static $requiredFiles = array();                                   // Массив путей подключенных файлов
-
-        foreach($dirInfo as $object) {                                     // Цикл по объектам директории
-            $file = call_user_func($callback, $object);                    // Выполнение необходимых действий с объектом
-            $file && array_push($requiredFiles, $file);                    // Если был подключен файл, то его надо добавить в массив
-        }
-
-        return $requiredFiles;
-    }
-
-    /**
      * Подключение всех php-файлов директории
      *
      * @param  string $dir Путь до директории
      * @return array       Массив путей
      */
     public static function requireDir($dir) {
-        return self::requireDirDecorate($dir, function($object) {
-            return core::requireDirFile($object);
-        });
+        $dirList = new \DirectoryIterator(self::resolve_path($dir));
+        return self::requireDirFiles($dirList);
     }
 
     /**
      * Рекурсивное подключение php-файлов всех вложенных директорий
      *
-     * @param  string $dir Путь до базовой директории
-     * @return array       Массив путей
+     * @param  string  $dir   Путь до базовой директории
+     * @param  integer $depth Глубина рекурсии, начиная с нуля
+     * @return array          Массив путей
      */
-    public static function requireDirRecursive($dir) {
-        return self::requireDirDecorate($dir, function($object) {
-            if($object->isDir() && !$object->isLink() && !$object->isDot()) {
-                core::requireDirRecursive($object->getPathname());
-            } else {
-                return core::requireDirFile($object);
-            }
-        });
+    public static function requireDirRecursive($dir, $depth = -1) {
+        $dirList  = new \RecursiveDirectoryIterator(self::resolve_path($dir));
+        $iterator = new \RecursiveIteratorIterator($dirList);
+        $iterator->setMaxDepth($depth);
+        return self::requireDirFiles($iterator);
     }
 
     /**
-     * Подключение файла в директории
-     * @private
+     * Подключение php-файлов в директории
      *
-     * @param  object           $object Объект с информацией о файле
-     * @return string | boolean         Путь до подключенного файла или false в случае отказа подключения
+     * @param  object $list Массив объектов директории
+     * @return array        Массив путей подключенных файлов
      */
-    public static function requireDirFile($object) {
-        if($object->isFile() && $object->getExtension() == 'php') {
-            $path = $object->getPathname();
-            self::requireFile($path);
-            return $path;
-        } else return false;
+    private static function requireDirFiles($list) {
+
+        $requiredFiles = array();
+
+        foreach($list as $object) {
+            if($object->isFile() && $object->getExtension() == 'php') {
+                $path = $object->getPathname();
+                self::requireFile($path);
+                array_push($requiredFiles, $path);
+            }
+        }
+
+        return $requiredFiles;
     }
 
     public static $define = array();                                       // Константы
@@ -268,6 +254,7 @@ class core {
     public static function initTest() {
         self::initStart();
         self::requireDir(TEN_PATH . '/classes/');
+        self::requireDirRecursive(TEN_PATH . '/test/', 1);
     }
 
     /**
