@@ -2,7 +2,7 @@
 
 /**
  * Маршрутизация запросов
- * @version 0.0.1
+ * @version 0.1.1
  */
 
 /* Использование
@@ -50,149 +50,238 @@ namespace ten;
 class route extends core {
 
     /**
-     * Функция разбора адресной строки на части
+     * GET-маршрут
      *
-     * @param string $urn URN для обработки
-     * @return array
+     * @param  array $route Данные о маршруте
+     * @return null         Маршрут не прошёл
+     * @return mixed        Результат выполнения колбека
      */
-    public static function parse_urn($urn = null) {
-
-        if(is_null($urn))
-            $urn = URI;
-
-        return preg_split('/\//', $urn, -1, PREG_SPLIT_NO_EMPTY);
-    }
-
-    public static $called = false;                                         // Флаг для определения была ли уже вызвана функция по текущему маршруту
-
-    /**
-     * Функция обработки маршрутов, отправленных методами GET и POST
-     *
-     * @param string $type     Тип запроса [GET || POST]
-     * @param string $url      Путь, указанный в роуте
-     * @param string $callback Класс->Метод для вызова
-     * @param array  $asserts  Массив регулярных выражений для проверки {переменных}
-     * @return boolean
-     */
-    public static function request($type, $url, $callback, $asserts = array()) {
-
-        if(
-            self::$called ||                                               // Если маршрут был проведён
-            $_SERVER['REQUEST_METHOD'] != $type                            // или метод вызова не соответствует
-        )
-            return false;                                                  // то маршрут обрабатывать не нужно
-
-        if(is_string($url)) {                                              // Если у маршрута один адрес
-
-            if(trim($url) == '*')
-                return self::callback($type, $callback);
-
-            $pathArr[0] = self::parse_urn($url);                           // Путь текущего адреса
-        }
-        else                                                               // Иначе передан массив адресов
-            foreach($url as $p => $path)                                   // Цикл по адресам маршрутов
-                $pathArr[$p] = self::parse_urn($path);                     // Путь каждого адреса
-
-        $urn = self::parse_urn();                                          // Текущий URN
-
-        foreach($pathArr as $p => $path) {                                 // Цикл по маршрутам
-
-            if(count($urn) != count($path))                                // Если количество частей URN и пути разное
-                continue;                                                  // значит надо вызывать следующий маршрут в index.php
-
-            $args = array();                                               // Объявление массива аргументов
-
-            for($part = 0; $part < count($urn); $part++)
-                if(preg_match('|^\{(.*)\}$|', $path[$part], $match))       // Если часть пути является {переменной}
-                    if(!isset($asserts[$match[1]]) ||                      // Если для этой переменной не назначено регулярное выражение
-                        preg_match($asserts[$match[1]], $urn[$part])) {    // или если переменная проходит проверку регулярным выражением
-                        $args[$match[1]] = $urn[$part];                    // Запись переменной в массив аргументов для дальнейшей передачи функции
-                        self::set_get_arg($match[1], $urn[$part]);         // Добавление пары ключ-значение в объект для работы с переменными
-                    }
-                    else {                                                 // Иначе переменная не проходит проверку регулярным выражением
-                        self::unset_get_args();                            // Нужно очистить объект переменных
-                        continue 2;                                        // и вызывать следующий маршрут в index.php
-                    }
-                else                                                       // иначе часть пути не является переменной
-                    if($urn[$part] != $path[$part]) {                      // и если часть URN не совпадает с частью пути
-                        self::unset_get_args();                            // Нужно очистить объект переменных
-                        continue 2;                                        // и вызывать следующий маршрут в index.php
-                    }
-
-            self::$called = true;                                          // Изменение флага для определения, что по текущему маршруту уже проведён роут
-
-            return self::callback($type, $callback, $args);
-        }
+    public static function get($route) {
+        if($_SERVER['REQUEST_METHOD'] != 'GET') return;
+        return self::request($route);
     }
 
     /**
-     * Функция обработки колбека
+     * POST-маршрут
      *
-     * @param string $type     Тип запроса [GET || POST]
-     * @param string $callback Класс->Метод для вызова
-     * @param array  $args     Массив переданных аргументов
+     * @param  array $route Данные о маршруте
+     * @return null         Маршрут не прошёл
+     * @return mixed        Результат выполнения колбека
      */
-    private static function callback($type, $callback, $args = array()) {
-
-        list($class, $method) = explode('->', $callback);                  // Разбор callback на класс и метод
-
-        if(method_exists($class, $method)) {                               // Если метод существует
-            call_user_func_array(                                          // Вызов
-                array($class, $method),                                    // из класса $class метода с именем $method
-                $args                                                      // и параметрами из массива $args
-            );
-        } else {
-            message::error(                                                // Иначе метод не существует
-                '[' . $type . '] Route error: Function is undefined: '
-                . $class . '->' . $method
-            );
-        }
+    public static function post($route) {
+        if($_SERVER['REQUEST_METHOD'] != 'POST') return;
+        return self::request($route);
     }
 
-    private static $routes_default = array(                                // Умолчания для системных маршрутов
-        'type'    => 'GET',
-        'asserts' => array(),
-        'dev'     => false                                                 // Проводить маршрут всегда
+    public static $called = false;                                                  // Флаг для определения была ли уже вызвана функция по текущему маршруту
+
+    private static $default = array(                                                // Стандартные данные о маршруте
+        'rule' => array(),
+        'dev' => false
     );
 
-    public static $routes = array();                                       // Системные маршруты
-
     /**
-     * Функция проведения системных маршуртов
+     * Проведение маршрута
      *
+     * @param  array $route Данные о маршруте
+     * @return null         Маршрут не прошёл
+     * @return mixed        Результат выполнения колбека
      */
-    public static function routes() {
+    private static function request($route) {
 
-        foreach(self::$routes as $route) {                                 // Цикл по системным маршрутам
+        $route = array_merge(self::$default, $route);
 
-            foreach(self::$routes_default as $key => $val)                 // Установка значений по умолчанию
-                if(!isset($route[$key]))                                   // для незаданных опций
-                    $route[$key] = $val;
+        if(self::$called || $route['dev'] && !DEV) return;
 
-            if(!$route['dev'] || $route['dev'] && DEV)                     // Если маршрут надо проводить всегда или только для режима разработчика и режим включен
-                self::request($route['type'], $route['url'], $route['callback'], $route['asserts']);
+        $url = self::parseUrl();                                                    // Разбор строки запроса
+
+        foreach(self::getUrl($route['url']) as $path) {                             // Цикл по разобранным путям из данных о маршруте
+            if(count($url) != count($path)) continue;
+
+            foreach($path as $i => $part) {                                         // Цикл по частям маршрутного пути
+                $var = self::isVar($url[$i], $part, $route['rule']);
+
+                if(is_null($var) && $url[$i] != $part) {                            // Если часть пути не является переменной и не совпадает с соответствующей частью строки запроса
+                    self::unsetVars();                                              // Очистить переменные строки запроса
+                    continue 2;                                                     // Перейти к следующему пути из данных о маршруте
+                }
+            }
+
+            self::$called = true;
+
+            return call_user_func_array($route['call'], array(array()));
         }
     }
 
     /**
-     * Функция добавления свойства для объекта parent::$get
+     * Проверка части маршрута на переменную и её обработка
      *
-     * @param string $key Имя GET-переменной
-     * @param string $val Значение GET-переменной
+     * @param  string                $url  Часть запроса
+     * @param  string                $part Часть маршрута
+     * @param  array                 $rule Правила для переменных
+     * @return null                        Часть маршрута не является переменной
+     * @return string|int|float|bool       Значение установленной переменной
      */
-    public static function set_get_arg($key, $val) {
+    private static function isVar($url, $part, $rule) {
+        $var = self::is('var', $part);
+        if(!$var) return null;
 
-        parent::$get->$key = $val;
+        if(!array_key_exists($var, $rule)) {                                        // Если для переменной не задано правило
+            return self::setVar($var, $url);                                        // то переменная устанавливается без проверки
+        }
+
+        $assertVar = self::testRule($rule[$var], $url);
+        if(!is_null($assertVar)) {                                                  // Если переменная прошла проверку
+            return self::setVar($var, $assertVar);                                  // то переменной устанавливается значение проверенного типа данных
+        }
     }
 
     /**
-     * Функция удаления всех свойств объекта parent::$get
+     * Проверка части запроса на правила
      *
+     * @param  string         $rule Правило для части запроса
+     * @param  string         $url  Часть запроса
+     * @return null                 Часть запроса не прошла проверку
+     * @return string               Пройдена проверка на регулярное выражение
+     * @return int|float|bool       Пройден проверочный шаблон
      */
-    public static function unset_get_args() {
+    private static function testRule($rule, $url) {
+        $template = self::is('ruleTemplate', $rule);
+        if(!$template) {                                                            // Если правило для части запроса не является проверочным шаблоном
+            return preg_match($rule, $url)? $url : null;                            // то оно является регулярным выражением
+        }
 
-        if(count(parent::$get))                                            // Если объект аргументов содержит хотя бы одно значение
-            foreach(get_object_vars(parent::$get) as $key => $val)
-                parent::$get->$key = '';
+        return self::testRuleTemplate($template, $url);
     }
+
+    /**
+     * Тестирование проверочных шаблонов
+     *
+     * @param  string         $template Имя шаблона
+     * @param  string         $url      Часть запроса
+     * @return null                     Часть запроса не прошла проверку
+     * @return int|float|bool           Пройден проверочный шаблон
+     * @throws \Exception               Неизвестный проверочный шаблон
+     */
+    private static function testRuleTemplate($template, $url) {
+
+        switch($template) {
+            case 'numeric':
+                return is_numeric($url)? +$url : null;
+            case 'int':
+                return is_int(+$url)? +$url : null;
+            case 'float':
+                return is_float(+$url)? +$url : null;
+            case 'natural':
+                return (is_int(+$url) && +$url > 0)? +$url : null;
+            case 'bool':
+                if($url === 'true') return true;
+                if($url === 'false') return false;
+                return null;
+        }
+
+        throw new \Exception(message::exception('Undefined rule template: ' . $template));
+    }
+
+    private static $templates = array(                                              // Шаблоны для проверки на спецзначения
+        'var'          => '/^\{(.+)\}$/',                                           // Переменная
+        'ruleTemplate' => '/^\((.+)\)$/'                                            // Проверочный шаблон
+    );
+
+    /**
+     * Проверка на спецзначение
+     *
+     * @param  string $template Имя спецзначения
+     * @param  string $obj      Объект к проверке
+     * @return false            Объект не прошёл проверку
+     * @return string           Имя прошедшего проверку объекта
+     */
+    private static function is($template, $obj) {
+        return !preg_match(self::$templates[$template], $obj, $match)? false : $match[1];
+    }
+
+    private static $url;                                                            // Объект для хранения переменных строки запроса
+
+    /**
+     * Возвращает объект переменных строки запроса
+     *
+     * @return object Объект переменных строки запроса
+     */
+    public static function url() {
+        return self::$url;
+    }
+
+    /**
+     * Устанавливает переменную строки запроса
+     *
+     * @param  string                 $key Имя переменной
+     * @param  string|int|float|bool  $val Значение
+     * @return string|int|float|bool       Установленное значение
+     */
+    private static function setVar($key, $val) {
+        !self::$url && self::unsetVars();
+        return self::$url->$key = $val;
+    }
+
+    /**
+     * Обнуляет объект переменных строки запроса
+     */
+    private static function unsetVars() {
+        self::$url = new \stdClass;
+    }
+
+    /**
+     * Разбор путей из данных о маршруте
+     *
+     * @param  string|array $path Путь или массив путей
+     * @return array              Массив разобранных путей
+     */
+    private static function getUrl($path) {
+
+        is_string($path)?
+            $paths[0] = $path :
+            $paths    = $path;
+
+        $pathArr = array();
+        foreach($paths as $p) {
+            array_push($pathArr, self::parseUrl($p));
+        }
+
+        return $pathArr;
+    }
+
+    /**
+     * Разбор одного пути
+     *
+     * @param  string [$url] Путь
+     * @return array         Разобранный путь
+     */
+    private static function parseUrl($url = null) {
+        return preg_split('/\//', $url ?: URL, -1, PREG_SPLIT_NO_EMPTY);
+    }
+
+//    private static $routes_default = array(                                // Умолчания для системных маршрутов
+//        'type'    => 'GET',
+//        'asserts' => array(),
+//        'dev'     => false                                                 // Проводить маршрут всегда
+//    );
+//
+//    public static $routes = array();                                       // Системные маршруты
+//
+//    /**
+//     * Функция проведения системных маршуртов
+//     *
+//     */
+//    public static function routes() {
+//
+//        foreach(self::$routes as $route) {                                 // Цикл по системным маршрутам
+//
+//            foreach(self::$routes_default as $key => $val)                 // Установка значений по умолчанию
+//                if(!isset($route[$key]))                                   // для незаданных опций
+//                    $route[$key] = $val;
+//
+//            if(!$route['dev'] || $route['dev'] && DEV)                     // Если маршрут надо проводить всегда или только для режима разработчика и режим включен
+//                self::request($route['type'], $route['url'], $route['callback'], $route['asserts']);
+//        }
+//    }
 }
