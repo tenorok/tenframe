@@ -7,31 +7,29 @@
 
 /* Использование
 
-    Приведение путей к корректному виду:
-        Корневой путь добавится автоматически:
-            ten\core::resolve_path(                     // Путь до папки: /Users/name/project/one/two/third/four/
-                'one//two///',
-                'third',
-                'four/'
-            );
-        Корневой путь не добавится, если он уже есть:
-            ten\core::resolve_path(                     // Путь до файла: /Users/name/project/one/two/third/four
-                ROOT,
-                'one//two///',
-                'third',
-                'four'
-            );
+    Приведение существующих путей.
+        Если файла не существует, то вернётся false.
+
+        Если файл существует: __DIR__ . '/testResolveRealPath/one/cat/cat.txt'.
+        ten\core::resolveRealPath(__DIR__, 'testResolveRealPath', 'one/cat/', '..', 'cat', 'cat.txt');
+
+        Абсолютный путь добавится автоматически: __DIR__ . '/tenframe/test/core'.
+        ten\core::resolveRealPath('tenframe', '/test', 'core/');
+
+    Приведение несуществующих путей.
+        Вне зависимости от существования файла: __DIR__ . '/virtualPath/one/cat/cat.txt'.
+        ten\core::resolvePath(__DIR__, 'virtualPath', 'one/cat/', '..', 'cat', 'cat.txt');
 
     Подключение файла.
-    Возвращает файл или false в случае его отсутствия.
+        Возвращает файл или false в случае его отсутствия.
         core::requireFile('/path/to/file.php');
 
     Подключение PHP-файлов из директории.
-    Возвращает массив путей подключенных файлов.
+        Возвращает массив путей подключенных файлов.
         core::requireDir('/path/to/dir/');
 
     Рекурсивное подключение PHP-файлов из всех директорий внутри директории.
-    Возвращает массив путей подключенных файлов.
+        Возвращает массив путей подключенных файлов.
         core::requireDirRecursive(
             '/path/to/dir/',
             0                                           // Количество уровней вложенности, начиная с нуля. По умолчанию: -1
@@ -73,7 +71,7 @@ class core {
      */
     public static function requireFile($file) {
 
-        $file = self::resolve_path($file);                                 // Приведение пути к корректному виду
+        $file = self::resolvePath($file);                                 // Приведение пути к корректному виду
 
         if(is_file($file)) {                                               // Если файл существует
             array_push(self::$required, $file);                            // Добавление в массив подключенных файлов классов
@@ -88,7 +86,7 @@ class core {
      * @return array       Массив путей
      */
     public static function requireDir($dir) {
-        $dirList = new \DirectoryIterator(self::resolve_path($dir));
+        $dirList = new \DirectoryIterator(self::resolvePath($dir));
         return self::requireDirFiles($dirList);
     }
 
@@ -100,7 +98,7 @@ class core {
      * @return array          Массив путей
      */
     public static function requireDirRecursive($dir, $depth = -1) {
-        $dirList  = new \RecursiveDirectoryIterator(self::resolve_path($dir));
+        $dirList  = new \RecursiveDirectoryIterator(self::resolvePath($dir));
         $iterator = new \RecursiveIteratorIterator($dirList);
         $iterator->setMaxDepth($depth);
         return self::requireDirFiles($iterator);
@@ -269,7 +267,7 @@ class core {
         self::define('TEN_MODULES', '/mod/');                              // Константа директории модулей
 
         $query = self::define_ROOT();                                      // Определение константы ROOT
-        self::define('BLOCKS', self::resolve_path('/view/blocks/'));       // Константа директории блоков
+        self::define('BLOCKS', self::resolvePath('/view/blocks/'));       // Константа директории блоков
 
         self::requireFile('/vendor/autoload.php');                         // Composer autoloader
 
@@ -325,35 +323,50 @@ class core {
     }
 
     /**
-     * Приведение путей к корректному виду с дополнением до абсолютного расположения
+     * Приведение существующих путей
+     *
+     * @param  string           Arguments Любое количество строк к объединению
+     * @return string | boolean           Приведённый путь или false, если путь не существует
+     */
+    public static function resolveRealPath() {
+        $args = implode('/', func_get_args());                             // Объединение всех аргументов в строку
+
+        $path = '/' . implode('/', array_filter(explode('/', $args)));     // Удаление лишних слешей
+
+        if(!self::hasRoot($path)) {
+            $path = ROOT . $path;
+        }
+
+        return realpath($path);                                            // Приведённый путь
+    }
+
+    /**
+     * Приведение несуществующих путей
      *
      * @param  string Arguments Любое количество строк к объединению
      * @return string           Приведённый путь
      */
-    public static function resolve_path() {
-        $arguments = implode('/', func_get_args());                        // Объединение всех аргументов в строку
-        $path = self::remove_path_slashes($arguments);                     // Удаление лишних слешей
+    public static function resolvePath() {
+        $args = implode('/', func_get_args());                             // Объединение всех аргументов в строку
 
-        if(!preg_match('/^' . str_replace('/', '\/', ROOT) . '/', $path))  // Если в пути не указана корневая директория
-            $path = self::remove_path_slashes(ROOT . $path);               // то её надо добавить
+        $path = array_reduce(explode('/', $args), function($a, $b) {       // Реализация realpath()
+            if($a === 0) $a = '/';
+            if($b === '' || $b === '.') return $a;
+            if($b === '..') return dirname($a);
+            return preg_replace('/\/+/', '/', $a . '/' . $b);
+        });
 
-        return $path . (                                                   // Приведённый путь
-            (substr($arguments, -1) == '/') ?                              // Если последним символом был слеш
-                '/' :                                                      // то его надо оставить
-                ''
-        );
+        return !self::hasRoot($path)? ROOT . $path : $path;
     }
 
     /**
-     * Удаление лишних слешей из пути
+     * Является ли путь абсолютным
      *
-     * @param  string $path Путь с лишними слешами
-     * @return string       Путь без лишних слешей
+     * @param  string $path Путь
+     * @return boolean
      */
-    private static function remove_path_slashes($path) {
-        $path = explode('/', $path);                                       // Разбить путь на части в массив
-        $path = array_filter($path);                                       // Удалить пустые элементы массива
-        return '/' . implode('/', $path);                                  // Снова объединить элементы в строку
+    private static function hasRoot($path) {
+        return !!preg_match('/^' . str_replace('/', '\/', ROOT) . '/', $path);
     }
 
     /**
