@@ -151,7 +151,7 @@ class html extends core {
 
         if(!is_file($file)) return false;                                               // Если tenhtml-шаблон не существует
 
-        $tenhtmlPath = core::resolve_path(                                              // Приведение пути к корректному виду
+        $tenhtmlPath = core::resolvePath(                                               // Приведение пути к корректному виду
             self::$tenhtmlFolder,                                                       // Путь до папки хранения tenhtml
             text::ldel($file, ROOT)                                                     // Относительный путь до tenhtml-шаблона
         );

@@ -70,15 +70,10 @@ class file extends core {
     /**
      * Функция создания директории, если её не существует
      * 
-     * @param string $path Путь к папке или файлу
+     * @param string $path Путь к папке
      * @return die || true
      */
     public static function make_dir($path) {
-
-        if(substr($path, -1) != '/')                                 // Если в конце переданной строки нет слеша
-            $path = implode('/', array_slice(                        // то это путь к файлу и нужно получить чистый путь без имени файла
-                explode('/', $path), 0, -1
-            ));
 
         if(!file_exists($path))                                      // Если указанного пути не существует
             if(!mkdir($path, 0777, true))                            // Если не удалось создать каталоги, указанные в пути
@@ -101,7 +96,7 @@ class file extends core {
      */
     public static function autogen($path, $content, $prefix = null, $chmod = false) {
 
-        $clear_path = core::resolve_path($path);                     // Приведение пути к корректному виду
+        $clear_path = parent::resolvePath($path);                    // Приведение пути к корректному виду
 
         $path_arr = explode('/', $clear_path);                       // Разбивка пути на массив
         $prefix = (is_null($prefix)) ? GEN : $prefix;                // Установить стандартный префикс, если он не задан
@@ -110,7 +105,7 @@ class file extends core {
 
         $final_path = implode('/', $path_arr);                       // Вновь объединение массива в строку
 
-        self::make_dir($final_path);                                 // Создание директории
+        self::make_dir(dirname($final_path));                        // Создание директории
         file_put_contents($final_path, $content);                    // Сохранение файла
         array_push(self::$debugAutogen, $final_path);                // Добавление файла в массив автоматически-сгенерированных
 

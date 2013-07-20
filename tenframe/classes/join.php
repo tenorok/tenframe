@@ -90,7 +90,7 @@ class join extends file {
      */
     public static function files($options) {
 
-        $options['output_file'] = parent::resolve_path($options['output_file']);     // Установление корректного пути до выходящего файла
+        $options['output_file'] = parent::resolvePath($options['output_file']);      // Установление корректного пути до выходящего файла
 
         foreach(self::$options as $key => $val)                                      // Установка значений по умолчанию
             if(!isset($options[$key]))                                               // для незаданных опций
@@ -171,7 +171,7 @@ class join extends file {
 
             foreach($input_path as $path) {                                          // Цикл по входящим директориям
 
-                $options['input_path'] = parent::resolve_path($path);                // Установление корректного пути входящей корневой директории
+                $options['input_path'] = parent::resolvePath($path);                 // Установление корректного пути входящей корневой директории
 
                 self::get_folders($mod, $val, $options);                             // Вызов функции рекурсивного перебора директорий
             }
@@ -195,7 +195,7 @@ class join extends file {
                 self::$output_file = trim(\JSMin::minify(self::$output_file));       // Обрезать первую пустую строку, которую оставляет JSMin
         }
 
-        $output_file = parent::resolve_path(                                         // Установление корректного пути до файла
+        $output_file = parent::resolvePath(                                          // Установление корректного пути до файла
             str_replace('{ext}', $extension, $options['output_file'])
         );
 
@@ -274,7 +274,7 @@ class join extends file {
         foreach($files as $file) {                                                   // Цикл по файлам
 
             if(!filter_var($file, FILTER_VALIDATE_URL)) {                            // Если не URL до файла
-                $file = core::resolve_path($file);                                   // Установление корректного пути до файла
+                $file = core::resolvePath($file);                                    // Установление корректного пути до файла
             }
 
             if(in_array($file, self::$input_files))                                  // Если файл уже был прилеплен

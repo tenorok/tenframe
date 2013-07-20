@@ -125,7 +125,7 @@ class statical extends file {
                 continue;                                                            // то его подключать не нужно и выполняется переход к следующему файлу
 
             $includes .= file_get_contents(                                          // Конкатенация содержимого текущего файла
-                parent::resolve_path(self::$path, $prefix . $file . '.tpl')          // Корректный вид пути
+                parent::resolvePath(self::$path, $prefix . $file . '.tpl')           // Корректный вид пути
             );
         }
 
@@ -245,7 +245,7 @@ class statical extends file {
         }
 
         return ($option) ?                                                           // Если метку надо добавлять
-            '?' . substr(md5_file(core::resolve_path($file)), 0, $option) :          // Добавление метки с заданной длиной
+            '?' . substr(md5_file(core::resolvePath($file)), 0, $option) :           // Добавление метки с заданной длиной
             '';                                                                      // Иначе метку добавлять не нужно
     }
 }

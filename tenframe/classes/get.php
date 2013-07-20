@@ -47,7 +47,7 @@ class get extends core {
             $path = (is_string($options['path'])) ? $options['path'] : $options['path'][$fileinfo['extension']];
 
             array_push($gottenFiles, file::autogen(                         // Сохранение файла и добавление в массив выкачанных файлов
-                parent::resolve_path($path, $fileinfo['file']),
+                parent::resolvePath($path, $fileinfo['file']),
                 file_get_contents((is_string($getFile)) ? $getFile : $setFile),
                 ''
             ));
