@@ -11,7 +11,16 @@ class test {
 
     public static function suite() {
         $suite = new PHPUnit_Framework_TestSuite();
-        $suite->addTestSuite('coreTest');
+
+        $tests = array(
+            'coreTest',
+            'routeTest'
+        );
+
+        foreach($tests as $test) {
+            $suite->addTestSuite($test);
+        }
+
         return $suite;
     }
 }
