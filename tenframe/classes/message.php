@@ -13,6 +13,9 @@
     Вывод ошибки с полным прекращением работы всего скрипта:
         ten\message::error('Error text');
 
+    Вывод исключения:
+        ten\message::exception('Error text');
+
     Кроме простых строк, методы могут принимать в качестве параметра массив,
     его элементы будут склеены в результирующую строку через пробел:
         ten\message::method(array(
@@ -39,7 +42,7 @@ class message extends core {
      * @param string $prepend Предваряющее основное сообщение текст
      */
     public static function log($message, $prepend = 'Message') {
-        echo '<br><b>' . implode(' ', array(self::tenMark(), $prepend)) . '</b>: ' . self::getText($message);
+        echo self::getParagraph($message, $prepend);
     }
 
     /**
@@ -49,7 +52,29 @@ class message extends core {
      * @param string $prepend Предваряющее основное сообщение текст
      */
     public static function error($message, $prepend = 'Error') {
-        die('<br><b>' . implode(' ', array(self::tenMark(), $prepend)) . '</b>: ' . self::getText($message));
+        die(self::getParagraph($message, $prepend));
+    }
+
+    /**
+     * Исключение
+     *
+     * @param  string $message Сообщение
+     * @param  string $prepend Предваряющее основное сообщение текст
+     * @return string          Текст исключения
+     */
+    public static function exception($message, $prepend = 'Exception') {
+        return self::getParagraph($message, $prepend);
+    }
+
+    /**
+     * Сформировать окончательный текст
+     *
+     * @param  string $message Сообщение
+     * @param  string $prepend Предваряющее основное сообщение текст
+     * @return string          Окончательный текст
+     */
+    private static function getParagraph($message, $prepend) {
+        return '<br><b>' . implode(' ', array(self::tenMark(), $prepend)) . '</b>: ' . self::getText($message);
     }
 
     /**
