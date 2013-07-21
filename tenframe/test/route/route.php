@@ -7,10 +7,6 @@ class routeTest extends PHPUnit_Framework_TestCase {
         ten\route::$called = false;
     }
 
-    private static function method($method) {
-        $_SERVER['REQUEST_METHOD'] = strtoupper($method);
-    }
-
     /**
      * Имитация запроса
      *
@@ -18,8 +14,19 @@ class routeTest extends PHPUnit_Framework_TestCase {
      * @param string $path   Запрос
      */
     private static function request($method, $path) {
-        self::method($method);
+        $_SERVER['REQUEST_METHOD'] = strtoupper($method);
         ten\test\env::setTestUrl($path);
+    }
+
+    /**
+     * Имитация AJAX-запроса
+     *
+     * @param string $method get/post/put/etc
+     * @param string $path   Запрос
+     */
+    private static function ajax($method, $path) {
+        $_SERVER['HTTP_X_REQUESTED_WITH'] = 'XMLHttpRequest';
+        self::request($method, $path);
     }
 
     /**
@@ -357,6 +364,65 @@ class routeTest extends PHPUnit_Framework_TestCase {
         )));
 
         $this->assertTrue(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+    }
+
+    /**
+     * AJAX
+     */
+    public function testAjaxSimple() {
+
+        self::ajax('get', '/path/to/');
+
+        $this->assertNull(ten\route::ajax(array(
+            'url' => '/',
+            'call' => 'controllerRouteTest::simple',
+            'type' => 'get'
+        )));
+
+        $this->assertNull(ten\route::ajax(array(
+            'url' => '/path/to/',
+            'call' => 'controllerRouteTest::simple',
+            'type' => 'post'
+        )));
+
+        $this->assertTrue(ten\route::ajax(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+    }
+
+    /**
+     * GET, POST, и AJAX вметсе
+     */
+    public function testGetPostAjaxSimple() {
+
+        self::request('get', '/path/to/');
+
+        $this->assertNull(ten\route::post(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertNull(ten\route::ajax(array(
+            'url' => '/path/to/',
+            'call' => 'controllerRouteTest::simple',
+            'type' => 'post'
+        )));
+
+        $this->assertNull(ten\route::ajax(array(
+            'url' => '/path/to/',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertTrue(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertNull(ten\route::get(array(
             'url' => '/path/to',
             'call' => 'controllerRouteTest::simple'
         )));

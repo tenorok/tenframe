@@ -58,7 +58,7 @@ class route extends core {
      */
     public static function get($route) {
         if($_SERVER['REQUEST_METHOD'] != 'GET') return;
-        return self::request($route, $_GET);
+        return self::request(array_merge(self::$default, $route), $_GET);
     }
 
     /**
@@ -70,14 +70,30 @@ class route extends core {
      */
     public static function post($route) {
         if($_SERVER['REQUEST_METHOD'] != 'POST') return;
-        return self::request($route, $_POST);
+        return self::request(array_merge(self::$default, $route), $_POST);
+    }
+
+    /**
+     * AJAX-маршрут
+     *
+     * @param  array $route Данные о маршруте
+     * @return null         Маршрут не прошёл
+     * @return mixed        Результат выполнения колбека
+     */
+    public static function ajax($route) {
+        if(!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || $_SERVER['HTTP_X_REQUESTED_WITH'] != 'XMLHttpRequest') return;
+        $route = array_merge(self::$default, $route);
+        $type = strtoupper($route['type']);
+        if($_SERVER['REQUEST_METHOD'] != $type) return;
+        return self::request($route, $type == 'GET'? $_GET : $_POST);
     }
 
     public static $called = false;                                                  // Флаг для определения была ли уже вызвана функция по текущему маршруту
 
     private static $default = array(                                                // Стандартные данные о маршруте
         'rule' => array(),
-        'dev' => false
+        'dev' => false,
+        'type' => 'get'                                                             // Для AJAX-запросов
     );
 
     /**
@@ -89,9 +105,6 @@ class route extends core {
      * @return mixed        Результат выполнения колбека
      */
     private static function request($route, $data) {
-
-        $route = array_merge(self::$default, $route);
-
         if(self::$called || $route['dev'] && !DEV) return;
 
         $url = self::parseUrl();                                                    // Разбор строки запроса
