@@ -28,7 +28,7 @@
         Возвращается полный путь к сохранённому файлу, например: /Users/name/my/path/__prefix__file.name
 
     Получение информации о файле:
-        $info = ten\file::getInfo('/path/to/file.ext');
+        $info = ten\file::info('/path/to/file.ext');
         Возвращает массив:
         array(
             'path' => '/path/to/',
@@ -122,7 +122,7 @@ class file extends core {
      * @param  string $file Путь до файла
      * @return array        Информация о файле
      */
-    public static function getInfo($file) {
+    public static function info($file) {
 
         $pathParts = explode('/', $file);
         $filename = array_pop($pathParts);

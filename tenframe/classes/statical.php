@@ -184,7 +184,7 @@ class statical extends file {
 
             case 'string':                                                           // Если текущий файл представлен строкой
 
-                $type = end(explode('.', $file));                                    // Расширение файла
+                $type = file::info($file)['extension'];                              // Расширение файла
 
                 switch($type) {
 

@@ -77,7 +77,7 @@ class css extends core {
                     text::rgum($cssFile, '.css')
                 );
             } else {                                                                // Иначе ключ является числом (указан только LESS-файл)
-                $lessFileInfo = file::getInfo($lessFilePath);
+                $lessFileInfo = file::info($lessFilePath);
                 $cssFilePath = $lessFileInfo['path'] . $lessFileInfo['name'] . '.css';  // CSS-файл должен быть одноимённым с LESS-файлом
             }
 

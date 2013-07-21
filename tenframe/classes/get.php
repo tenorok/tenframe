@@ -41,7 +41,7 @@ class get extends core {
 
         foreach($options['files'] as $getFile => $setFile) {                // Цикл по файлам
 
-            $fileinfo = file::getInfo($setFile);                            // Информация о файле
+            $fileinfo = file::info($setFile);                               // Информация о файле
 
             // Может быть указана одна общая директория или директории для каждого расширения файлов
             $path = (is_string($options['path'])) ? $options['path'] : $options['path'][$fileinfo['extension']];

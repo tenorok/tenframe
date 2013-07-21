@@ -156,7 +156,7 @@ class join extends file {
      */
     private static function join_files($mod, $val, $options) {
 
-        $output_extension = end(explode('.', $options['output_file']));              // Расширение выходящего файла
+        $output_extension = file::info($options['output_file'])['extension'];        // Расширение выходящего файла
 
         if($mod == 'fls') {                                                          // Если переданы конкретные файлы для объединения
 
@@ -234,7 +234,7 @@ class join extends file {
                     }
                     else if (                                                        // Иначе текущий объект - это файл
                         $mod == 'ext' &&                                             // Если задан мод расширений
-                        end(explode('.', $object)) == $val ||                        // и расширение текущего файла соответствует заданному для поиска
+                        file::info($object)['extension'] == $val ||                  // и расширение текущего файла соответствует заданному для поиска
 
                         $mod == 'reg' &&                                             // Или задан мод регулярного выражения
                         preg_match($val, $object)                                    // и имя текущего файла удовлетворяет условия регулярного выражения
