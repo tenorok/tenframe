@@ -304,4 +304,61 @@ class routeTest extends PHPUnit_Framework_TestCase {
             ]]
         ];
     }
+
+    /**
+     * Проверка передачи данных в POST
+     *
+     * @dataProvider providerPostData
+     */
+    public function testPostData($post) {
+
+        self::request('post', '/data/');
+        $_POST = $post;
+
+        $this->assertEquals(
+            ten\route::post([
+                'url' => '/data/',
+                'call' => 'controllerRouteTest::data'
+            ]),
+            $post
+        );
+    }
+
+    public function providerPostData() {
+        return [
+            [
+                'day' => 16,
+                'month' => 'june',
+                'year' => 1990
+            ],
+            [
+                'day' => [16, 20],
+                'month' => ['june', 'march'],
+                'year' => 1990
+            ]
+        ];
+    }
+
+    /**
+     * GET и POST вместе
+     */
+    public function testGetPostSimple() {
+
+        self::request('get', '/path/to/');
+
+        $this->assertNull(ten\route::get(array(
+            'url' => '/',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertNull(ten\route::post(array(
+            'url' => '/path/to/',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertTrue(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+    }
 }
