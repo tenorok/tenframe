@@ -291,12 +291,23 @@ class core {
         self::define('URI', $_SERVER['REQUEST_URI']);
     }
 
-    private static $url;
+    private static $url;                                                   // Массив информации об URL
 
+    /**
+     * Установить массив информации об URL
+     *
+     * @param  string $url Строка запроса
+     * @return array       Массив информации
+     */
     protected static function setUrl($url) {
         return self::$url = parse_url($url);
     }
 
+    /**
+     * Получить массив информации об URL
+     *
+     * @return array Массив информации
+     */
     public static function getUrl() {
         return self::$url;
     }

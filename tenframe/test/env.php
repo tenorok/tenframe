@@ -8,6 +8,7 @@ namespace ten\test;
 
 interface ienv {
     public static function define($name, $value);
+    public static function setTestUrl($url);
 }
 
 class env extends \ten\core implements ienv {
@@ -24,6 +25,12 @@ class env extends \ten\core implements ienv {
             runkit_constant_redefine($name, $value);
     }
 
+    /**
+     * Установить массив информации об URL для тестового окружения
+     *
+     * @param  string $url Строка запроса
+     * @return array       Массив информации
+     */
     public static function setTestUrl($url) {
         return parent::setUrl($url);
     }
