@@ -58,7 +58,7 @@ class route extends core {
      */
     public static function get($route) {
         if($_SERVER['REQUEST_METHOD'] != 'GET') return;
-        return self::request($route);
+        return self::request($route, $_GET);
     }
 
     /**
@@ -70,7 +70,7 @@ class route extends core {
      */
     public static function post($route) {
         if($_SERVER['REQUEST_METHOD'] != 'POST') return;
-        return self::request($route);
+        return self::request($route, $_POST);
     }
 
     public static $called = false;                                                  // Флаг для определения была ли уже вызвана функция по текущему маршруту
@@ -84,10 +84,11 @@ class route extends core {
      * Проведение маршрута
      *
      * @param  array $route Данные о маршруте
+     * @param  array $data  Данные запроса
      * @return null         Маршрут не прошёл
      * @return mixed        Результат выполнения колбека
      */
-    private static function request($route) {
+    private static function request($route, $data) {
 
         $route = array_merge(self::$default, $route);
 
@@ -95,7 +96,7 @@ class route extends core {
 
         $url = self::parseUrl();                                                    // Разбор строки запроса
 
-        foreach(self::getUrl($route['url']) as $path) {                             // Цикл по разобранным путям из данных о маршруте
+        foreach(self::getUrlParts($route['url']) as $path) {                        // Цикл по разобранным путям из данных о маршруте
             if(count($url) != count($path)) continue;
 
             foreach($path as $i => $part) {                                         // Цикл по частям маршрутного пути
@@ -109,7 +110,7 @@ class route extends core {
 
             self::$called = true;
 
-            return call_user_func_array($route['call'], array(array()));
+            return call_user_func_array($route['call'], array($data));
         }
     }
 
@@ -236,7 +237,7 @@ class route extends core {
      * @param  string|array $path Путь или массив путей
      * @return array              Массив разобранных путей
      */
-    private static function getUrl($path) {
+    private static function getUrlParts($path) {
 
         is_string($path)?
             $paths[0] = $path :
@@ -257,7 +258,7 @@ class route extends core {
      * @return array         Разобранный путь
      */
     private static function parseUrl($url = null) {
-        return preg_split('/\//', $url ?: URL, -1, PREG_SPLIT_NO_EMPTY);
+        return preg_split('/\//', $url ?: parent::getUrl()['path'], -1, PREG_SPLIT_NO_EMPTY);
     }
 
 //    private static $routes_default = array(                                // Умолчания для системных маршрутов

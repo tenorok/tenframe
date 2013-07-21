@@ -19,7 +19,7 @@ class routeTest extends PHPUnit_Framework_TestCase {
      */
     private static function request($method, $path) {
         self::method($method);
-        ten\test\env::define('URI', $path);
+        ten\test\env::setTestUrl($path);
     }
 
     /**
@@ -269,5 +269,39 @@ class routeTest extends PHPUnit_Framework_TestCase {
             array('bool', 100, null),
             array('bool', 'not', null)
         );
+    }
+
+    /**
+     * Проверка передачи данных
+     *
+     * @dataProvider providerGetData
+     */
+    public function testGetData($data, $get) {
+
+        self::request('get', '/data/?' . $data);
+        $_GET = $get;
+
+        $this->assertEquals(
+            ten\route::get([
+                'url' => '/data/',
+                'call' => 'controllerRouteTest::data'
+            ]),
+            $get
+        );
+    }
+
+    public function providerGetData() {
+        return [
+            ['day=16&month=june&year=1990', [
+                'day' => 16,
+                'month' => 'june',
+                'year' => 1990
+            ]],
+            ['days[]=16&days[]=20&month[]=june&month[]=march&year=1990', [
+                'day' => [16, 20],
+                'month' => ['june', 'march'],
+                'year' => 1990
+            ]]
+        ];
     }
 }

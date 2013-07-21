@@ -291,6 +291,16 @@ class core {
         self::define('URI', $_SERVER['REQUEST_URI']);
     }
 
+    private static $url;
+
+    protected static function setUrl($url) {
+        return self::$url = parse_url($url);
+    }
+
+    public static function getUrl() {
+        return self::$url;
+    }
+
     /**
      * Определение константы DEV (флаг режима разработчика)
      *

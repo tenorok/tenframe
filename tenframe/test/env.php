@@ -10,7 +10,7 @@ interface ienv {
     public static function define($name, $value);
 }
 
-class env implements ienv {
+class env extends \ten\core implements ienv {
 
     /**
      * Определить константу
@@ -22,5 +22,9 @@ class env implements ienv {
         !defined($name)?
             runkit_constant_add($name, $value) :
             runkit_constant_redefine($name, $value);
+    }
+
+    public static function setTestUrl($url) {
+        return parent::setUrl($url);
     }
 }
