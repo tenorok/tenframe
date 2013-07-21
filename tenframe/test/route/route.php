@@ -427,4 +427,76 @@ class routeTest extends PHPUnit_Framework_TestCase {
             'call' => 'controllerRouteTest::simple'
         )));
     }
+
+    /**
+     * Тест на звёздочку
+     */
+    public function testGetStar() {
+
+        self::request('get', '/path/to/');
+
+        $this->assertTrue(ten\route::get(array(
+            'url' => '*',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertTrue(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertNull(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+    }
+
+    /**
+     * Тест на звёздочку в массиве
+     */
+    public function testGetStarArray() {
+
+        self::request('get', '/path/to/');
+
+        $this->assertTrue(ten\route::get(array(
+            'url' => ['left', '*', 'right'],
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertTrue(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertNull(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+    }
+
+    /**
+     * Always
+     */
+    public function testGetAlways() {
+
+        self::request('get', '/path/to/');
+
+        $this->assertTrue(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertNull(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertTrue(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertTrue(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple'
+        )));
+    }
 }

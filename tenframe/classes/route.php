@@ -85,7 +85,26 @@ class route extends core {
         $route = array_merge(self::$default, $route);
         $type = strtoupper($route['type']);
         if($_SERVER['REQUEST_METHOD'] != $type) return;
-        return self::request($route, $type == 'GET'? $_GET : $_POST);
+        return self::request($route, self::getData());
+    }
+
+    /**
+     * Колбек вызывается всегда
+     *
+     * @param  array $route Данные о маршруте
+     * @return mixed        Результат выполнения колбека
+     */
+    public static function always($route) {
+        return self::call($route, self::getData());
+    }
+
+    /**
+     * Возвращает актуальный массив данных запроса
+     *
+     * @return array Данные запроса
+     */
+    private static function getData() {
+        return $_SERVER['REQUEST_METHOD'] == 'GET'? $_GET : $_POST;
     }
 
     public static $called = false;                                                  // Флаг для определения была ли уже вызвана функция по текущему маршруту
@@ -110,6 +129,7 @@ class route extends core {
         $url = self::parseUrl();                                                    // Разбор строки запроса
 
         foreach(self::getUrlParts($route['url']) as $path) {                        // Цикл по разобранным путям из данных о маршруте
+            if(self::isStar($path)) return self::call($route, $data);
             if(count($url) != count($path)) continue;
 
             foreach($path as $i => $part) {                                         // Цикл по частям маршрутного пути
@@ -123,8 +143,29 @@ class route extends core {
 
             self::$called = true;
 
-            return call_user_func_array($route['call'], array($data));
+            return self::call($route, $data);
         }
+    }
+
+    /**
+     * Проверка на маршрут-звёздочку
+     *
+     * @param  array $path Разобранный путь
+     * @return bool
+     */
+    private static function isStar($path) {
+        return count($path) == 1 && $path[0] == '*';
+    }
+
+    /**
+     * Вызов колбека
+     *
+     * @param  array $route Данные о маршруте
+     * @param  array $data  Данные запроса
+     * @return mixed        Результат выполнения колбека
+     */
+    private static function call($route, $data) {
+        return call_user_func_array($route['call'], array($data));
     }
 
     /**
