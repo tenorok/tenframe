@@ -6,6 +6,10 @@ class controllerRouteTest {
         return true;
     }
 
+    public static function wrong() {
+        return false;
+    }
+
     public static function param() {
         return ten\route::url()->post;
     }

@@ -99,6 +99,13 @@ class route extends core {
     }
 
     /**
+     * Продолжить проведение маршрутов
+     */
+    public static function next() {
+        self::$called = false;
+    }
+
+    /**
      * Возвращает актуальный массив данных запроса
      *
      * @return array Данные запроса
@@ -107,11 +114,13 @@ class route extends core {
         return $_SERVER['REQUEST_METHOD'] == 'GET'? $_GET : $_POST;
     }
 
+    // TODO: сделать private и геттер
     public static $called = false;                                                  // Флаг для определения была ли уже вызвана функция по текущему маршруту
 
     private static $default = array(                                                // Стандартные данные о маршруте
         'rule' => array(),
         'dev' => false,
+        'next' => false,
         'type' => 'get'                                                             // Для AJAX-запросов
     );
 
@@ -141,7 +150,7 @@ class route extends core {
                 }
             }
 
-            self::$called = true;
+            !$route['next'] && self::$called = true;
 
             return self::call($route, $data);
         }

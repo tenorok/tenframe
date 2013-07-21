@@ -499,4 +499,106 @@ class routeTest extends PHPUnit_Framework_TestCase {
             'call' => 'controllerRouteTest::simple'
         )));
     }
+
+    /**
+     * Опция next
+     */
+    public function testGetOptionNext() {
+
+        self::request('get', '/path/to/');
+
+        $this->assertTrue(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple',
+            'next' => true
+        )));
+
+        $this->assertTrue(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertNull(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+    }
+
+    /**
+     * Метод next()
+     */
+    public function testGetNext() {
+
+        self::request('get', '/path/to/');
+
+        !ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::wrong'
+        )) && ten\route::next();
+
+        $this->assertTrue(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertNull(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+    }
+
+    /**
+     * Звёздочка, always(), опция next и next() одновременно
+     */
+    public function testGetStarAlwaysNexts() {
+
+        self::request('get', '/path/to/');
+
+        $this->assertTrue(ten\route::get(array(
+            'url' => '*',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertTrue(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple',
+            'next' => true
+        )));
+
+        !ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )) && ten\route::next();
+
+        !ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )) && ten\route::next();
+
+        !ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::wrong'
+        )) && ten\route::next();
+
+        $this->assertTrue(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertNull(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertTrue(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        ten\route::next();
+
+        $this->assertTrue(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+    }
 }
