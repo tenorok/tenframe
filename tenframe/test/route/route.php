@@ -475,7 +475,7 @@ class routeTest extends PHPUnit_Framework_TestCase {
     }
 
     /**
-     * Always
+     * Always get
      */
     public function testGetAlways() {
 
@@ -497,6 +497,159 @@ class routeTest extends PHPUnit_Framework_TestCase {
 
         $this->assertTrue(ten\route::always(array(
             'call' => 'controllerRouteTest::simple'
+        )));
+    }
+
+    /**
+     * Always post
+     */
+    public function testPostAlways() {
+
+        self::request('post', '/path/to/');
+
+        $this->assertTrue(ten\route::post(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertNull(ten\route::post(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertTrue(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertTrue(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple'
+        )));
+    }
+
+    /**
+     * Always get с опциями типов
+     */
+    public function testGetAlwaysType() {
+
+        self::request('get', '/path/to/');
+
+        $this->assertTrue(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertNull(ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertNull(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple',
+            'type' => 'post'
+        )));
+
+        $this->assertTrue(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple',
+            'type' => 'get'
+        )));
+
+        $this->assertTrue(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple'
+        )));
+    }
+
+    /**
+     * Always post с опциями типов
+     */
+    public function testPostAlwaysType() {
+
+        self::request('post', '/path/to/');
+
+        $this->assertTrue(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertTrue(ten\route::post(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertNull(ten\route::post(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertNull(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple',
+            'type' => 'get'
+        )));
+
+        $this->assertTrue(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple',
+            'type' => 'post'
+        )));
+
+        $this->assertTrue(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple',
+            'type' => 'post'
+        )));
+    }
+
+    /**
+     * Always get для AJAX
+     */
+    public function testGetAlwaysAjax() {
+
+        self::ajax('get', '/path/to/');
+
+        $this->assertTrue(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertNull(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple',
+            'type' => 'get',
+            'ajax' => false
+        )));
+
+        $this->assertTrue(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple',
+            'type' => 'get'
+        )));
+
+        $this->assertNull(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple',
+            'type' => 'post',
+            'ajax' => true
+        )));
+    }
+
+    /**
+     * Always post без AJAX
+     */
+    public function testPostAlwaysAjax() {
+
+        self::ajax('post', '/path/to/');
+
+        $this->assertNull(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple',
+            'type' => 'post',
+            'ajax' => false
+        )));
+
+        $this->assertTrue(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple'
+        )));
+
+        $this->assertTrue(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple',
+            'type' => 'post'
+        )));
+
+        $this->assertNull(ten\route::always(array(
+            'call' => 'controllerRouteTest::simple',
+            'type' => 'get',
+            'ajax' => true
         )));
     }
 
@@ -530,6 +683,11 @@ class routeTest extends PHPUnit_Framework_TestCase {
     public function testGetNext() {
 
         self::request('get', '/path/to/');
+
+        !ten\route::get(array(
+            'url' => '/path/to',
+            'call' => 'controllerRouteTest::simple'
+        )) && ten\route::next();
 
         !ten\route::get(array(
             'url' => '/path/to',

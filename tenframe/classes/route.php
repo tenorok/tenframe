@@ -81,7 +81,7 @@ class route extends core {
      * @return mixed        Результат выполнения колбека
      */
     public static function ajax($route) {
-        if(!isset($_SERVER['HTTP_X_REQUESTED_WITH']) || $_SERVER['HTTP_X_REQUESTED_WITH'] != 'XMLHttpRequest') return;
+        if(!self::isAjax()) return;
         $route = array_merge(self::$default, $route);
         $type = strtoupper($route['type']);
         if($_SERVER['REQUEST_METHOD'] != $type) return;
@@ -95,6 +95,9 @@ class route extends core {
      * @return mixed        Результат выполнения колбека
      */
     public static function always($route) {
+        if(isset($route['type']) && $_SERVER['REQUEST_METHOD'] != strtoupper($route['type'])) return;
+        $route = array_merge(self::$default, $route);
+        if(!$route['ajax'] && self::isAjax()) return;
         return self::call($route, self::getData());
     }
 
@@ -103,6 +106,15 @@ class route extends core {
      */
     public static function next() {
         self::$called = false;
+    }
+
+    /**
+     * Проверка на AJAX-запрос
+     *
+     * @return bool
+     */
+    private static function isAjax() {
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
     }
 
     /**
@@ -121,7 +133,8 @@ class route extends core {
         'rule' => array(),
         'dev' => false,
         'next' => false,
-        'type' => 'get'                                                             // Для AJAX-запросов
+        'type' => 'get',                                                            // Для AJAX-запросов
+        'ajax' => true                                                              // Для метода ::always()
     );
 
     /**
