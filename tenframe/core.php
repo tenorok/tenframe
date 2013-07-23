@@ -40,7 +40,7 @@ namespace ten;
 
 class core {
 
-    public static $paths = array('/');                                     // Массив с директориями классов
+    protected static $paths = array('/');                                  // Массив с директориями классов
     public static $startTime;                                              // Время начала выполнения скрипта
     public static $required = array();                                     // Подключенные файлы классов
     
@@ -52,7 +52,7 @@ class core {
     public static function auto_load($class) {
 
         foreach(self::$paths as $dir) {
-            
+
             $path = str_replace(                                           // Замена символов в строке вызова метода tenframe
                 array('__', 'ten\\mod\\', 'ctr\\',           'mod\\',      'ten\\',     '\\'),
                 array('/',  TEN_MODULES,  'app/controller/', 'app/model/', TEN_CLASSES, '/'),
@@ -213,7 +213,7 @@ class core {
         self::define('GEN', file::$autoprefix);                            // Константа префикса автоматически сгенерированных файлов
         self::requireFile('/settings.php');                                // Подключение настроек работы tenframe
 
-        self::define_URI();                                                // Определение константы URI
+        self::setUrl($_SERVER['REQUEST_URI']);
         self::define_DEV();                                                // Определение константы DEV
 
         self::$paths = array_merge(                                        // Добавление путей автоматической загрузки классов
@@ -280,15 +280,6 @@ class core {
      */
     private static function define_ROOT() {
         self::define('ROOT', implode('/', array_slice(explode('/', __DIR__), 0, -1)));
-    }
-
-    /**
-     * Определение константы URI
-     *
-     */
-    private static function define_URI() {
-        // TODO: Проверка на AJAX-запрос
-        self::define('URI', $_SERVER['REQUEST_URI']);
     }
 
     private static $url;                                                   // Массив информации об URL
@@ -417,8 +408,6 @@ class core {
      * 
      */
     public static function shutdown() {
-
-        route::routes();                                                   // Проведение системных маршрутов
 
         tpl::not_found(array(                                              // Если ни один маршрут не был проведён, значит страница не найдена
             'sysauto' => true                                              // Опция символизирует возврат автоматической страницы 404
