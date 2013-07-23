@@ -264,7 +264,7 @@ class html extends core {
      * @return string      Чистое имя ключа
      */
     private static function getClearKey($key) {
-        return array_shift(explode(self::$iterateSeparator, $key));                     // Вернуть первую часть ключа по разделителю
+        return explode(self::$iterateSeparator, $key)[0];                               // Вернуть первую часть ключа по разделителю
     }
 
     /**

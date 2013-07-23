@@ -225,7 +225,7 @@ class join extends file {
 
                 if($object != '.' && $object != '..') {                              // Если текущий объект является файлом или директорией
 
-                    $directory = $options['input_path'] . $object . '/';
+                    $directory = parent::resolveRealPath($options['input_path'], $object);
 
                     if(
                         is_dir($directory) &&                                        // Если текущий объект является директорией
@@ -241,7 +241,7 @@ class join extends file {
                         preg_match($val, $object)                                    // и имя текущего файла удовлетворяет условия регулярного выражения
                     ) {
                         self::concat(                                                // Непосредственное прилепливание текущего файла
-                            $options['input_path'] . $object,                        // Полный путь к файлу
+                            parent::resolveRealPath($options['input_path'], $object),// Полный путь к файлу
                             $options
                         );
                     }
@@ -275,7 +275,7 @@ class join extends file {
         foreach($files as $file) {                                                   // Цикл по файлам
 
             if(!filter_var($file, FILTER_VALIDATE_URL)) {                            // Если не URL до файла
-                $file = core::resolvePath($file);                                    // Установление корректного пути до файла
+                $file = parent::resolveRealPath($file);                              // Установление корректного пути до файла
             }
 
             if(in_array($file, self::$input_files))                                  // Если файл уже был прилеплен

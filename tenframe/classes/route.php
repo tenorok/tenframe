@@ -429,29 +429,4 @@ class route extends core {
     private static function parseUrl($url = null) {
         return preg_split('/\//', $url ?: parent::getUrl()['path'], -1, PREG_SPLIT_NO_EMPTY);
     }
-
-//    private static $routes_default = array(                                // Умолчания для системных маршрутов
-//        'type'    => 'GET',
-//        'asserts' => array(),
-//        'dev'     => false                                                 // Проводить маршрут всегда
-//    );
-//
-//    public static $routes = array();                                       // Системные маршруты
-//
-//    /**
-//     * Функция проведения системных маршуртов
-//     *
-//     */
-//    public static function routes() {
-//
-//        foreach(self::$routes as $route) {                                 // Цикл по системным маршрутам
-//
-//            foreach(self::$routes_default as $key => $val)                 // Установка значений по умолчанию
-//                if(!isset($route[$key]))                                   // для незаданных опций
-//                    $route[$key] = $val;
-//
-//            if(!$route['dev'] || $route['dev'] && DEV)                     // Если маршрут надо проводить всегда или только для режима разработчика и режим включен
-//                self::request($route['type'], $route['url'], $route['callback'], $route['asserts']);
-//        }
-//    }
 }
