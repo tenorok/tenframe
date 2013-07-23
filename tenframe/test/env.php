@@ -32,6 +32,6 @@ class env extends \ten\core implements ienv {
      * @return array       Массив информации
      */
     public static function setTestUrl($url) {
-        return parent::setUrl($url);
+        return parent::setUrlInfo($url);
     }
 }

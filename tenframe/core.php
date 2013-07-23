@@ -22,18 +22,27 @@
 
     Подключение файла.
         Возвращает файл или false в случае его отсутствия.
-        core::requireFile('/path/to/file.php');
+        ten\core::requireFile('/path/to/file.php');
 
     Подключение PHP-файлов из директории.
         Возвращает массив путей подключенных файлов.
-        core::requireDir('/path/to/dir/');
+        ten\core::requireDir('/path/to/dir/');
 
     Рекурсивное подключение PHP-файлов из всех директорий внутри директории.
         Возвращает массив путей подключенных файлов.
-        core::requireDirRecursive(
+        ten\core::requireDirRecursive(
             '/path/to/dir/',
             0                                           // Количество уровней вложенности, начиная с нуля. По умолчанию: -1
         );
+
+    Получить массив информации о текущем URL:
+        ten\core::getUrlInfo();                         // Возвращается: http://php.net/manual/ru/function.parse-url.php
+
+    Получить текущий URL:
+        ten\core::getUrl();                             // Например: http://tenframe/path/to/
+
+    Получить строку запроса к текущему файлу:
+        ten\core::getCurrentPageUrl();                  // Например: http://tenframe/tenframe/index.php
 */
 
 namespace ten;
@@ -213,7 +222,7 @@ class core {
         self::define('GEN', file::$autoprefix);                            // Константа префикса автоматически сгенерированных файлов
         self::requireFile('/settings.php');                                // Подключение настроек работы tenframe
 
-        self::setUrl($_SERVER['REQUEST_URI']);
+        self::setUrlInfo(self::getUrl());
         self::define_DEV();                                                // Определение константы DEV
 
         self::$paths = array_merge(                                        // Добавление путей автоматической загрузки классов
@@ -285,22 +294,53 @@ class core {
     private static $url;                                                   // Массив информации об URL
 
     /**
-     * Установить массив информации об URL
+     * Установить массив информации о текущем URL
      *
      * @param  string $url Строка запроса
      * @return array       Массив информации
      */
-    protected static function setUrl($url) {
+    protected static function setUrlInfo($url) {
         return self::$url = parse_url($url);
     }
 
     /**
-     * Получить массив информации об URL
+     * Получить массив информации о текущем URL
      *
      * @return array Массив информации
      */
-    public static function getUrl() {
+    public static function getUrlInfo() {
         return self::$url;
+    }
+
+    /**
+     * Получить текущий URL
+     *
+     * @return string URL
+     */
+    public static function getUrl() {
+        return self::getProtocol() . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    }
+
+    /**
+     * Получить строку запроса к текущему файлу
+     *
+     * @return string Строка запроса
+     */
+    public static function getCurrentPageUrl() {
+        return
+            self::getProtocol() . '://' .
+            $_SERVER['HTTP_HOST'] .
+            $_SERVER['SCRIPT_NAME'] .
+            (!empty($_SERVER['QUERY_STRING'])? '?' . $_SERVER['QUERY_STRING'] : '');
+    }
+
+    /**
+     * Получить текущий протокол
+     *
+     * @return string Протокол
+     */
+    private static function getProtocol() {
+        return strpos(strtolower($_SERVER['SERVER_PROTOCOL']),'https') === false? 'http' : 'https';
     }
 
     /**

@@ -134,7 +134,7 @@
         ten\route::ajax([
             'url' => '/path/to/',
             'call' => 'controller::method',
-            'type' => 'post'                                            // По умолчанию GET
+            'type' => 'post'                                            // По умолчанию: GET
         ]);
 */
 
@@ -384,8 +384,8 @@ class route extends core {
     /**
      * Устанавливает переменную строки запроса
      *
-     * @param  string                 $key Имя переменной
-     * @param  string|int|float|bool  $val Значение
+     * @param  string                $key Имя переменной
+     * @param  string|int|float|bool $val Значение
      * @return string|int|float|bool       Установленное значение
      */
     private static function setVar($key, $val) {
@@ -427,6 +427,6 @@ class route extends core {
      * @return array         Разобранный путь
      */
     private static function parseUrl($url = null) {
-        return preg_split('/\//', $url ?: parent::getUrl()['path'], -1, PREG_SPLIT_NO_EMPTY);
+        return preg_split('/\//', $url ?: parent::getUrlInfo()['path'], -1, PREG_SPLIT_NO_EMPTY);
     }
 }
