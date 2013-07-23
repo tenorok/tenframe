@@ -112,7 +112,7 @@ class categories {
 
         $info = mod\categories::get_info();                                // Получение массива с информацией для парсинга
 
-        if(isset(\ten\core::$get->categoryid)) {
+        if(isset(\ten\route::url()->categoryid)) {
 
             $edit = \ten\tpl::block(array(
                 'mod'   => 'shop',
@@ -121,11 +121,11 @@ class categories {
 
                 'parse' => array(
                     'hided'      => $info['hided'],
-                    'categories' => mod\categories::get_categories_list(\ten\core::$get->categoryid)
+                    'categories' => mod\categories::get_categories_list(\ten\route::url()->categoryid)
                 )
             ));
 
-            mod\categories::get_fields(\ten\core::$get->categoryid);
+            mod\categories::get_fields(\ten\route::url()->categoryid);
         }
         else
             $edit = '';
