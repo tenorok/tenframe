@@ -28,6 +28,9 @@
         Возвращает файл или false в случае его отсутствия.
         ten\core::requireFile('/path/to/file.php');
 
+    Подключение файлов.
+        ten\core::requireFiles('/path/to/file1.php', '/path/to/fileN.php');
+
     Подключение PHP-файлов из директории.
         Возвращает массив путей подключенных файлов.
         ten\core::requireDir('/path/to/dir/');
@@ -91,6 +94,27 @@ class core {
             return require $file;                                          // его нужно подключить
         } else return false;
     }
+
+    /**
+     * Подключение файлов
+     *
+     * @param  string Arguments Пути до файлов
+     * @return array            Массив успешно подключенных файлов
+     */
+    public static function requireFiles() {
+
+        $requiredFiles = array();
+
+        foreach(func_get_args() as $file) {
+            $required = self::requireFile($file);
+            if(!$required) continue;
+
+            $requiredFiles[$file] = $required;
+        }
+
+        return $requiredFiles;
+    }
+
 
     /**
      * Подключение всех php-файлов директории
