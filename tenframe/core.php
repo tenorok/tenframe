@@ -16,8 +16,12 @@
         Абсолютный путь добавится автоматически: __DIR__ . '/tenframe/test/core'.
         ten\core::resolveRealPath('tenframe', '/test', 'core/');
 
-    Приведение несуществующих путей.
+    Приведение несуществующих путей в относительном виде.
+        ten\core::resolveRelativePath('path', 'to', 'dir', 'or', 'file');
+
+    Приведение несуществующих путей в абсолютном виде.
         Вне зависимости от существования файла: __DIR__ . '/virtualPath/one/cat/cat.txt'.
+        Абсолютный путь добавится по необходимости.
         ten\core::resolvePath(__DIR__, 'virtualPath', 'one/cat/', '..', 'cat', 'cat.txt');
 
     Подключение файла.
@@ -80,7 +84,7 @@ class core {
      */
     public static function requireFile($file) {
 
-        $file = self::resolvePath($file);                                 // Приведение пути к корректному виду
+        $file = self::resolvePath($file);                                  // Приведение пути к корректному виду
 
         if(is_file($file)) {                                               // Если файл существует
             array_push(self::$required, $file);                            // Добавление в массив подключенных файлов классов
@@ -393,21 +397,30 @@ class core {
     }
 
     /**
-     * Приведение несуществующих путей
+     * Приведение несуществующих путей в относительном виде
      *
      * @param  string Arguments Любое количество строк к объединению
      * @return string           Приведённый путь
      */
-    public static function resolvePath() {
+    public static function resolveRelativePath() {
         $args = implode('/', func_get_args());                             // Объединение всех аргументов в строку
 
-        $path = array_reduce(explode('/', $args), function($a, $b) {       // Реализация realpath()
+        return array_reduce(explode('/', $args), function($a, $b) {        // Реализация realpath()
             if($a === 0) $a = '/';
             if($b === '' || $b === '.') return $a;
             if($b === '..') return dirname($a);
             return preg_replace('/\/+/', '/', $a . '/' . $b);
         });
+    }
 
+    /**
+     * Приведение несуществующих путей в абсолютном виде
+     *
+     * @param  string Arguments Любое количество строк к объединению
+     * @return string           Приведённый путь
+     */
+    public static function resolvePath() {
+        $path = call_user_func_array(array('self', 'resolveRelativePath'), func_get_args());
         return !self::hasRoot($path)? ROOT . $path : $path;
     }
 
