@@ -362,4 +362,18 @@ class categories {
 
         return (!empty($e));
     }
+
+    /**
+     * Сортировка категорий
+     *
+     * @param array $data Принимается $_POST
+     */
+    public static function sort($data) {
+        \ten\orm::db('tmod_shop');
+        foreach($data['categories'] as $i => $id) {
+            \ten\orm::update('tmod_shop_categories', array(
+                'serial' => $i
+            ))->where($id);
+        }
+    }
 }

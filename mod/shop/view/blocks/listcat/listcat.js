@@ -41,15 +41,12 @@ BEM.DOM.decl('mod-shop-listcat', {
         });
 
         $.ajax({
-            type: 'GET',
+            type: 'post',
             dataType: 'json',
-            url: '/mod/shop/app/ajax/categories.php',
+            url: '/modshop/categories/sort/',
             data: {
-                event: 'sort',
                 categories: order
             }
-        }).fail(function(data) {
-            console.log(data.responseText);
         });
     }
 
