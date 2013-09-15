@@ -1,34 +1,8 @@
 ctx%mod-shop-categories: {
     li
         .__labelitem
-        ._position_right: {
-            label
-                .__label
-                ._long: {
-                    input.__checkboxinput: {
-                        attr: {
-                            type: 'checkbox',
-                            name: 'hide',
-                            bool: {
-                                checked: '{hided}'
-                            }
-                        },
-                        content: ' скрыть категорию'
-                    }
-                }
-        },
+        ._position_right: '{hided}',
     li
         .__labelitem
-        ._independent: {
-            a
-                .__link
-                ._pseudo
-                ._change-parent: {
-                    span.__link-text: 'Изменить родительскую категорию',
-                    span.__harr: '&#9650;'
-                },
-            ul
-                .__list
-                ._edit: '{categories}'
-        }
+        ._independent: '{change-parent}'
 }

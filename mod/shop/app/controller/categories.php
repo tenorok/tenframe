@@ -120,8 +120,24 @@ class categories {
                 'view'  => 'edit',
 
                 'parse' => array(
-                    'hided'      => $info['hided'],
-                    'categories' => mod\categories::get_categories_list(\ten\route::url()->categoryid)
+
+                    'hided' => \ten\tpl::block(array(
+                        'mod' => 'shop',
+                        'block' => 'edit',
+                        'view' => 'hided',
+                        'parse' => array(
+                            'hided' => $info['hided']
+                        )
+                    )),
+
+                    'change-parent' => \ten\tpl::block(array(
+                        'mod' => 'shop',
+                        'block' => 'edit',
+                        'view' => 'change-parent',
+                        'parse' => array(
+                            'categories' => mod\categories::get_categories_list(\ten\route::url()->categoryid)
+                        )
+                    ))
                 )
             ));
 

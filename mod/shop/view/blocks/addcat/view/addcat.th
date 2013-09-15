@@ -6,13 +6,6 @@
         },
         content: [
             {
-                input.__catparent: {
-                    attr: {
-                        type: 'hidden',
-                        name: 'catparent',
-                        value: '{parent}'
-                    }
-                },
                 ul.__labellist: [
                     {
                         li&mod-shop-fielditem__labelitem: {

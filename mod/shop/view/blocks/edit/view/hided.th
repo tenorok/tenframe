@@ -1,0 +1,16 @@
+%mod-shop-edit: {
+    label
+        .__label
+        ._long: {
+            input.__checkboxinput: {
+                attr: {
+                    type: 'checkbox',
+                    name: 'hide',
+                    bool: {
+                        checked: '{hided}'
+                    }
+                },
+                content: ' скрыть категорию'
+            }
+        }
+}

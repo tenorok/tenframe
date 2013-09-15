@@ -13,6 +13,7 @@ route::get([
     'url' => [
         $page . '/categories/add/',
         $page . '/categories/{parentid}/addcategory/',
+        $page . '/categories/{categoryid}/edit/',
         $page . '/categories/{categoryid}/'
     ],
     'call' => $ctr . 'categories::add_category_form'

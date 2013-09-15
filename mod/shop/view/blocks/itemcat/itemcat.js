@@ -3,7 +3,6 @@ BEM.DOM.decl('mod-shop-itemcat', {
     onSetMod: {
 
         js: function() {
-            this._dropdown = this.findBlockOutside('mod-shop-categories').findBlockInside('mod-shop-dropdown');
             this._isSubCat = !this.findBlockInside('mod-shop-listcat').domElem.is(':empty');
 
             var childrens = this.domElem.children();
@@ -25,11 +24,19 @@ BEM.DOM.decl('mod-shop-itemcat', {
     },
 
     /**
+     * Получить блок выпадушки
+     * @returns {jQuery}
+     */
+    getDropdown: function() {
+        return this._dropdown || (this._dropdown = this.findBlockOutside('mod-shop-categories').findBlockInside('mod-shop-dropdown'));
+    },
+
+    /**
      * Показать выпадающий список рядом с категорией
      * @param {jQuery} link Ссылка категории
      */
     showDropdown: function(link) {
-        this._dropdown
+        this.getDropdown()
             .setHref(link.attr('href'), ['addproduct', 'addcategory', 'edit'])
             .show(link.position());
     },
@@ -55,6 +62,28 @@ BEM.DOM.decl('mod-shop-itemcat', {
         dom.listcat.slideToggle(200, function() {
             dom.arrow.html(dom.listcat.is(':hidden')? '&#9650;' : '&#9660;');
         });
+    },
+
+    /**
+     * Подписать событие на элемент cat
+     * @param {Function} callback Колбек
+     */
+    bindCatClick: function(callback) {
+        this.elem('cat').eq(0).unbind('click').on('click', callback.bind(this));
+    },
+
+    /**
+     * Сделать категорию выбранной
+     */
+    select: function() {
+        this.setMod(this.elem('cat').eq(0), 'selected', 'yes');
+    },
+
+    /**
+     * Сделать категорию невыбранной
+     */
+    unselect: function() {
+        this.delMod(this.elem('cat').eq(0), 'selected');
     }
 
 }, {
