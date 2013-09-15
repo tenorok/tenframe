@@ -76,7 +76,7 @@ class file extends core {
     public static function make_dir($path) {
 
         if(!file_exists($path))                                      // Если указанного пути не существует
-            if(!mkdir($path, 0777, true))                            // Если не удалось создать каталоги, указанные в пути
+            if(!mkdir($path, 0755, true))                            // Если не удалось создать каталоги, указанные в пути
                 message::error('can\'t find and make directory: <b>' . $path . '</b>');
 
         return true;                                                 // Если скрипт не был убит, значит операция прошла успешно

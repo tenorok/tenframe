@@ -200,7 +200,7 @@ class join extends file {
             str_replace('{ext}', $extension, $options['output_file'])
         );
 
-        parent::make_dir($output_file);                                              // Создание пути, если его не существует
+        parent::make_dir(dirname($output_file));                                     // Создание пути, если его не существует
 
         file::autogen($output_file, self::$output_file, '');                         // Запись итоговой строки в выходящий файл
 
