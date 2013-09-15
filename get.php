@@ -23,12 +23,21 @@ ten\get::files(array(                               // Выкачивание н
         'http://modernizr.com/downloads/modernizr-latest.js',
         'http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.js',
         'https://raw.github.com/digitalBush/jquery.maskedinput/1.3.1/dist/jquery.maskedinput.min.js',
-        'https://raw.github.com/necolas/normalize.css/master/normalize.css'
+        'https://raw.github.com/necolas/normalize.css/master/normalize.css',
+        'https://raw.github.com/isagalaev/highlight.js/master/src/styles/github.css' => 'highlight.github.css',
+        'https://raw.github.com/jasonm23/markdown-css-themes/gh-pages/markdown10.css' => 'markdown.css'
     ),
     'path' => array(
         'css' => '/assets/css/vendor/',
         'js'  => '/assets/js/vendor/'
     )
+));
+
+ten\join::files(array(
+    'files' => array('http://yandex.st/highlightjs/7.3/highlight.min.js'),
+    'output_file' => '/assets/js/vendor/highlight.js',
+    'after' => 'hljs.initHighlightingOnLoad();',
+    'compress' => false
 ));
 
 ten\join::files(array(                              // Сборка внешних CSS
