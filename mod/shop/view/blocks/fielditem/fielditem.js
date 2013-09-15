@@ -3,7 +3,7 @@ BEM.DOM.decl('mod-shop-fielditem', {
     onSetMod: {
 
         js: function() {
-            this._parent = $('.mod-shop-fieldlist').bem('mod-shop-fieldlist');
+            this._parent = this.findBlockOutside('mod-shop-fieldlist');
             this._classifierHtml = this.elem('classifier').htmlWithParent();
             this._fieldAdded = false;
             this._classifierCount = 1;
