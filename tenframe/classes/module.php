@@ -34,10 +34,18 @@ class module extends core {
             'dev' => true
         ]);
 
-        foreach(parent::$settings['modules'] as $mod) {                // Цикл по перечисленным именам модулей
-            $path = TEN_MODULES . $mod;                                // Относительный путь к модулю
-            array_push(join::$input_path, $path . '/view/');           // Добавление пути к представлениям модуля для объединения файлов
-            parent::requireFile($path . '/init.php');                  // Подключение файла инициализации модуля
+        foreach(parent::$settings['modules'] as $mod) {
+
+            $path = parent::resolveRealPath(TEN_MODULES, $mod);
+
+            list($view, $init, $routes) = array(
+                parent::resolveRealPath($path, '/view/'),
+                parent::resolveRealPath($path, '/init.php'),
+                parent::resolveRealPath($path, '/routes.php')
+            );
+
+            array_push(join::$input_path, $view);                       // Добавление пути к представлениям модуля для объединения файлов
+            parent::requireFiles($init, $routes);
         }
     }
 
