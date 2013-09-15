@@ -3,7 +3,7 @@ BEM.DOM.decl('mod-shop-itemcat', {
     onSetMod: {
 
         js: function() {
-            this._dropdown = $('.mod-shop-dropdown').bem('mod-shop-dropdown');
+            this._dropdown = this.findBlockOutside('mod-shop-categories').findBlockInside('mod-shop-dropdown');
             this._isSubCat = !this.findBlockInside('mod-shop-listcat').domElem.is(':empty');
 
             var childrens = this.domElem.children();

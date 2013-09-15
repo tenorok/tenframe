@@ -25,34 +25,39 @@ class module extends core {
 
     /**
      * Функция инициализации модулей
-     *
      */
     public static function init() {
 
-        array_push(                                                    // Добавление маршрута отображения документации по модулю
-            route::$routes,
-            array(
-                'url'      => '/module/{mod}/',
-                'callback' => 'ten\module->readme',
-                'dev'      => true                                     // Проводить маршрут только когда включен режим разработчика
-            )
-        );
+        route::get([
+            'url' => '/module/{mod}/',
+            'call' => 'ten\module::readme',
+            'dev' => true
+        ]);
 
-        foreach(parent::$settings['modules'] as $mod) {                // Цикл по перечисленным именам модулей
-            $path = TEN_MODULES . $mod;                                // Относительный путь к модулю
-            array_push(join::$input_path, $path . '/view/');           // Добавление пути к представлениям модуля для объединения файлов
-            require ROOT . $path . '/init.php';                        // Подключение файла инициализации модуля
+        foreach(parent::$settings['modules'] as $mod) {
+
+            $path = parent::resolveRealPath(TEN_MODULES, $mod);
+
+            list($view, $init, $routes) = array(
+                parent::resolveRealPath($path, '/view/'),
+                parent::resolveRealPath($path, '/init.php'),
+                parent::resolveRealPath($path, '/routes.php')
+            );
+
+            array_push(join::$input_path, $view);                       // Добавление пути к представлениям модуля для объединения файлов
+            parent::requireFiles($init, $routes);
         }
     }
 
     /**
      * Функция отображения readme модулей
-     *
-     * @param string $mod Имя модуля
      */
-    public static function readme($mod) {
+    public static function readme() {
 
+        // TODO: Подключать в Composer
         require ROOT . '/assets/php/markdown.php';
+
+        $mod = route::url()->mod;
 
         echo tpl::block(array(
 
@@ -62,7 +67,7 @@ class module extends core {
 
                 'title' => 'Модуль — ' . $mod,
                 'files' => statical::includes('markdown', GEN),
-                'body'  => Markdown(file_get_contents(ROOT . '/mod/' . $mod . '/readme.md'))
+                'body'  => Markdown(file_get_contents(parent::resolveRealPath('/mod/', $mod, '/readme.md')))
             )
         ));
     }

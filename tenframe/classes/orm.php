@@ -102,7 +102,9 @@ class orm extends core {
      */
     private function __construct($operation = null) {
 
-        self::$queries[count(self::$queries)]->name = $operation;
+        $std = new \stdClass();
+        $std->name = $operation;
+        array_push(self::$queries, $std);
 
         self::$limit      = null;                                           // Обнуление дополнительных переменных перед каждым новым запросом
         self::$order      = null;

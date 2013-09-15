@@ -66,18 +66,18 @@ class css extends core {
 
         foreach($files as $lessFile => $cssFile) {                                  // Цикл по переданным файлам
 
-            $lessFilePath = parent::resolve_path(                                   // Путь до LESS-файла
+            $lessFilePath = parent::resolvePath(                                    // Путь до LESS-файла
                 $lessPath,
                 text::rgum(is_string($lessFile) ? $lessFile : $cssFile, '.less')    // Если ключ является строкой, то в нём хранится LESS-файл, иначе он хранится в значении
             );
 
             if(is_string($lessFile)) {                                              // Если ключ является строкой (если указан CSS-файл)
-                $cssFilePath = parent::resolve_path(                                // Путь до CSS-файла
+                $cssFilePath = parent::resolvePath(                                 // Путь до CSS-файла
                     $cssPath,
                     text::rgum($cssFile, '.css')
                 );
             } else {                                                                // Иначе ключ является числом (указан только LESS-файл)
-                $lessFileInfo = file::getInfo($lessFilePath);
+                $lessFileInfo = file::info($lessFilePath);
                 $cssFilePath = $lessFileInfo['path'] . $lessFileInfo['name'] . '.css';  // CSS-файл должен быть одноимённым с LESS-файлом
             }
 

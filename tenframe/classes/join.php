@@ -33,6 +33,7 @@
             'before'      => "\n start: {filename} { \n",      // Строка, помещаемая перед содержанием очередного файла
             'after'       => "\n } {filename} :end \n",        // Строка, помещаемая после содержания очередного файла
                                                                   Где {filename} - путь и имя текущего файла
+                                                                  По умолчанию: "\n"
 
             'start_str'   => "start { \n",                     // Строка, помещаемая в начало файла, по умолчанию отсутствует
             'end_str'     => "\n } end",                       // Строка, помещаемая в конец файла, по умолчанию отсутствует
@@ -74,7 +75,7 @@ class join extends file {
 
     private static $options = array(                                                 // Дефолтные параметры объединения файлов
         'before'    => '',
-        'after'     => '',
+        'after'     => "\n",
         'start_str' => '',
         'end_str'   => '',
         'priority'  => '',
@@ -90,7 +91,7 @@ class join extends file {
      */
     public static function files($options) {
 
-        $options['output_file'] = parent::resolve_path($options['output_file']);     // Установление корректного пути до выходящего файла
+        $options['output_file'] = parent::resolvePath($options['output_file']);      // Установление корректного пути до выходящего файла
 
         foreach(self::$options as $key => $val)                                      // Установка значений по умолчанию
             if(!isset($options[$key]))                                               // для незаданных опций
@@ -156,7 +157,7 @@ class join extends file {
      */
     private static function join_files($mod, $val, $options) {
 
-        $output_extension = end(explode('.', $options['output_file']));              // Расширение выходящего файла
+        $output_extension = file::info($options['output_file'])['extension'];        // Расширение выходящего файла
 
         if($mod == 'fls') {                                                          // Если переданы конкретные файлы для объединения
 
@@ -171,7 +172,7 @@ class join extends file {
 
             foreach($input_path as $path) {                                          // Цикл по входящим директориям
 
-                $options['input_path'] = parent::resolve_path($path);                // Установление корректного пути входящей корневой директории
+                $options['input_path'] = parent::resolvePath($path);                 // Установление корректного пути входящей корневой директории
 
                 self::get_folders($mod, $val, $options);                             // Вызов функции рекурсивного перебора директорий
             }
@@ -195,7 +196,7 @@ class join extends file {
                 self::$output_file = trim(\JSMin::minify(self::$output_file));       // Обрезать первую пустую строку, которую оставляет JSMin
         }
 
-        $output_file = parent::resolve_path(                                         // Установление корректного пути до файла
+        $output_file = parent::resolvePath(                                          // Установление корректного пути до файла
             str_replace('{ext}', $extension, $options['output_file'])
         );
 
@@ -224,7 +225,7 @@ class join extends file {
 
                 if($object != '.' && $object != '..') {                              // Если текущий объект является файлом или директорией
 
-                    $directory = $options['input_path'] . $object . '/';
+                    $directory = parent::resolveRealPath($options['input_path'], $object);
 
                     if(
                         is_dir($directory) &&                                        // Если текущий объект является директорией
@@ -234,13 +235,13 @@ class join extends file {
                     }
                     else if (                                                        // Иначе текущий объект - это файл
                         $mod == 'ext' &&                                             // Если задан мод расширений
-                        end(explode('.', $object)) == $val ||                        // и расширение текущего файла соответствует заданному для поиска
+                        file::info($object)['extension'] == $val ||                  // и расширение текущего файла соответствует заданному для поиска
 
                         $mod == 'reg' &&                                             // Или задан мод регулярного выражения
                         preg_match($val, $object)                                    // и имя текущего файла удовлетворяет условия регулярного выражения
                     ) {
                         self::concat(                                                // Непосредственное прилепливание текущего файла
-                            $options['input_path'] . $object,                        // Полный путь к файлу
+                            parent::resolveRealPath($options['input_path'], $object),// Полный путь к файлу
                             $options
                         );
                     }
@@ -274,7 +275,7 @@ class join extends file {
         foreach($files as $file) {                                                   // Цикл по файлам
 
             if(!filter_var($file, FILTER_VALIDATE_URL)) {                            // Если не URL до файла
-                $file = core::resolve_path($file);                                   // Установление корректного пути до файла
+                $file = parent::resolveRealPath($file);                              // Установление корректного пути до файла
             }
 
             if(in_array($file, self::$input_files))                                  // Если файл уже был прилеплен

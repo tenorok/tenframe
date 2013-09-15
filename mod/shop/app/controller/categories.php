@@ -112,7 +112,7 @@ class categories {
 
         $info = mod\categories::get_info();                                // Получение массива с информацией для парсинга
 
-        if(isset(\ten\core::$get->categoryid)) {
+        if(isset(\ten\route::url()->categoryid)) {
 
             $edit = \ten\tpl::block(array(
                 'mod'   => 'shop',
@@ -121,11 +121,11 @@ class categories {
 
                 'parse' => array(
                     'hided'      => $info['hided'],
-                    'categories' => mod\categories::get_categories_list(\ten\core::$get->categoryid)
+                    'categories' => mod\categories::get_categories_list(\ten\route::url()->categoryid)
                 )
             ));
 
-            mod\categories::get_fields(\ten\core::$get->categoryid);
+            mod\categories::get_fields(\ten\route::url()->categoryid);
         }
         else
             $edit = '';
@@ -361,5 +361,19 @@ class categories {
     private static function foo($e) {
 
         return (!empty($e));
+    }
+
+    /**
+     * Сортировка категорий
+     *
+     * @param array $data Принимается $_POST
+     */
+    public static function sort($data) {
+        \ten\orm::db('tmod_shop');
+        foreach($data['categories'] as $i => $id) {
+            \ten\orm::update('tmod_shop_categories', array(
+                'serial' => $i
+            ))->where($id);
+        }
     }
 }

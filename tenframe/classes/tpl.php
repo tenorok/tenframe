@@ -92,13 +92,14 @@ class tpl extends core {
 
         foreach($extensions as $ext) {                                                  // Поиск существующих шаблонов
 
-            $file = $blocks . $block . '/view/' . $view . '.' . $ext;                   // Полный путь к шаблону
+            $file = parent::resolvePath($blocks, $block, 'view', $view . '.' . $ext);   // Полный путь к шаблону
 
             if($ext == 'tenhtml' || $ext == 'th' && parent::$settings['tenhtml']) {     // Если рассматриваемое расширение tenhtml и включена его настройка
 
                 $file = (DEV) ?                                                         // Если включен режим разработчика
-                    html::savetenhtml(core::resolve_path($file)) :                      // то tenhtml-шаблон нужно преобразовать в простой шаблон
-                    core::resolve_path(html::$tenhtmlFolder, text::ldel($file, ROOT));  // иначе просто взять уже сгенерированный шаблон
+                    html::savetenhtml(core::resolvePath($file)) :                       // то tenhtml-шаблон нужно преобразовать в простой шаблон
+                    parent::resolvePath(html::$tenhtmlFolder, text::ldel($file, ROOT)); // иначе просто взять уже сгенерированный шаблон
+
                 if(file_exists($file)) {                                                // Если этот уже сгенерированный простой шаблон существует
                     break;                                                              // то рассматривать менее приоритетные расширения не нужно
                 }
@@ -109,17 +110,17 @@ class tpl extends core {
 
             if(DEV) {                                                                   // Если включен режим разработчика
                 file::autogen(                                                          // Сохранение сжатого шаблона
-                    self::$compressTplFolder . text::ldel($file, ROOT),
+                    parent::resolvePath(self::$compressTplFolder, text::ldel($file, ROOT)),
                     self::compressHTML(file_get_contents($file)),
                     false
                 );
             }
 
             $blocks = (isset($mod)) ?
-                file::resolve_path(self::$compressTplFolder, '/mod/', $mod, '/view/blocks/') :
-                file::resolve_path(self::$compressTplFolder, '/view/blocks/');
+                file::resolvePath(self::$compressTplFolder, '/mod/', $mod, '/view/blocks/') :
+                file::resolvePath(self::$compressTplFolder, '/view/blocks/');
 
-            $compressedFile = file::resolve_path(                                       // Полный путь к сжатому шаблону
+            $compressedFile = file::resolvePath(                                        // Полный путь к сжатому шаблону
                 $blocks, $block, '/view/', $view . '.tpl'
             );
 
