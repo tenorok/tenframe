@@ -4,7 +4,7 @@ namespace ten;
 
 $settings = core::requireFile(__DIR__ . '/conf/settings.php');
 
-$page = text::rdel($settings['urls']['page'], '/');
+$page = core::resolveRelativePath($settings['urls']['page']);
 $ctr = 'ten\mod\admin\ctr\\';
 
 route::get([
