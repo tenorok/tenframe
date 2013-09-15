@@ -2,12 +2,12 @@
 
 ten\statical::involve(array(                            // Markdown для модулей
     'markdown.css',
-    'highlight/github.css',
+    'highlight.github.css',
     'highlight.js'
 ), array(
     'path' => array(
-        'css' => '/assets/css/',
-        'js'  => '/assets/js/'
+        'css' => '/assets/css/vendor/',
+        'js'  => '/assets/js/vendor/'
     ),
     'output_file' => 'markdown.tpl',
     'prefix' => GEN,

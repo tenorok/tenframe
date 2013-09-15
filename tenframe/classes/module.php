@@ -54,8 +54,7 @@ class module extends core {
      */
     public static function readme() {
 
-        // TODO: Подключать в Composer
-        require ROOT . '/assets/php/markdown.php';
+        $markdown = new \dflydev\markdown\MarkdownExtraParser();
 
         $mod = route::url()->mod;
 
@@ -67,7 +66,7 @@ class module extends core {
 
                 'title' => 'Модуль — ' . $mod,
                 'files' => statical::includes('markdown', GEN),
-                'body'  => Markdown(file_get_contents(parent::resolveRealPath('/mod/', $mod, '/readme.md')))
+                'body'  => $markdown->transformMarkdown(file_get_contents(parent::resolveRealPath('/mod/', $mod, '/readme.md')))
             )
         ));
     }
