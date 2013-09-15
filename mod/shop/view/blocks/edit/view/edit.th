@@ -1,4 +1,4 @@
-ctx%mod-shop-categories: {
+ctx%mod-shop-fielditem: {
     li
         .__labelitem
         ._position_right: '{hided}',

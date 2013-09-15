@@ -116,8 +116,7 @@ class categories {
 
             $edit = \ten\tpl::block(array(
                 'mod'   => 'shop',
-                'block' => 'categories',
-                'view'  => 'edit',
+                'block' => 'edit',
 
                 'parse' => array(
 

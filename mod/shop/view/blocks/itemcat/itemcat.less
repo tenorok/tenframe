@@ -16,11 +16,14 @@
             height: 16px;
             padding-right: 4px;
 
-            background: url(/mod/shop/view/blocks/listcat/img/draggable.png) no-repeat;
+            background: url(/mod/shop/view/blocks/itemcat/img/draggable.png) no-repeat;
             vertical-align: bottom;
-            cursor: url(/mod/shop/view/blocks/listcat/img/openhand.cur), move;
+            cursor: url(/mod/shop/view/blocks/itemcat/img/openhand.cur), move;
 
             .transition(opacity);
+        }
+        .mod-shop-itemcat__draggable:active {
+            cursor: url(/mod/shop/view/blocks/itemcat/img/closehand.cur);
         }
         .mod-shop-itemcat__cat {
             border-bottom: 1px dotted #3232FF;
