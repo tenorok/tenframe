@@ -100,7 +100,7 @@ class categories {
             return \ten\tpl::block(array(                                                // Значит нужно парсить список категорий для изменения родительской категории
 
                 'mod'   => 'shop',
-                'block' => 'categories',
+                'block' => 'itemcat',
                 'view'  => 'parent',
 
                 'context' => array(
@@ -130,8 +130,7 @@ class categories {
             return \ten\tpl::block(array(
 
                 'mod'   => 'shop',
-                'block' => 'categories',
-                'view'  => 'item',
+                'block' => 'itemcat',
 
                 'context' => array(
 
@@ -168,8 +167,8 @@ class categories {
 
         \ten\orm::db('tmod_shop');
 
-        $categoryid = (isset(\ten\core::$get->categoryid)) ? \ten\core::$get->categoryid : null;   // Если в адресной строке есть идентификатор категории
-        $parentid   = (isset(\ten\core::$get->parentid))   ? \ten\core::$get->parentid   : null;   // Если в адресной строке есть идентификатор родительской категории
+        $categoryid = (isset(\ten\route::url()->categoryid)) ? \ten\route::url()->categoryid : null;   // Если в адресной строке есть идентификатор категории
+        $parentid   = (isset(\ten\route::url()->parentid))   ? \ten\route::url()->parentid   : null;   // Если в адресной строке есть идентификатор родительской категории
 
         $info = array(                                                                   // Массив возможных полей с дефолтными значениями
             'title'    => '',

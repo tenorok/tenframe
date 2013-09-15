@@ -41,13 +41,13 @@ class get extends core {
 
         foreach($options['files'] as $getFile => $setFile) {                // Цикл по файлам
 
-            $fileinfo = file::getInfo($setFile);                            // Информация о файле
+            $fileinfo = file::info($setFile);                               // Информация о файле
 
             // Может быть указана одна общая директория или директории для каждого расширения файлов
             $path = (is_string($options['path'])) ? $options['path'] : $options['path'][$fileinfo['extension']];
 
             array_push($gottenFiles, file::autogen(                         // Сохранение файла и добавление в массив выкачанных файлов
-                parent::resolve_path($path, $fileinfo['file']),
+                parent::resolvePath($path, $fileinfo['file']),
                 file_get_contents((is_string($getFile)) ? $getFile : $setFile),
                 ''
             ));

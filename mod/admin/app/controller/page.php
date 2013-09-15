@@ -11,7 +11,11 @@ class page {
      * Формирование страницы авторизации
      *
      */
-    public static function page($page = null, $tab = '') {
+    public static function page() {
+
+        $urlParams = \ten\route::url();
+        $page = isset($urlParams->page) ? $urlParams->page : null;
+        $tab = isset($urlParams->tab) ? $urlParams->tab : '';
 
         $settings = \ten\core::requireFile('/mod/admin/conf/settings.php');
 

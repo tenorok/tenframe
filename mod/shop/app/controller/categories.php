@@ -24,8 +24,16 @@ class categories {
 
             'parse' => array(
 
-                'page'       => $page,
-                'categories' => mod\categories::get_categories_list($page)
+                'page'    => $page,
+
+                'listcat' => \ten\tpl::block(array(
+                    'mod'   => 'shop',
+                    'block' => 'listcat',
+
+                    'parse' => array(
+                        'list' => mod\categories::get_categories_list($page)
+                    )
+                ))
             )
         ));
     }
@@ -104,20 +112,35 @@ class categories {
 
         $info = mod\categories::get_info();                                // Получение массива с информацией для парсинга
 
-        if(isset(\ten\core::$get->categoryid)) {
+        if(isset(\ten\route::url()->categoryid)) {
 
             $edit = \ten\tpl::block(array(
                 'mod'   => 'shop',
-                'block' => 'categories',
-                'view'  => 'edit',
+                'block' => 'edit',
 
                 'parse' => array(
-                    'hided'      => $info['hided'],
-                    'categories' => mod\categories::get_categories_list(\ten\core::$get->categoryid)
+
+                    'hided' => \ten\tpl::block(array(
+                        'mod' => 'shop',
+                        'block' => 'edit',
+                        'view' => 'hided',
+                        'parse' => array(
+                            'hided' => $info['hided']
+                        )
+                    )),
+
+                    'change-parent' => \ten\tpl::block(array(
+                        'mod' => 'shop',
+                        'block' => 'edit',
+                        'view' => 'change-parent',
+                        'parse' => array(
+                            'categories' => mod\categories::get_categories_list(\ten\route::url()->categoryid)
+                        )
+                    ))
                 )
             ));
 
-            mod\categories::get_fields(\ten\core::$get->categoryid);
+            mod\categories::get_fields(\ten\route::url()->categoryid);
         }
         else
             $edit = '';
@@ -217,29 +240,41 @@ class categories {
                                         'parent' => $info['parentid'],
                                         'name'   => $info['name'],
                                         'alias'  => $info['alias'],
-                                        'edit'   => $edit
-                                    ),
+                                        'edit'   => $edit,
 
-                                    'context' => array(
+                                        'fieldlist' => \ten\tpl::block(array(
+                                            'mod'   => 'shop',
+                                            'block' => 'fieldlist',
 
-                                        'existfields' => array(
-
-                                            'array' => $fieldslist,
                                             'parse' => array(
-                                                'id'       => 'tmod_shop_fields_id',
-                                                'category' => 'name',
-                                                'field'    => 'tmod_shop_fields_name'
-                                            )
-                                        ),
+                                                'fielditem' => \ten\tpl::block(array(
+                                                    'mod'   => 'shop',
+                                                    'block' => 'fielditem',
 
-                                        'types' => array(
+                                                    'context' => array(
 
-                                            'array' => self::$types,
-                                            'parse' => array(
-                                                'value' => 'val',
-                                                'text'  => 'txt'
+                                                        'existfields' => array(
+
+                                                            'array' => $fieldslist,
+                                                            'parse' => array(
+                                                                'id'       => 'tmod_shop_fields_id',
+                                                                'category' => 'name',
+                                                                'field'    => 'tmod_shop_fields_name'
+                                                            )
+                                                        ),
+
+                                                        'types' => array(
+
+                                                            'array' => self::$types,
+                                                            'parse' => array(
+                                                                'value' => 'val',
+                                                                'text'  => 'txt'
+                                                            )
+                                                        )
+                                                    )
+                                                ))
                                             )
-                                        )
+                                        ))
                                     )
                                 ))
                             )
@@ -341,5 +376,19 @@ class categories {
     private static function foo($e) {
 
         return (!empty($e));
+    }
+
+    /**
+     * Сортировка категорий
+     *
+     * @param array $data Принимается $_POST
+     */
+    public static function sort($data) {
+        \ten\orm::db('tmod_shop');
+        foreach($data['categories'] as $i => $id) {
+            \ten\orm::update('tmod_shop_categories', array(
+                'serial' => $i
+            ))->where($id);
+        }
     }
 }

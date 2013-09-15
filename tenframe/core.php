@@ -7,28 +7,56 @@
 
 /* Использование
 
-    Приведение путей к корректному виду:
-        Корневой путь добавится автоматически:
-            ten\core::resolve_path(                     // Путь до папки: /Users/name/project/one/two/third/four/
-                'one//two///',
-                'third',
-                'four/'
-            );
-        Корневой путь не добавится, если он уже есть:
-            ten\core::resolve_path(                     // Путь до файла: /Users/name/project/one/two/third/four
-                ROOT,
-                'one//two///',
-                'third',
-                'four'
-            );
+    Приведение существующих путей.
+        Если файла не существует, то вернётся false.
+
+        Если файл существует: __DIR__ . '/testResolveRealPath/one/cat/cat.txt'.
+        ten\core::resolveRealPath(__DIR__, 'testResolveRealPath', 'one/cat/', '..', 'cat', 'cat.txt');
+
+        Абсолютный путь добавится автоматически: __DIR__ . '/tenframe/test/core'.
+        ten\core::resolveRealPath('tenframe', '/test', 'core/');
+
+    Приведение несуществующих путей в относительном виде.
+        ten\core::resolveRelativePath('path', 'to', 'dir', 'or', 'file');
+
+    Приведение несуществующих путей в абсолютном виде.
+        Вне зависимости от существования файла: __DIR__ . '/virtualPath/one/cat/cat.txt'.
+        Абсолютный путь добавится по необходимости.
+        ten\core::resolvePath(__DIR__, 'virtualPath', 'one/cat/', '..', 'cat', 'cat.txt');
+
+    Подключение файла.
+        Возвращает файл или false в случае его отсутствия.
+        ten\core::requireFile('/path/to/file.php');
+
+    Подключение файлов.
+        ten\core::requireFiles('/path/to/file1.php', '/path/to/fileN.php');
+
+    Подключение PHP-файлов из директории.
+        Возвращает массив путей подключенных файлов.
+        ten\core::requireDir('/path/to/dir/');
+
+    Рекурсивное подключение PHP-файлов из всех директорий внутри директории.
+        Возвращает массив путей подключенных файлов.
+        ten\core::requireDirRecursive(
+            '/path/to/dir/',
+            0                                           // Количество уровней вложенности, начиная с нуля. По умолчанию: -1
+        );
+
+    Получить массив информации о текущем URL:
+        ten\core::getUrlInfo();                         // Возвращается: http://php.net/manual/ru/function.parse-url.php
+
+    Получить текущий URL:
+        ten\core::getUrl();                             // Например: http://tenframe/path/to/
+
+    Получить строку запроса к текущему файлу:
+        ten\core::getCurrentPageUrl();                  // Например: http://tenframe/tenframe/index.php
 */
 
 namespace ten;
 
 class core {
 
-    public static $get;                                                    // Объект, который используется из приложения для обращения к GET-переменным
-    public static $paths = array('/');                                     // Массив с директориями классов
+    protected static $paths = array('/');                                  // Массив с директориями классов
     public static $startTime;                                              // Время начала выполнения скрипта
     public static $required = array();                                     // Подключенные файлы классов
     
@@ -40,7 +68,7 @@ class core {
     public static function auto_load($class) {
 
         foreach(self::$paths as $dir) {
-            
+
             $path = str_replace(                                           // Замена символов в строке вызова метода tenframe
                 array('__', 'ten\\mod\\', 'ctr\\',           'mod\\',      'ten\\',     '\\'),
                 array('/',  TEN_MODULES,  'app/controller/', 'app/model/', TEN_CLASSES, '/'),
@@ -59,12 +87,79 @@ class core {
      */
     public static function requireFile($file) {
 
-        $file = self::resolve_path($file);                                 // Приведение пути к корректному виду
+        $file = self::resolvePath($file);                                  // Приведение пути к корректному виду
 
         if(is_file($file)) {                                               // Если файл существует
             array_push(self::$required, $file);                            // Добавление в массив подключенных файлов классов
             return require $file;                                          // его нужно подключить
         } else return false;
+    }
+
+    /**
+     * Подключение файлов
+     *
+     * @param  string Arguments Пути до файлов
+     * @return array            Массив успешно подключенных файлов
+     */
+    public static function requireFiles() {
+
+        $requiredFiles = array();
+
+        foreach(func_get_args() as $file) {
+            $required = self::requireFile($file);
+            if(!$required) continue;
+
+            $requiredFiles[$file] = $required;
+        }
+
+        return $requiredFiles;
+    }
+
+
+    /**
+     * Подключение всех php-файлов директории
+     *
+     * @param  string $dir Путь до директории
+     * @return array       Массив путей
+     */
+    public static function requireDir($dir) {
+        $dirList = new \DirectoryIterator(self::resolvePath($dir));
+        return self::requireDirFiles($dirList);
+    }
+
+    /**
+     * Рекурсивное подключение php-файлов всех вложенных директорий
+     *
+     * @param  string  $dir   Путь до базовой директории
+     * @param  integer $depth Глубина рекурсии, начиная с нуля
+     * @return array          Массив путей
+     */
+    public static function requireDirRecursive($dir, $depth = -1) {
+        $dirList  = new \RecursiveDirectoryIterator(self::resolvePath($dir));
+        $iterator = new \RecursiveIteratorIterator($dirList);
+        $iterator->setMaxDepth($depth);
+        return self::requireDirFiles($iterator);
+    }
+
+    /**
+     * Подключение php-файлов в директории
+     *
+     * @param  object $list Массив объектов директории
+     * @return array        Массив путей подключенных файлов
+     */
+    private static function requireDirFiles($list) {
+
+        $requiredFiles = array();
+
+        foreach($list as $object) {
+            if($object->isFile() && $object->getExtension() == 'php') {
+                $path = $object->getPathname();
+                self::requireFile($path);
+                array_push($requiredFiles, $path);
+            }
+        }
+
+        return $requiredFiles;
     }
 
     public static $define = array();                                       // Константы
@@ -82,7 +177,6 @@ class core {
 
     protected static $settings = array(                                    // Параметры работы фреймворка
         'develop' => false,                                                // Режим разработки
-        'clearURI' => true,                                                // Маршрутизировать относительный путь
         'autoprefix' => '__autogen__',                                     // Префикс для автоматически сгенерированных файлов
 
         // Для compressHTML и tenhtml в качестве значения нужно указать путь до директории, в которой будут храниться сгенерированные шаблоны
@@ -147,21 +241,16 @@ class core {
 
         self::$startTime = microtime(true);                                // Сохранение времени начала выполнения скрипта
 
-        self::define('TEN_PATH', 'tenframe');                              // Константа директории tenframe
-        self::define('TEN_CLASSES', TEN_PATH . '/classes/');               // Константа директории для хранения классов tenframe
-        self::define('TEN_MODULES', '/mod/');                              // Константа директории модулей
-
+        session_start();
         spl_autoload_register(array('self', 'auto_load'));                 // Включение автоподгрузки классов
         register_shutdown_function(array('ten\core', 'shutdown'));         // Указание метода, который будет вызван по окончании выполнения всего скрипта
 
-        $query = self::define_ROOT();                                      // Определение константы ROOT
-        self::define('BLOCKS', self::resolve_path('/view/blocks/'));       // Константа директории блоков
-        self::define('GEN', file::$autoprefix);                            // Константа префикса автоматически сгенерированных файлов
+        self::initStart();                                                 // Базовая инициализация
 
-        self::requireFile('/vendor/autoload.php');                         // Composer autoloader
+        self::define('GEN', file::$autoprefix);                            // Константа префикса автоматически сгенерированных файлов
         self::requireFile('/settings.php');                                // Подключение настроек работы tenframe
 
-        self::define_URI($query);                                          // Определение константы URI
+        self::setUrlInfo(self::getUrl());
         self::define_DEV();                                                // Определение константы DEV
 
         self::$paths = array_merge(                                        // Добавление путей автоматической загрузки классов
@@ -194,43 +283,92 @@ class core {
     }
 
     /**
-     * Определение константы ROOT
+     * Инициализация для тестов
+     *
+     */
+    public static function initTest() {
+        self::initStart();
+        self::requireDir(TEN_PATH . '/classes/');
+        self::requireDirRecursive(TEN_PATH . '/test/', 1);
+    }
+
+    /**
+     * Базовая инициализация
      *
      * @return string Строка запроса
      */
-    private static function define_ROOT() {
+    private static function initStart() {
 
-        if(stripos($_SERVER['PHP_SELF'], TEN_PATH . '/index.php')) {       // Если выполняется обычный запрос
-            list($root, $query) = explode(
-                TEN_PATH . '/index.php',
-                $_SERVER['PHP_SELF']
-            );
-        }
-        else {                                                             // Иначе выполняется ajax-запрос
-            $root = '';
-            $query = $_SERVER['PHP_SELF'];
-        }
+        self::define('TEN_PATH', 'tenframe');                              // Константа директории tenframe
+        self::define('TEN_CLASSES', TEN_PATH . '/classes/');               // Константа директории для хранения классов tenframe
+        self::define('TEN_MODULES', '/mod/');                              // Константа директории модулей
 
-        self::define('ROOT', $_SERVER['DOCUMENT_ROOT'] . $root);           // Константа корневого пути
+        $query = self::define_ROOT();                                      // Определение константы ROOT
+        self::define('BLOCKS', self::resolvePath('/view/blocks/'));       // Константа директории блоков
+
+        self::requireFile('/vendor/autoload.php');                         // Composer autoloader
 
         return $query;
     }
 
     /**
-     * Определение константы URI
+     * Определение константы ROOT
      *
-     * @param string $query Строка запроса
      */
-    private static function define_URI($query) {
+    private static function define_ROOT() {
+        self::define('ROOT', implode('/', array_slice(explode('/', __DIR__), 0, -1)));
+    }
 
-        if(self::$settings['clearURI']) {                                  // Если задана маршрутизация только относительного пути
-            $uri = $query . (($_SERVER['QUERY_STRING']) ?                  // Константа чистого запроса
-                '?' . $_SERVER['QUERY_STRING'] : '');
-        } else {
-            $uri = $_SERVER['REQUEST_URI'];                                // Константа полного запроса
-        }
+    private static $url;                                                   // Массив информации об URL
 
-        self::define('URI', $uri);                                         // Путь до приложения
+    /**
+     * Установить массив информации о текущем URL
+     *
+     * @param  string $url Строка запроса
+     * @return array       Массив информации
+     */
+    protected static function setUrlInfo($url) {
+        return self::$url = parse_url($url);
+    }
+
+    /**
+     * Получить массив информации о текущем URL
+     *
+     * @return array Массив информации
+     */
+    public static function getUrlInfo() {
+        return self::$url;
+    }
+
+    /**
+     * Получить текущий URL
+     *
+     * @return string URL
+     */
+    public static function getUrl() {
+        return self::getProtocol() . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+    }
+
+    /**
+     * Получить строку запроса к текущему файлу
+     *
+     * @return string Строка запроса
+     */
+    public static function getCurrentPageUrl() {
+        return
+            self::getProtocol() . '://' .
+            $_SERVER['HTTP_HOST'] .
+            $_SERVER['SCRIPT_NAME'] .
+            (!empty($_SERVER['QUERY_STRING'])? '?' . $_SERVER['QUERY_STRING'] : '');
+    }
+
+    /**
+     * Получить текущий протокол
+     *
+     * @return string Протокол
+     */
+    private static function getProtocol() {
+        return strpos(strtolower($_SERVER['SERVER_PROTOCOL']),'https') === false? 'http' : 'https';
     }
 
     /**
@@ -259,43 +397,65 @@ class core {
             }
         }
 
-        self::requireFile(TEN_PATH . '/request.php');                      // Подключение функций обработки маршрутов
-
         foreach(self::$settings['files'] as $file) {                       // Подключение общих файлов
             self::requireFile($file . '.php');
         }
     }
 
     /**
-     * Приведение путей к корректному виду с дополнением до абсолютного расположения
+     * Приведение существующих путей
+     *
+     * @param  string           Arguments Любое количество строк к объединению
+     * @return string | boolean           Приведённый путь или false, если путь не существует
+     */
+    public static function resolveRealPath() {
+        $args = implode('/', func_get_args());                             // Объединение всех аргументов в строку
+
+        $path = '/' . implode('/', array_filter(explode('/', $args)));     // Удаление лишних слешей
+
+        if(!self::hasRoot($path)) {
+            $path = ROOT . $path;
+        }
+
+        return realpath($path);                                            // Приведённый путь
+    }
+
+    /**
+     * Приведение несуществующих путей в относительном виде
      *
      * @param  string Arguments Любое количество строк к объединению
      * @return string           Приведённый путь
      */
-    public static function resolve_path() {
-        $arguments = implode('/', func_get_args());                        // Объединение всех аргументов в строку
-        $path = self::remove_path_slashes($arguments);                     // Удаление лишних слешей
+    public static function resolveRelativePath() {
+        $args = implode('/', func_get_args());                             // Объединение всех аргументов в строку
 
-        if(!preg_match('/^' . str_replace('/', '\/', ROOT) . '/', $path))  // Если в пути не указана корневая директория
-            $path = self::remove_path_slashes(ROOT . $path);               // то её надо добавить
-
-        return $path . (                                                   // Приведённый путь
-            (substr($arguments, -1) == '/') ?                              // Если последним символом был слеш
-                '/' :                                                      // то его надо оставить
-                ''
-        );
+        return array_reduce(explode('/', $args), function($a, $b) {        // Реализация realpath()
+            if($a === 0) $a = '/';
+            if($b === '' || $b === '.') return $a;
+            if($b === '..') return dirname($a);
+            return preg_replace('/\/+/', '/', $a . '/' . $b);
+        });
     }
 
     /**
-     * Удаление лишних слешей из пути
+     * Приведение несуществующих путей в абсолютном виде
      *
-     * @param  string $path Путь с лишними слешами
-     * @return string       Путь без лишних слешей
+     * @param  string Arguments Любое количество строк к объединению
+     * @return string           Приведённый путь
      */
-    private static function remove_path_slashes($path) {
-        $path = explode('/', $path);                                       // Разбить путь на части в массив
-        $path = array_filter($path);                                       // Удалить пустые элементы массива
-        return '/' . implode('/', $path);                                  // Снова объединить элементы в строку
+    public static function resolvePath() {
+        $path = call_user_func_array(array('self', 'resolveRelativePath'), func_get_args());
+        return !self::hasRoot($path)? ROOT . $path : $path;
+    }
+
+    /**
+     * Является ли путь абсолютным
+     *
+     * @param  string $path Путь
+     * @return boolean
+     */
+    private static function hasRoot($path) {
+        return !!preg_match('/^' . str_replace('/', '\/', ROOT) . '/', $path);
     }
 
     /**
@@ -325,8 +485,6 @@ class core {
      * 
      */
     public static function shutdown() {
-
-        route::routes();                                                   // Проведение системных маршрутов
 
         tpl::not_found(array(                                              // Если ни один маршрут не был проведён, значит страница не найдена
             'sysauto' => true                                              // Опция символизирует возврат автоматической страницы 404
