@@ -7,7 +7,7 @@ class join extends core {
     /**
      * Конструктор
      *
-     * @param array $options Массив опций
+     * @param array [$options=[]] Массив опций
      */
     function __construct($options = []) {
 
@@ -34,12 +34,13 @@ class join extends core {
     /**
      * Объединить файлы
      *
-     * @param array $options Опции объединения
+     * @param array $files Массив путей до файлов
+     * @param array [$options=[]] Опции объединения
      * @return string
      */
-    public function combine($options) {
+    public function combine($files, $options = []) {
 
-        $concat = $this->concat($options['files']);
+        $concat = $this->concat($files);
 
         $imploded = $this->implode(
             $this->start,

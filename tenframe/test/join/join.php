@@ -24,11 +24,9 @@ class joinTest extends PHPUnit_Framework_TestCase {
         $join = new ten\join();
 
         $result = $join->combine([
-            'files' => [
-                self::file('a.html'),
-                self::file('b.css'),
-                self::file('c.js')
-            ]
+            self::file('a.html'),
+            self::file('b.css'),
+            self::file('c.js')
         ]);
 
         $this->assertEquals($result, 'a-htmlb-cssc-js');
@@ -42,11 +40,10 @@ class joinTest extends PHPUnit_Framework_TestCase {
         $join = new ten\join();
 
         $result = $join->combine([
-            'files' => [
-                self::file('a.html'),
-                self::file('b.css'),
-                self::file('c.js')
-            ],
+            self::file('a.html'),
+            self::file('b.css'),
+            self::file('c.js')
+        ], [
             'save' => self::save('saved.txt')
         ]);
 
@@ -64,11 +61,9 @@ class joinTest extends PHPUnit_Framework_TestCase {
         ]);
 
         $result = $join->combine([
-            'files' => [
-                self::file('a.html'),
-                self::file('b.css'),
-                self::file('c.js')
-            ]
+            self::file('a.html'),
+            self::file('b.css'),
+            self::file('c.js')
         ]);
 
         $this->assertEquals($result, '{a-html{b-css{c-js');
@@ -84,11 +79,9 @@ class joinTest extends PHPUnit_Framework_TestCase {
         ]);
 
         $result = $join->combine([
-            'files' => [
-                self::file('a.html'),
-                self::file('b.css'),
-                self::file('c.js')
-            ]
+            self::file('a.html'),
+            self::file('b.css'),
+            self::file('c.js')
         ]);
 
         $this->assertEquals($result, 'a-html}b-css}c-js}');
@@ -105,11 +98,9 @@ class joinTest extends PHPUnit_Framework_TestCase {
         ]);
 
         $result = $join->combine([
-            'files' => [
-                self::file('a.html'),
-                self::file('b.css'),
-                self::file('c.js')
-            ]
+            self::file('a.html'),
+            self::file('b.css'),
+            self::file('c.js')
         ]);
 
         $this->assertEquals($result, '{a-html}{b-css}{c-js}');
@@ -127,11 +118,9 @@ class joinTest extends PHPUnit_Framework_TestCase {
         ]);
 
         $result = $join->combine([
-            'files' => [
-                self::file('a.html'),
-                self::file('b.css'),
-                self::file('c.js')
-            ]
+            self::file('a.html'),
+            self::file('b.css'),
+            self::file('c.js')
         ]);
 
         $this->assertEquals($result, '[{a-html}{b-css}{c-js}');
@@ -149,11 +138,9 @@ class joinTest extends PHPUnit_Framework_TestCase {
         ]);
 
         $result = $join->combine([
-            'files' => [
-                self::file('a.html'),
-                self::file('b.css'),
-                self::file('c.js')
-            ]
+            self::file('a.html'),
+            self::file('b.css'),
+            self::file('c.js')
         ]);
 
         $this->assertEquals($result, '{a-html}{b-css}{c-js}]');
@@ -172,11 +159,9 @@ class joinTest extends PHPUnit_Framework_TestCase {
         ]);
 
         $result = $join->combine([
-            'files' => [
-                self::file('a.html'),
-                self::file('b.css'),
-                self::file('c.js')
-            ]
+            self::file('a.html'),
+            self::file('b.css'),
+            self::file('c.js')
         ]);
 
         $this->assertEquals($result, '[{a-html}{b-css}{c-js}]');
@@ -194,9 +179,7 @@ class joinTest extends PHPUnit_Framework_TestCase {
 
         list($a, $b, $c) = [self::file('a.html'), self::file('b.css'), self::file('c.js')];
 
-        $result = $join->combine([
-            'files' => [$a, $b, $c]
-        ]);
+        $result = $join->combine([$a, $b, $c]);
 
         $this->assertEquals($result, "($a)a-html;($b)b-css;($c)c-js;");
     }
@@ -213,9 +196,7 @@ class joinTest extends PHPUnit_Framework_TestCase {
 
         list($a, $b, $c) = [self::file('a.html'), self::file('b.css'), self::file('c.js')];
 
-        $result = $join->combine([
-            'files' => [$a, $b, $c]
-        ]);
+        $result = $join->combine([$a, $b, $c]);
 
         $this->assertEquals($result, "($a)a-html($a|$a);($b)b-css($b|$b);($c)c-js($c|$c);");
     }
