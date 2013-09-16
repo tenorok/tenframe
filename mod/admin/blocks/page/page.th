@@ -1,0 +1,8 @@
+%mod-admin-page: {
+    json: false,
+    content: [
+        '{header}',
+        '{menu}',
+        '{content}'
+    ]
+}

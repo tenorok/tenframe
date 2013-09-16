@@ -1,0 +1,5 @@
+%mod-admin-content: {
+    json: false,
+    h1.__title: '{title}',
+    .__content: '{content}'
+}

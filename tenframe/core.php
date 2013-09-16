@@ -191,7 +191,7 @@ class core {
             '/app/model/'
         ),
 
-        'statical' => '/view/statical/',                                   // Путь до путей к статическим файлам
+        'statical' => '/assets/statical/',                                 // Путь до путей к статическим файлам
 
         'mysql' => false,
 //        'mysql' => array(                                                  // Подключение к БД (true | array())
@@ -304,7 +304,7 @@ class core {
         self::define('TEN_MODULES', '/mod/');                              // Константа директории модулей
 
         $query = self::define_ROOT();                                      // Определение константы ROOT
-        self::define('BLOCKS', self::resolvePath('/view/blocks/'));       // Константа директории блоков
+        self::define('BLOCKS', self::resolvePath('/blocks/'));             // Константа директории блоков
 
         self::requireFile('/vendor/autoload.php');                         // Composer autoloader
 
@@ -469,7 +469,7 @@ class core {
             isset($_SESSION['DEV']) && $_SESSION['DEV'] && !$dev ||        // Если режим разработчика был включен, а сейчас его выключили
             $dev                                                           // или он просто включен
         ) {
-            file::autogen('/view/include/dev.js', 'tenframe.dev=' . (($dev) ? 'true;' : 'false;'));
+            file::autogen('/assets/js/dev.js', 'tenframe.dev=' . (($dev) ? 'true;' : 'false;'));
             $ret = true;                                                   // то надо вернуть true, чтобы собрать JS-файлы с новым значением
         }
         else                                                               // Иначе режим разработчика выключен

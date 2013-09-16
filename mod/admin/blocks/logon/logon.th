@@ -1,0 +1,49 @@
+form%mod-admin-logon: {
+    json: false,
+    attr: {
+        method: 'post',
+        action: '{action}'
+    },
+    content: {
+        ul.__form: {
+            li.__item: {
+                label.__label: 'Логин',
+                .__value: {
+                    input.__input: {
+                        attr: {
+                            type: 'text',
+                            name: 'login',
+                            autofocus: true
+                        }
+                    }
+                }
+            },
+            li.__item: {
+                label.__label: 'Пароль',
+                .__value: {
+                    input.__input: {
+                        attr: {
+                            type: 'password',
+                            name: 'password'
+                        }
+                    }
+                }
+            },
+            li.__item: {
+                .__send: {
+                    input
+                        .__input-send: {
+                            attr: {
+                                type: 'submit',
+                                name: 'send',
+                                value: 'войти'
+                            }
+                        }
+                }
+            },
+            li.__item: {
+                .__error: '{error}'
+            }
+        }
+    }
+}

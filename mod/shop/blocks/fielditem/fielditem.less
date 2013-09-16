@@ -1,0 +1,88 @@
+.mod-shop-fielditem__labelitem {
+    margin: 10px 0;
+}
+.mod-shop-fielditem__labelitem_position_right {
+    position: absolute;
+    top: -10px;
+
+    margin-left: 350px;
+
+    color: #888888;
+}
+
+.mod-shop-fielditem__labelitem_independent {
+    margin: 40px 0 40px -20px;
+    padding: 10px 20px;
+
+    background: #F7F5E6;
+}
+
+    .mod-shop-fielditem_value_exist .mod-shop-fielditem__labelitem_type_option {
+        display: none;
+    }
+
+    .mod-shop-fielditem_classifier_yes .mod-shop-fielditem__hiddenitem {
+        display: block;
+    }
+
+    @mod_shop_categories__input_padding_top_bottom: 2px;
+
+    .mod-shop-fielditem__label {
+        display: inline-block;
+        padding: @mod_shop_categories__input_padding_top_bottom + 1px 0;
+        width: 100px;
+
+        vertical-align: top;
+    }
+    .mod-shop-fielditem__label_long {
+        width: auto;
+    }
+    .mod-shop-fielditem__label_left-column {
+        float: left;
+    }
+    .mod-shop-fielditem__textinput,
+    .mod-shop-fielditem__numberinput {
+        border: 1px solid #aaa;
+        padding: @mod_shop_categories__input_padding_top_bottom 4px;
+
+        color: #333;
+
+        @placeholder-color: #aaa;
+
+        &::-webkit-input-placeholder {
+            color: @placeholder-color;
+        }
+
+        &:-moz-placeholder {
+            color: @placeholder-color;
+        }
+    }
+    .mod-shop-fielditem__textinput {
+        width: 150px;
+    }
+    .mod-shop-fielditem__textinput_right-column {
+        display: block;
+        margin: 10px 0 10px 100px;
+    }
+    .mod-shop-fielditem__numberinput {
+        width: 30px;
+    }
+    .mod-shop-fielditem__checkboxinput {
+        float: left;
+        margin: 4px 7px 0 0;
+    }
+
+    .mod-shop-fielditem__selectinput {
+        border: 1px solid #aaa;
+
+        color: #333;
+    }
+    .mod-shop-fielditem__selectinput_right-column {
+        margin-left: 100px;
+    }
+        .mod-shop-fielditem__optioninput {
+            padding: @mod_shop_categories__input_padding_top_bottom 4px;
+        }
+.mod-shop-fielditem__hiddenitem {
+    display: none;
+}

@@ -83,16 +83,15 @@ class tpl extends core {
         foreach($options as $opt => $val)                                               // Переприсваивание массива опций в самостоятельные переменные
             $$opt = $val;
 
-        if(!isset($view))                                                               // Если представление не указано
-            $view = $block;                                                             // его имя соответствует имени блока
+        $view = (!isset($view)) ? $block : '/view/' . $view;
 
-        $blocks = (isset($mod)) ? ROOT . '/mod/' . $mod . '/view/blocks/' : BLOCKS;     // Изменение начального пути, если указан модуль
+        $blocks = (isset($mod)) ? ROOT . '/mod/' . $mod . '/blocks/' : BLOCKS;          // Изменение начального пути, если указан модуль
 
         $extensions = array('tenhtml', 'th', 'tpl');                                    // Расширения файлов шаблонов в порядке приоритета
 
         foreach($extensions as $ext) {                                                  // Поиск существующих шаблонов
 
-            $file = parent::resolvePath($blocks, $block, 'view', $view . '.' . $ext);   // Полный путь к шаблону
+            $file = parent::resolvePath($blocks, $block, $view . '.' . $ext);           // Полный путь к шаблону
 
             if($ext == 'tenhtml' || $ext == 'th' && parent::$settings['tenhtml']) {     // Если рассматриваемое расширение tenhtml и включена его настройка
 
@@ -117,11 +116,11 @@ class tpl extends core {
             }
 
             $blocks = (isset($mod)) ?
-                file::resolvePath(self::$compressTplFolder, '/mod/', $mod, '/view/blocks/') :
-                file::resolvePath(self::$compressTplFolder, '/view/blocks/');
+                file::resolvePath(self::$compressTplFolder, '/mod/', $mod, '/blocks/') :
+                file::resolvePath(self::$compressTplFolder, '/blocks/');
 
             $compressedFile = file::resolvePath(                                        // Полный путь к сжатому шаблону
-                $blocks, $block, '/view/', $view . '.tpl'
+                $blocks, $block, $view . '.tpl'
             );
 
             if(file_exists($compressedFile)) {
@@ -368,8 +367,7 @@ class tpl extends core {
                 $options[$key] = $val;
 
         die(self::block(array(
-            'block' => 'html',
-            'view'  => '404',
+            'block' => '404',
             'parse' => array(
                 'title'   => $options['title'],
                 'header'  => $options['header'],

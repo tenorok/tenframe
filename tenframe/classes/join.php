@@ -70,7 +70,7 @@ class join extends file {
     private static $input_files = array();                                           // Массив путей объединённых файлов
     private static $output_file;                                                     // Строка, в которую собираются файлы
 
-    public  static $input_path = array('/view/');                                    // Массив входящих директорий
+    public  static $input_path = array('/blocks/');                                  // Массив входящих директорий
     public  static $debugJoin  = array();                                            // Массив объединённых файлов
 
     private static $options = array(                                                 // Дефолтные параметры объединения файлов

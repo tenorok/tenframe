@@ -2,17 +2,18 @@
 
 ten\join::files(array(                            // Сборка всех js-файлов
     'files'       => 'ext: js',
-    'priority'    => array('/view/objects/core.js'),
+    'priority'    => array('/blocks/tenframe/tenframe.js'),
     'output_file' => '/assets/js/main.js'
 ));
 
 ten\join::files(array(                            // Сборка основных стилей и необходимых библиотек
-    'files'       => 'reg: /\.less|\.style|\.import/',
+    'files'       => 'reg: /\.less|\.style/',
+    'input_path'  => '/blocks/',
     'output_file' => '/assets/css/main.less'
 ));
 
 ten\join::files(array(                            // Сборка стилей для печати и необходимых библиотек
-    'files'       => 'reg: /\.print|\.import/',
+    'files'       => 'reg: /\.print/',
     'output_file' => '/assets/css/print.less'
 ));
 

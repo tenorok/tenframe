@@ -1,0 +1,42 @@
+ul%mod-admin-menu: {
+    json: false,
+    for.items: {
+        li.__item: {
+            for.deactive: {
+                .__item-wrap: {
+                    a.__url: {
+                        attr: {
+                            href: '{href}'
+                        },
+                        content: '{title}'
+                    }
+                }
+            },
+            for.active: {
+                .__item-wrap
+                ._active: '{title}'
+            },
+            for.sub: {
+                ul.__submenu: {
+                    for.subitems: {
+                        for.deactive: {
+                            li.__submenu-item: {
+                                a.__url: {
+                                    attr: {
+                                        href: '{href}'
+                                    },
+                                    content: '{title}'
+                                }
+                            }
+                        },
+                        for.active: {
+                            li
+                                .__submenu-item
+                                ._active: '{title}'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

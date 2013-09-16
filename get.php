@@ -25,10 +25,12 @@ ten\get::files(array(                               // Выкачивание н
         'https://raw.github.com/digitalBush/jquery.maskedinput/1.3.1/dist/jquery.maskedinput.min.js',
         'https://raw.github.com/necolas/normalize.css/master/normalize.css',
         'https://raw.github.com/isagalaev/highlight.js/master/src/styles/github.css' => 'highlight.github.css',
-        'https://raw.github.com/jasonm23/markdown-css-themes/gh-pages/markdown10.css' => 'markdown.css'
+        'https://raw.github.com/jasonm23/markdown-css-themes/gh-pages/markdown10.css' => 'markdown.css',
+        'https://raw.github.com/dmitryf/elements/master/elements.less'
     ),
     'path' => array(
         'css' => '/assets/css/vendor/',
+        'less' => '/assets/css/vendor/',
         'js'  => '/assets/js/vendor/'
     )
 ));
