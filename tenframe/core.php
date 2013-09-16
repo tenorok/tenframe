@@ -28,6 +28,11 @@
         Возвращает файл или false в случае его отсутствия.
         ten\core::requireFile('/path/to/file.php');
 
+    Подключение php-файла.
+        Расширение указывать не нужно.
+        Возвращает файл или false в случае его отсутствия.
+        ten\core::requirePhpFile('/path/to/file');
+
     Подключение файлов.
         ten\core::requireFiles('/path/to/file1.php', '/path/to/fileN.php');
 
@@ -75,12 +80,12 @@ class core {
                 strtolower($class)
             );
 
-            if(self::requireFile($dir . $path . '.php')) break;            // Подключение файла
+            if(self::requirePhpFile($dir . $path)) break;            // Подключение файла
         }
     }
 
     /**
-     * Подключение файлов
+     * Подключение файла
      *
      * @param  string  $file Путь до файла
      * @return mixed         Файл или false в случае его отсутствия
@@ -93,6 +98,16 @@ class core {
             array_push(self::$required, $file);                            // Добавление в массив подключенных файлов классов
             return require $file;                                          // его нужно подключить
         } else return false;
+    }
+
+    /**
+     * Подключение php-файла
+     *
+     * @param  string  $file Путь до файла
+     * @return mixed         Файл или false в случае его отсутствия
+     */
+    public static function requirePhpFile($file) {
+        return self::requireFile($file . '.php');
     }
 
     /**
@@ -393,12 +408,12 @@ class core {
 
         if(self::dev(DEV)) {                                               // Если включен режим разработчика
             foreach(self::$settings['devFiles'] as $file) {                // Подключение файлов для разработки
-                self::requireFile($file . '.php');
+                self::requirePhpFile($file);
             }
         }
 
         foreach(self::$settings['files'] as $file) {                       // Подключение общих файлов
-            self::requireFile($file . '.php');
+            self::requirePhpFile($file);
         }
     }
 
