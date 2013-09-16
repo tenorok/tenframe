@@ -181,4 +181,42 @@ class joinTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals($result, '[{a-html}{b-css}{c-js}]');
     }
+
+    /**
+     * Объединение с добавлением строки перед и после каждого файла с переменной {filename}
+     */
+    public function testBeforeAfterFilename() {
+
+        $join = new ten\join([
+            'before' => '({filename})',
+            'after' => ';'
+        ]);
+
+        list($a, $b, $c) = [self::file('a.html'), self::file('b.css'), self::file('c.js')];
+
+        $result = $join->combine([
+            'files' => [$a, $b, $c]
+        ]);
+
+        $this->assertEquals($result, "($a)a-html;($b)b-css;($c)c-js;");
+    }
+
+    /**
+     * Объединение с добавлением строки перед и после каждого файла с повторяющейся переменной {filename}
+     */
+    public function testBeforeAfterFilename2() {
+
+        $join = new ten\join([
+            'before' => '({filename})',
+            'after' => '({filename}|{filename});'
+        ]);
+
+        list($a, $b, $c) = [self::file('a.html'), self::file('b.css'), self::file('c.js')];
+
+        $result = $join->combine([
+            'files' => [$a, $b, $c]
+        ]);
+
+        $this->assertEquals($result, "($a)a-html($a|$a);($b)b-css($b|$b);($c)c-js($c|$c);");
+    }
 }

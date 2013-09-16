@@ -67,7 +67,46 @@ class join extends core {
      * @return string
      */
     private function implode($start, $before, $after, $end, $concat) {
-        return $start . $before . implode($after . $before, $concat) . $after . $end;
+        return $start . $this->addBeforeAfter($before, $after, $concat) . $end;
+    }
+
+    /**
+     * Добавление значений опций before и after
+     *
+     * @param string $before Перед каждым файлом
+     * @param string $after После каждого файла
+     * @param array $concat Массив сожержимого файлов
+     * @return string
+     */
+    private function addBeforeAfter($before, $after, $concat) {
+
+        // Оптимизация для скорости при отсутствии опций
+        if(empty($before) && empty($after)) return implode('', $concat);
+
+        $added = array();
+
+        foreach($concat as $filename => $data) {
+            array_push(
+                $added,
+                $this->variable('{filename}', $filename, $before) .
+                $data .
+                $this->variable('{filename}', $filename, $after)
+            );
+        }
+
+        return implode('', $added);
+    }
+
+    /**
+     * Замена переменной на значение
+     *
+     * @param string $name Имя переменной
+     * @param string $value Значение
+     * @param string $string Строка содержащая переменную
+     * @return mixed
+     */
+    private function variable($name, $value, $string) {
+        return str_replace($name, $value, $string);
     }
 
     /**
@@ -81,7 +120,7 @@ class join extends core {
         $joined = array();
 
         foreach($files as $file) {
-            array_push($joined, file_get_contents($file));
+            $joined[$file] = file_get_contents($file);
         }
 
         return $joined;
