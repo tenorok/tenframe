@@ -5,24 +5,49 @@ namespace ten;
 class join extends core {
 
     /**
+     * Конструктор
+     *
+     * @param array $options Массив опций
+     */
+    function __construct($options = []) {
+
+        $this->options = array_merge($this->defaultOptions, $options);
+
+        $this->start = $this->options['start'];
+        $this->before = $this->options['before'];
+        $this->after = $this->options['after'];
+        $this->end = $this->options['end'];
+    }
+
+    /**
      * Дефолтные опции
      *
      * @var array
      */
-    private static $options = array(
+    private $defaultOptions = array(
         'start' => '',
         'before' => '',
         'after' => '',
         'end' => ''
     );
 
-    public static function files($options) {
+    /**
+     * Объединить файлы
+     *
+     * @param array $options Опции объединения
+     * @return string
+     */
+    public function combine($options) {
 
-        $options = array_merge(self::$options, $options);
+        $concat = $this->concat($options['files']);
 
-        $concat = self::concat($options['files']);
-
-        $imploded = self::implode($options['start'], $options['before'], $options['after'], $options['end'], $concat);
+        $imploded = $this->implode(
+            $this->start,
+            $this->before,
+            $this->after,
+            $this->end,
+            $concat
+        );
 
         if(array_key_exists('save', $options)) {
             self::save($options['save'], $imploded);
@@ -41,7 +66,7 @@ class join extends core {
      * @param array $concat Массив сожержимого файлов
      * @return string
      */
-    private static function implode($start, $before, $after, $end, $concat) {
+    private function implode($start, $before, $after, $end, $concat) {
         return $start . $before . implode($after . $before, $concat) . $after . $end;
     }
 
@@ -51,7 +76,7 @@ class join extends core {
      * @param array $files Массив путей файлов
      * @return array
      */
-    private static function concat($files) {
+    private function concat($files) {
 
         $joined = array();
 
@@ -69,7 +94,7 @@ class join extends core {
      * @param string $data Содержимое
      * @return int
      */
-    private static function save($filename, $data) {
+    private function save($filename, $data) {
         return file_put_contents($filename, $data);
     }
 }

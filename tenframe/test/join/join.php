@@ -2,6 +2,12 @@
 
 class joinTest extends PHPUnit_Framework_TestCase {
 
+    protected function setUp() {
+        // Перед каждым тестом удаляется тестовый файл
+        $saved = self::save('saved.txt');
+        file_exists($saved) && unlink($saved);
+    }
+
     private static function file($file) {
         return ten\core::resolveRelativePath(__DIR__, 'files', $file);
     }
@@ -15,7 +21,9 @@ class joinTest extends PHPUnit_Framework_TestCase {
      */
     public function testSimple() {
 
-        $result = ten\join::files([
+        $join = new ten\join();
+
+        $result = $join->combine([
             'files' => [
                 self::file('a.html'),
                 self::file('b.css'),
@@ -31,7 +39,9 @@ class joinTest extends PHPUnit_Framework_TestCase {
      */
     public function testSave() {
 
-        $result = ten\join::files([
+        $join = new ten\join();
+
+        $result = $join->combine([
             'files' => [
                 self::file('a.html'),
                 self::file('b.css'),
@@ -49,13 +59,16 @@ class joinTest extends PHPUnit_Framework_TestCase {
      */
     public function testBefore() {
 
-        $result = ten\join::files([
+        $join = new ten\join([
+            'before' => '{'
+        ]);
+
+        $result = $join->combine([
             'files' => [
                 self::file('a.html'),
                 self::file('b.css'),
                 self::file('c.js')
-            ],
-            'before' => '{'
+            ]
         ]);
 
         $this->assertEquals($result, '{a-html{b-css{c-js');
@@ -66,13 +79,16 @@ class joinTest extends PHPUnit_Framework_TestCase {
      */
     public function testAfter() {
 
-        $result = ten\join::files([
+        $join = new ten\join([
+            'after' => '}'
+        ]);
+
+        $result = $join->combine([
             'files' => [
                 self::file('a.html'),
                 self::file('b.css'),
                 self::file('c.js')
-            ],
-            'after' => '}'
+            ]
         ]);
 
         $this->assertEquals($result, 'a-html}b-css}c-js}');
@@ -83,14 +99,17 @@ class joinTest extends PHPUnit_Framework_TestCase {
      */
     public function testBeforeAfter() {
 
-        $result = ten\join::files([
+        $join = new ten\join([
+            'before' => '{',
+            'after' => '}'
+        ]);
+
+        $result = $join->combine([
             'files' => [
                 self::file('a.html'),
                 self::file('b.css'),
                 self::file('c.js')
-            ],
-            'before' => '{',
-            'after' => '}'
+            ]
         ]);
 
         $this->assertEquals($result, '{a-html}{b-css}{c-js}');
@@ -101,15 +120,18 @@ class joinTest extends PHPUnit_Framework_TestCase {
      */
     public function testBeforeAfterStart() {
 
-        $result = ten\join::files([
+        $join = new ten\join([
+            'before' => '{',
+            'after' => '}',
+            'start' => '['
+        ]);
+
+        $result = $join->combine([
             'files' => [
                 self::file('a.html'),
                 self::file('b.css'),
                 self::file('c.js')
-            ],
-            'before' => '{',
-            'after' => '}',
-            'start' => '['
+            ]
         ]);
 
         $this->assertEquals($result, '[{a-html}{b-css}{c-js}');
@@ -120,15 +142,18 @@ class joinTest extends PHPUnit_Framework_TestCase {
      */
     public function testBeforeAfterEnd() {
 
-        $result = ten\join::files([
+        $join = new ten\join([
+            'before' => '{',
+            'after' => '}',
+            'end' => ']'
+        ]);
+
+        $result = $join->combine([
             'files' => [
                 self::file('a.html'),
                 self::file('b.css'),
                 self::file('c.js')
-            ],
-            'before' => '{',
-            'after' => '}',
-            'end' => ']'
+            ]
         ]);
 
         $this->assertEquals($result, '{a-html}{b-css}{c-js}]');
@@ -139,16 +164,19 @@ class joinTest extends PHPUnit_Framework_TestCase {
      */
     public function testBeforeAfterStartEnd() {
 
-        $result = ten\join::files([
-            'files' => [
-                self::file('a.html'),
-                self::file('b.css'),
-                self::file('c.js')
-            ],
+        $join = new ten\join([
             'before' => '{',
             'after' => '}',
             'start' => '[',
             'end' => ']'
+        ]);
+
+        $result = $join->combine([
+            'files' => [
+                self::file('a.html'),
+                self::file('b.css'),
+                self::file('c.js')
+            ]
         ]);
 
         $this->assertEquals($result, '[{a-html}{b-css}{c-js}]');
