@@ -20,6 +20,10 @@ class joinTest extends PHPUnit_Framework_TestCase {
         return ten\core::resolveRelativePath(__DIR__, 'files');
     }
 
+    private static function directory2() {
+        return ten\core::resolveRelativePath(__DIR__, 'files2');
+    }
+
     /**
      * Простое объединение
      */
@@ -265,5 +269,19 @@ class joinTest extends PHPUnit_Framework_TestCase {
         ]);
 
         $this->assertEquals($result, 'ccc-cssbb-jsb-cssd-cssf-cssaa-csscc-css');
+    }
+
+    /**
+     * Объединение по расширению файла из нескольких директорий
+     */
+    public function testExtensionDirectories() {
+
+        $join = new ten\join([
+            'directory' => [self::directory(), self::directory2()]
+        ]);
+
+        $result = $join->extension('css');
+
+        $this->assertEquals($result, 'b-cssd-cssf-cssaa-csscc-cssccc-cssa2-cssb2-css');
     }
 }

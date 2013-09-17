@@ -80,7 +80,7 @@ class join extends core {
 
         $this->extension = is_string($extension) ? array($extension) : $extension;
 
-        $fileList = $this->fileList($this->iteratorInit(), $priorityList, function($file) {
+        $fileList = $this->fileList($this->iteratorsInit(), $priorityList, function($file) {
             return in_array($file->getExtension(), $this->extension);
         });
 
@@ -88,33 +88,43 @@ class join extends core {
     }
 
     /**
-     * Инициализация итератора
+     * Инициализация итераторов
      *
-     * @return \RecursiveIteratorIterator
+     * @return \RecursiveIteratorIterator[]
      */
-    private function iteratorInit() {
-        $dirList  = new \RecursiveDirectoryIterator($this->directory);
-        $iterator = new \RecursiveIteratorIterator($dirList);
-        $iterator->setMaxDepth($this->depth);
-        return $iterator;
+    private function iteratorsInit() {
+
+        $directory = is_string($this->directory) ? array($this->directory) : $this->directory;
+        $iterators = array();
+
+        foreach($directory as $dir) {
+            $dirList  = new \RecursiveDirectoryIterator($dir);
+            $iterator = new \RecursiveIteratorIterator($dirList);
+            $iterator->setMaxDepth($this->depth);
+            array_push($iterators, $iterator);
+        }
+
+        return $iterators;
     }
 
     /**
      * Получение массива файлов к объединению
      *
-     * @param \RecursiveIteratorIterator $iterator Итератор
+     * @param \RecursiveIteratorIterator[] $iterators Массив итераторов
      * @param array $priority Массив файлов по приоритету
      * @param callback $criterion Критерий искомого файла
      * @return array
      */
-    private function fileList($iterator, $priority, $criterion) {
+    private function fileList($iterators, $priority, $criterion) {
 
         $list = array();
 
-        foreach($iterator as $object) {
-            $pathname = $object->getPathname();
-            if($object->isFile() && !in_array($pathname, $priority) && $criterion($object)) {
-                array_push($list, $pathname);
+        foreach($iterators as $iterator) {
+            foreach($iterator as $object) {
+                $pathname = $object->getPathname();
+                if($object->isFile() && !in_array($pathname, $priority) && $criterion($object)) {
+                    array_push($list, $pathname);
+                }
             }
         }
 
