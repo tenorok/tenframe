@@ -16,6 +16,10 @@ class joinTest extends PHPUnit_Framework_TestCase {
         return ten\core::resolveRelativePath(__DIR__, 'save', $file);
     }
 
+    private static function directory() {
+        return ten\core::resolveRelativePath(__DIR__, 'files');
+    }
+
     /**
      * Простое объединение
      */
@@ -199,5 +203,67 @@ class joinTest extends PHPUnit_Framework_TestCase {
         $result = $join->combine([$a, $b, $c]);
 
         $this->assertEquals($result, "($a)a-html($a|$a);($b)b-css($b|$b);($c)c-js($c|$c);");
+    }
+
+    /**
+     * Объединение по расширению файла
+     */
+    public function testExtension() {
+
+        $join = new ten\join([
+            'directory' => self::directory()
+        ]);
+
+        $result = $join->extension('css');
+
+        $this->assertEquals($result, 'b-cssd-cssf-cssaa-csscc-cssccc-css');
+    }
+
+    /**
+     * Объединение по расширению файла с указанием глубины рекурсии
+     */
+    public function testExtensionDepth() {
+
+        $join = new ten\join([
+            'directory' => self::directory(),
+            'depth' => 1
+        ]);
+
+        $result = $join->extension('css');
+
+        $this->assertEquals($result, 'b-cssd-cssf-cssaa-csscc-css');
+    }
+
+    /**
+     * Объединение по нескольким расширениям файлов
+     */
+    public function testExtensions() {
+
+        $join = new ten\join([
+            'directory' => self::directory()
+        ]);
+
+        $result = $join->extension(['css', 'html']);
+
+        $this->assertEquals($result, 'a-htmlb-cssd-cssf-cssaa-csscc-cssccc-cssddd-html');
+    }
+
+    /**
+     * Объединение по расширению файла с приоритетами
+     */
+    public function testExtensionPriority() {
+
+        $join = new ten\join([
+            'directory' => self::directory()
+        ]);
+
+        $result = $join->extension('css', [
+            'priority' => [
+                self::file('/nested/nested/ccc.css'),
+                self::file('/nested/bb.js')
+            ]
+        ]);
+
+        $this->assertEquals($result, 'ccc-cssbb-jsb-cssd-cssf-cssaa-csscc-css');
     }
 }

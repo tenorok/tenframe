@@ -17,6 +17,9 @@ class join extends core {
         $this->before = $this->options['before'];
         $this->after = $this->options['after'];
         $this->end = $this->options['end'];
+
+        $this->directory = $this->options['directory'];
+        $this->depth = $this->options['depth'];
     }
 
     /**
@@ -25,10 +28,14 @@ class join extends core {
      * @var array
      */
     private $defaultOptions = array(
+
         'start' => '',
         'before' => '',
         'after' => '',
-        'end' => ''
+        'end' => '',
+
+        'directory' => false,
+        'depth' => -1
     );
 
     /**
@@ -51,10 +58,67 @@ class join extends core {
         );
 
         if(array_key_exists('save', $options)) {
-            self::save($options['save'], $imploded);
+            $this->save($options['save'], $imploded);
         }
 
         return $imploded;
+    }
+
+    /**
+     * Объединить файлы по расширению
+     *
+     * @throws \Exception При отсутствии опции directory в конструкторе
+     * @param string|array $extension Расширение или массив расширений
+     * @param array [$options=[]] Опции объединения
+     * @return string
+     */
+    public function extension($extension, $options = []) {
+
+        if(!$this->directory) throw new \Exception('Missing option: directory');
+
+        $priorityList = array_key_exists('priority', $options) ? $options['priority'] : array();
+
+        $this->extension = is_string($extension) ? array($extension) : $extension;
+
+        $fileList = $this->fileList($this->iteratorInit(), $priorityList, function($file) {
+            return in_array($file->getExtension(), $this->extension);
+        });
+
+        return $this->combine(array_merge($priorityList, $fileList), $options);
+    }
+
+    /**
+     * Инициализация итератора
+     *
+     * @return \RecursiveIteratorIterator
+     */
+    private function iteratorInit() {
+        $dirList  = new \RecursiveDirectoryIterator($this->directory);
+        $iterator = new \RecursiveIteratorIterator($dirList);
+        $iterator->setMaxDepth($this->depth);
+        return $iterator;
+    }
+
+    /**
+     * Получение массива файлов к объединению
+     *
+     * @param \RecursiveIteratorIterator $iterator Итератор
+     * @param array $priority Массив файлов по приоритету
+     * @param callback $criterion Критерий искомого файла
+     * @return array
+     */
+    private function fileList($iterator, $priority, $criterion) {
+
+        $list = array();
+
+        foreach($iterator as $object) {
+            $pathname = $object->getPathname();
+            if($object->isFile() && !in_array($pathname, $priority) && $criterion($object)) {
+                array_push($list, $pathname);
+            }
+        }
+
+        return $list;
     }
 
     /**
