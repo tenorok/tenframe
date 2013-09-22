@@ -2,10 +2,13 @@
 
 class joinTest extends PHPUnit_Framework_TestCase {
 
-    protected function setUp() {
-        // Перед каждым тестом удаляется тестовый файл
-        $saved = self::save('saved.txt');
-        file_exists($saved) && unlink($saved);
+    protected function tearDown() {
+        // После каждого теста удаляются тестовые файлы
+        $files = ['saved.txt', 'saved.js', 'saved.css', 'saved.html'];
+        foreach($files as $file) {
+            $saved = self::save($file);
+            file_exists($saved) && unlink($saved);
+        }
     }
 
     private static function file($file) {
@@ -284,4 +287,93 @@ class joinTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals($result, 'b-cssd-cssf-cssaa-csscc-cssccc-cssa2-cssb2-css');
     }
+
+    /**
+     * Объединение по нескольким расширениям файлов с сохранением в файл
+     */
+    public function testExtensionsSave() {
+
+        $join = new ten\join([
+            'directory' => self::directory()
+        ]);
+
+        $result = $join->extension(['css', 'html'], [
+            'save' => self::save('saved.txt')
+        ]);
+
+        $rightResult = 'a-htmlb-cssd-cssf-cssaa-csscc-cssccc-cssddd-html';
+        $this->assertEquals($result, $rightResult);
+        $this->assertEquals(file_get_contents(self::save('saved.txt')), $rightResult);
+    }
+
+    /**
+     * Объединение по нескольким расширениям из нескольких директорий с заданной глубиной и приоритетами с сохранением в файл
+     */
+    public function testExtensionsMulti() {
+
+        $join = new ten\join([
+            'directory' => [self::directory(), self::directory2()],
+            'depth' => 1,
+
+            'before' => '{',
+            'after' => '}',
+            'start' => '[',
+            'end' => ']'
+        ]);
+
+        $result = $join->extension(['css', 'js'], [
+            'priority' => [
+                self::file('/nested/nested/aaa.js'),
+                self::file('/nested/cc.css')
+            ],
+            'save' => self::save('saved.html')
+        ]);
+
+        $rightResult = '[{aaa-js}{cc-css}{b-css}{c-js}{d-css}{e-js}{f-css}{aa-css}{bb-js}{a2-css}{b2-css}{c2-js}{bb2-js}]';
+        $this->assertEquals($result, $rightResult);
+        $this->assertEquals(file_get_contents(self::save('saved.html')), $rightResult);
+    }
+
+    /**
+     * Объединение по регулярному выражению
+     */
+    public function testRegexp() {
+
+        $join = new ten\join([
+            'directory' => self::directory()
+        ]);
+
+        $result = $join->regexp('/\.css$/');
+
+        $this->assertEquals($result, 'b-cssd-cssf-cssaa-csscc-cssccc-css');
+    }
+
+    /**
+     * Объединение по регулярному выражению из нескольких директорий с заданной глубиной и приоритетами с сохранением в файл
+     */
+    public function testRegexpMulti() {
+
+        $join = new ten\join([
+            'directory' => [self::directory(), self::directory2()],
+            'depth' => 1,
+
+            'before' => '{',
+            'after' => '}',
+            'start' => '[',
+            'end' => ']'
+        ]);
+
+        $result = $join->regexp('/^[ac]{2,}2?\.(?:html|css)$/', [
+            'priority' => [
+                self::file('/a.html'),
+                self::file('/nested/nested/ddd.html')
+            ],
+            'save' => self::save('saved.js')
+        ]);
+
+        $rightResult = '[{a-html}{ddd-html}{aa-css}{cc-css}{aa2-html}]';
+        $this->assertEquals($result, $rightResult);
+        $this->assertEquals(file_get_contents(self::save('saved.js')), $rightResult);
+    }
+
 }

@@ -67,24 +67,62 @@ class join extends core {
     /**
      * Объединить файлы по расширению
      *
-     * @throws \Exception При отсутствии опции directory в конструкторе
      * @param string|array $extension Расширение или массив расширений
      * @param array [$options=[]] Опции объединения
      * @return string
      */
     public function extension($extension, $options = []) {
 
-        if(!$this->directory) throw new \Exception('Missing option: directory');
-
-        $priorityList = array_key_exists('priority', $options) ? $options['priority'] : array();
-
         $this->extension = is_string($extension) ? array($extension) : $extension;
 
-        $fileList = $this->fileList($this->iteratorsInit(), $priorityList, function($file) {
+        return $this->combineDirectoryFilesByCriterion($options, function($file) {
             return in_array($file->getExtension(), $this->extension);
         });
+    }
+
+    /**
+     * Объединить файлы по регулярному выражению
+     *
+     * @param string $regexp Регулярное выражение
+     * @param array [$options=[]] Опции объединения
+     * @return string
+     */
+    public function regexp($regexp, $options = []) {
+
+        $this->regexp = $regexp;
+
+        return $this->combineDirectoryFilesByCriterion($options, function($file) {
+            return preg_match($this->regexp, $file->getFilename());
+        });
+    }
+
+    /**
+     * Объединить файлы в директории по критерию
+     *
+     * @param array $options Опции объединения
+     * @param callback $criterion Критерий искомых файлов
+     * @return string
+     * @throws \Exception При отсутствии опции directory в конструкторе
+     */
+    private function combineDirectoryFilesByCriterion($options, $criterion) {
+
+        if(!$this->directory) throw new \Exception('Missing option: directory');
+
+        $priorityList = $this->priorityList($options);
+
+        $fileList = $this->fileList($this->iteratorsInit(), $priorityList, $criterion);
 
         return $this->combine(array_merge($priorityList, $fileList), $options);
+    }
+
+    /**
+     * Получение списка приоритетных файлов
+     *
+     * @param array $options Опции объединения
+     * @return array
+     */
+    private function priorityList($options) {
+        return array_key_exists('priority', $options) ? $options['priority'] : array();
     }
 
     /**
@@ -112,7 +150,7 @@ class join extends core {
      *
      * @param \RecursiveIteratorIterator[] $iterators Массив итераторов
      * @param array $priority Массив файлов по приоритету
-     * @param callback $criterion Критерий искомого файла
+     * @param callback $criterion Критерий искомых файлов
      * @return array
      */
     private function fileList($iterators, $priority, $criterion) {
