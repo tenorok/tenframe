@@ -133,7 +133,7 @@ class debug extends core {
             'join' => array(
                 'h2' => 'Join:',
                 'p' => 'Объединённые файлы.',
-                'list' => join::$debugJoin
+                'list' => join::$debug
             ),
             'tenhtml' => array(
                 'h2' => 'Tenhtml:',

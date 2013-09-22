@@ -58,7 +58,7 @@ class join extends core {
         );
 
         if(array_key_exists('save', $options)) {
-            $this->save($options['save'], $imploded);
+            $this->save($options['save'], $imploded) && $this->debug($files, $options['save']);
         }
 
         return $imploded;
@@ -248,5 +248,27 @@ class join extends core {
      */
     private function save($filename, $data) {
         return file_put_contents($filename, $data);
+    }
+
+    /**
+     * Массив для хранения информации по объединённым файлам
+     *
+     * @var array
+     */
+    public static $debug = array();
+
+    /**
+     * Сохранение информации по объединённым файлам
+     *
+     * @param array $files Массив путей до файлов
+     * @param string $save Путь до результирующего файла
+     */
+    private function debug($files, $save) {
+        if(!DEV) return;
+
+        array_push(self::$debug, array(
+            'files' => $files,
+            'save' => $save
+        ));
     }
 }
