@@ -20,6 +20,8 @@ class join extends core {
 
         $this->directory = $this->options['directory'];
         $this->depth = $this->options['depth'];
+
+        $this->resolve = $this->options['resolve'];
     }
 
     /**
@@ -35,7 +37,9 @@ class join extends core {
         'end' => '',
 
         'directory' => false,
-        'depth' => -1
+        'depth' => -1,
+
+        'resolve' => true
     );
 
     /**
@@ -46,22 +50,7 @@ class join extends core {
      * @return string
      */
     public function combine($files, $options = []) {
-
-        $concat = $this->concat($files);
-
-        $imploded = $this->implode(
-            $this->start,
-            $this->before,
-            $this->after,
-            $this->end,
-            $concat
-        );
-
-        if(array_key_exists('save', $options)) {
-            $this->save($options['save'], $imploded) && $this->debug($files, $options['save']);
-        }
-
-        return $imploded;
+        return $this->combineResolvedFiles($this->resolveFiles($files, true), $options);
     }
 
     /**
@@ -97,6 +86,33 @@ class join extends core {
     }
 
     /**
+     * Объединить файлы с приведёнными путями
+     *
+     * @param array $files Массив приведённых путей до файлов
+     * @param array [$options=[]] Опции объединения
+     * @return string
+     */
+    private function combineResolvedFiles($files, $options = []) {
+
+        $concat = $this->concat($files);
+
+        $imploded = $this->implode(
+            $this->start,
+            $this->before,
+            $this->after,
+            $this->end,
+            $concat
+        );
+
+        if(array_key_exists('save', $options)) {
+            $resolveSave = $this->resolve($options['save']);
+            $this->save($resolveSave, $imploded) && $this->debug($files, $resolveSave);
+        }
+
+        return $imploded;
+    }
+
+    /**
      * Объединить файлы в директории по критерию
      *
      * @param array $options Опции объединения
@@ -112,7 +128,7 @@ class join extends core {
 
         $fileList = $this->fileList($this->iteratorsInit(), $priorityList, $criterion);
 
-        return $this->combine(array_merge($priorityList, $fileList), $options);
+        return $this->combineResolvedFiles(array_merge($priorityList, $fileList), $options);
     }
 
     /**
@@ -122,7 +138,7 @@ class join extends core {
      * @return array
      */
     private function priorityList($options) {
-        return array_key_exists('priority', $options) ? $options['priority'] : array();
+        return array_key_exists('priority', $options) ? $this->resolveFiles($options['priority'], true) : array();
     }
 
     /**
@@ -136,7 +152,7 @@ class join extends core {
         $iterators = array();
 
         foreach($directory as $dir) {
-            $dirList  = new \RecursiveDirectoryIterator($dir);
+            $dirList  = new \RecursiveDirectoryIterator($this->resolve($dir, true));
             $iterator = new \RecursiveIteratorIterator($dirList);
             $iterator->setMaxDepth($this->depth);
             array_push($iterators, $iterator);
@@ -248,6 +264,41 @@ class join extends core {
      */
     private function save($filename, $data) {
         return file_put_contents($filename, $data);
+    }
+
+    /**
+     * Приведение пути
+     *
+     * @param string $path Путь
+     * @param boolean [$real=false] Существующий путь
+     * @return string
+     * @throws \Exception При отсутствии пути, который должен существовать
+     */
+    private function resolve($path, $real = false) {
+        if(!$this->resolve) return $path;
+
+        $resolve = is_string($this->resolve) ? $this->resolve : '';
+
+        if($real) {
+            $resolve = parent::resolveRealPath($resolve, $path);
+            if(!$resolve) throw new \Exception('Path not found: ' . $path);
+            return $resolve;
+        }
+
+        return parent::resolvePath($resolve, $path);
+    }
+
+    /**
+     * Приведение массива путей
+     *
+     * @param array $files Массив путей
+     * @param boolean [$real=false] Существующий путь
+     * @return array
+     */
+    private function resolveFiles($files, $real = false) {
+        return array_map(function($file) use ($real) {
+            return $this->resolve($file, $real);
+        }, $files);
     }
 
     /**

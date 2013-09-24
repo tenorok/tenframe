@@ -2,17 +2,27 @@
 
 class joinTest extends PHPUnit_Framework_TestCase {
 
+    public static function setUpBeforeClass() {
+
+        // Константа DEV нужна для сохранения путей в debug
+        ten\test\env::define('DEV', true);
+    }
+
     protected function tearDown() {
+
         // После каждого теста удаляются тестовые файлы
         $files = ['saved.txt', 'saved.js', 'saved.css', 'saved.html'];
         foreach($files as $file) {
             $saved = self::save($file);
             file_exists($saved) && unlink($saved);
         }
+
+        // Сбрасывается массив дебага
+        ten\join::$debug = [];
     }
 
     private static function file($file) {
-        return ten\core::resolveRelativePath(__DIR__, 'files', $file);
+        return ten\core::resolveRealPath(__DIR__, 'files', $file);
     }
 
     private static function save($file) {
@@ -20,11 +30,11 @@ class joinTest extends PHPUnit_Framework_TestCase {
     }
 
     private static function directory() {
-        return ten\core::resolveRelativePath(__DIR__, 'files');
+        return ten\core::resolveRealPath(__DIR__, 'files');
     }
 
     private static function directory2() {
-        return ten\core::resolveRelativePath(__DIR__, 'files2');
+        return ten\core::resolveRealPath(__DIR__, 'files2');
     }
 
     /**
@@ -60,6 +70,64 @@ class joinTest extends PHPUnit_Framework_TestCase {
 
         $this->assertEquals($result, 'a-htmlb-cssc-js');
         $this->assertEquals(file_get_contents(self::save('saved.txt')), 'a-htmlb-cssc-js');
+    }
+
+    /**
+     * Указание относительных путей
+     */
+    public function testRelative() {
+
+        $join = new ten\join();
+
+        $result = $join->combine([
+            'tenframe/test/join/files/a.html',
+            'tenframe/test/join/files/b.css',
+            'tenframe/test/join/files/c.js'
+        ], [
+            'save' => 'tenframe/test/join/save/saved.txt'
+        ]);
+
+        $this->assertEquals($result, 'a-htmlb-cssc-js');
+        $this->assertEquals(file_get_contents(self::save('saved.txt')), 'a-htmlb-cssc-js');
+
+        $this->assertEquals(ten\join::$debug, [[
+            'files' => [
+                self::file('a.html'),
+                self::file('b.css'),
+                self::file('c.js')
+            ],
+            'save' => self::save('saved.txt')
+        ]]);
+    }
+
+    /**
+     * Указание относительных путей с базовой директорией
+     */
+    public function testRelativeResolve() {
+
+        $join = new ten\join([
+            'resolve' => 'tenframe/test/join/'
+        ]);
+
+        $result = $join->combine([
+            'files/a.html',
+            'files/b.css',
+            'files/c.js'
+        ], [
+            'save' => 'save/saved.txt'
+        ]);
+
+        $this->assertEquals($result, 'a-htmlb-cssc-js');
+        $this->assertEquals(file_get_contents(self::save('saved.txt')), 'a-htmlb-cssc-js');
+
+        $this->assertEquals(ten\join::$debug, [[
+            'files' => [
+                self::file('a.html'),
+                self::file('b.css'),
+                self::file('c.js')
+            ],
+            'save' => self::save('saved.txt')
+        ]]);
     }
 
     /**
@@ -272,6 +340,75 @@ class joinTest extends PHPUnit_Framework_TestCase {
         ]);
 
         $this->assertEquals($result, 'ccc-cssbb-jsb-cssd-cssf-cssaa-csscc-css');
+    }
+
+    /**
+     * Объединение по расширению файла с приоритетами и относительными путями
+     */
+    public function testExtensionPriorityRelative() {
+
+        $join = new ten\join([
+            'directory' => 'tenframe/test/join/files/'
+        ]);
+
+        $result = $join->extension('css', [
+            'priority' => [
+                'tenframe/test/join/files/nested/nested/ccc.css',
+                'tenframe/test/join/files/nested/bb.js'
+            ],
+            'save' => 'tenframe/test/join/save/saved.txt'
+        ]);
+
+        $this->assertEquals($result, 'ccc-cssbb-jsb-cssd-cssf-cssaa-csscc-css');
+        $this->assertEquals(file_get_contents(self::save('saved.txt')), 'ccc-cssbb-jsb-cssd-cssf-cssaa-csscc-css');
+
+        $this->assertEquals(ten\join::$debug, [[
+            'files' => [
+                self::file('nested/nested/ccc.css'),
+                self::file('nested/bb.js'),
+                self::file('b.css'),
+                self::file('d.css'),
+                self::file('f.css'),
+                self::file('nested/aa.css'),
+                self::file('nested/cc.css')
+            ],
+            'save' => self::save('saved.txt')
+        ]]);
+    }
+
+    /**
+     * Объединение по расширению файла с приоритетами и относительными путями и базовой директорией
+     */
+    public function testExtensionPriorityRelativeResolve() {
+
+        $join = new ten\join([
+            'resolve' => 'tenframe/test/join/',
+            'directory' => 'files/'
+        ]);
+
+        $result = $join->extension('css', [
+            'priority' => [
+                'files/nested/nested/ccc.css',
+                'files/nested/bb.js'
+            ],
+            'save' => 'save/saved.txt'
+        ]);
+
+        $this->assertEquals($result, 'ccc-cssbb-jsb-cssd-cssf-cssaa-csscc-css');
+        $this->assertEquals(file_get_contents(self::save('saved.txt')), 'ccc-cssbb-jsb-cssd-cssf-cssaa-csscc-css');
+
+        $this->assertEquals(ten\join::$debug, [[
+            'files' => [
+                self::file('nested/nested/ccc.css'),
+                self::file('nested/bb.js'),
+                self::file('b.css'),
+                self::file('d.css'),
+                self::file('f.css'),
+                self::file('nested/aa.css'),
+                self::file('nested/cc.css')
+            ],
+            'save' => self::save('saved.txt')
+        ]]);
     }
 
     /**
