@@ -32,7 +32,10 @@ class docTest extends PHPUnit_Framework_TestCase {
                 "<li>One</li>\n" .
                 "<li>Two</li>\n" .
                 "<li>Three</li>\n" .
-                "</ol>\n"
+                "</ol>\n\n" .
+                "<p><code>var a = new Doc();</code></p>\n\n" .
+                "<pre><code>var b = 502;\n" .
+                "</code></pre>\n"
         ];
 
         return $results[$key];

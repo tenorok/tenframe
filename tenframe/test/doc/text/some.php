@@ -41,5 +41,10 @@ function foo() {}
          * 3. Three
          *
          *
+         * `var a = new Doc();`
+         *
+         *     var b = 502;
+         *
+         *
          *
          */
