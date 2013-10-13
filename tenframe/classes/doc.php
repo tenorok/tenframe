@@ -16,7 +16,7 @@ class doc extends core {
 
     private function getDocBody() {
 
-        preg_match(
+        preg_match_all(
             '/' .
                 '\s*\/\*\* doc\n' .
                     '((?:\s+\*\s*.*)*)' .
@@ -26,7 +26,7 @@ class doc extends core {
             $matches
         );
 
-        return $matches[1];
+        return is_array($matches[1]) ? implode('', $matches[1]) : $matches[1];
     }
 
     private function getDocMarkdown($body) {
