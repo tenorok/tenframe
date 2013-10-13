@@ -25,6 +25,17 @@ class doc extends core {
     }
 
     /**
+     * Добавить текст для преобразования
+     *
+     * @param string $text Текст
+     * @return $this
+     */
+    public function addText($text) {
+        $this->text .= $text;
+        return $this;
+    }
+
+    /**
      * Задать текст для преобразования из файла
      *
      * @param string $file Полный путь до файла
@@ -32,6 +43,17 @@ class doc extends core {
      */
     public function file($file) {
         $this->text = file_get_contents($file);
+        return $this;
+    }
+
+    /**
+     * Добаить текст для преобразования из файла
+     *
+     * @param string $file Полный путь до файла
+     * @return $this
+     */
+    public function addFile($file) {
+        $this->text .= file_get_contents($file);
         return $this;
     }
 

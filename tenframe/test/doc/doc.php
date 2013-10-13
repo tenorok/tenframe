@@ -9,6 +9,9 @@ class docTest extends PHPUnit_Framework_TestCase {
     private static function result($key) {
 
         $results = [
+
+            'simple' => "<h1>Hello world!</h1>\n",
+
             'multi' => "<h1>Header first level</h1>\n\n" .
                 "<h1>Header first level</h1>\n\n" .
                 "<h2>Header second level</h2>\n\n" .
@@ -41,7 +44,7 @@ class docTest extends PHPUnit_Framework_TestCase {
     public function testSimple() {
 
         $doc = new ten\doc(self::text('simple.php'));
-        $this->assertEquals($doc->html(), "<h1>Hello world!</h1>\n");
+        $this->assertEquals($doc->html(), self::result('simple'));
     }
 
     /**
@@ -89,10 +92,49 @@ class docTest extends PHPUnit_Framework_TestCase {
     public function testFile() {
 
         $doc = new ten\doc();
-        //        $doc->addText('text')->addFile('filename.php')->html();
 
         $this->assertEquals(
             $doc->file(ten\core::resolveRealPath(__DIR__, 'text', 'multi.php'))->html(),
+            self::result('multi')
+        );
+    }
+
+    /**
+     * Добавление нескольких кусков текста отдельными методами
+     */
+    public function testAddText() {
+
+        $doc = new ten\doc();
+
+        $this->assertEquals(
+
+            $doc
+                ->addText(self::text('simple.php'))
+                ->addText(self::text('multi.php'))
+                ->html(),
+
+            self::result('simple') .
+            "\n" .
+            self::result('multi')
+        );
+    }
+
+    /**
+     * Добавление нескольких кусков текста из файлов отдельными методами
+     */
+    public function testAddFile() {
+
+        $doc = new ten\doc();
+
+        $this->assertEquals(
+
+            $doc
+                ->addFile(ten\core::resolveRealPath(__DIR__, 'text', 'simple.php'))
+                ->addFile(ten\core::resolveRealPath(__DIR__, 'text', 'multi.php'))
+                ->html(),
+
+            self::result('simple') .
+            "\n" .
             self::result('multi')
         );
     }
