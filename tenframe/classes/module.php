@@ -54,8 +54,6 @@ class module extends core {
      */
     public static function readme() {
 
-        $markdown = new \dflydev\markdown\MarkdownExtraParser();
-
         $mod = route::url()->mod;
 
         echo tpl::block(array(
@@ -66,7 +64,7 @@ class module extends core {
 
                 'title' => 'Модуль — ' . $mod,
                 'files' => statical::includes('markdown', GEN),
-                'body'  => $markdown->transformMarkdown(file_get_contents(parent::resolveRealPath('/mod/', $mod, '/readme.md')))
+                'body'  => markdown::html(file_get_contents(parent::resolveRealPath('/mod/', $mod, '/readme.md')))
             )
         ));
     }
