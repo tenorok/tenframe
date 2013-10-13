@@ -76,11 +76,23 @@ class docTest extends PHPUnit_Framework_TestCase {
     public function testText() {
 
         $doc = new ten\doc();
-        //        $doc->text('text')->file('filename.php')->html();
-        //        $doc->addText('text')->addFile('filename.php')->html();
 
         $this->assertEquals(
             $doc->text(self::text('some.php'))->html(),
+            self::result('multi')
+        );
+    }
+
+    /**
+     * Добавление текста из файла в отдельном методе
+     */
+    public function testFile() {
+
+        $doc = new ten\doc();
+        //        $doc->addText('text')->addFile('filename.php')->html();
+
+        $this->assertEquals(
+            $doc->file(ten\core::resolveRealPath(__DIR__, 'text', 'multi.php'))->html(),
             self::result('multi')
         );
     }

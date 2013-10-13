@@ -25,6 +25,17 @@ class doc extends core {
     }
 
     /**
+     * Задать текст для преобразования из файла
+     *
+     * @param string $file Полный путь до файла
+     * @return $this
+     */
+    public function file($file) {
+        $this->text = file_get_contents($file);
+        return $this;
+    }
+
+    /**
      * Получить документацию в html
      *
      * @return string
