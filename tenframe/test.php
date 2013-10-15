@@ -14,7 +14,9 @@ class test {
 
         $tests = array(
             'coreTest',
-            'routeTest'
+            'routeTest',
+            'joinTest',
+            'docTest'
         );
 
         foreach($tests as $test) {

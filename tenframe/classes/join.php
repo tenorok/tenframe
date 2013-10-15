@@ -1,292 +1,425 @@
 <?php
 
-/**
- * Конкатенация файлов
- * @version 0.0.2
+/** doc
+ *
+ * # Объединение файлов
+ *
+ * Методы класса могут принимать относительные пути до файлов и директорий.
+ *
+ * ## Примеры
+ *
+ * ### Объединение точечно указанных файлов
+ *
+ * Простое объединение нескольких файлов.
+ *
+ *     $join = new ten\join();
+ *     $result = $join->combine([
+ *         'a.html',
+ *         'b.html',
+ *         'c.html'
+ *     ]);
+ *
+ * Объединение с сохранением в файл.
+ *
+ *     $join = new ten\join();
+ *     $result = $join->combine([
+ *         'a.html',
+ *         'b.html',
+ *         'c.html'
+ *     ], [
+ *         'save' => 'save.html'
+ *     ]);
+ *
+ * Указание базовой директории. В результате будут объединены файлы `path/to/files/a.html` и `path/to/files/path/b.html`.
+ *
+ *     $join = new ten\join([
+ *         'resolve' => 'path/to/files/'
+ *     ]);
+ *     $result = $join->combine([
+ *         'a.html',
+ *         'path/b.html'
+ *     ]);
+ *
+ * Добавление строк вокруг объединяемых файлов. Переменная `{filename}` будет заменена на путь до каждого файла, используемого при объединении.
+ *
+ *     $join = new ten\join([
+ *         'start' => 'start of result file',
+ *         'before' => '{filename} begin',
+ *         'after' => '{filename} end',
+ *         'end' => 'end of result file'
+ *     ]);
+ *
+ * ### Объединение файлов по расширениям
+ *
+ * Для объединения файлов по расширениям, нужно указать входящую директорию, с которой будет рекурсивно осуществляться поиск файлов.
+ *
+ *     $join = new ten\join([
+ *         'directory' => 'path/to/files/'
+ *     ]);
+ *     $result = $join->extension('css');
+ *
+ * Для сохранения результата объединения в файл, всегда используется опция `save`.
+ *
+ *     $result = $join->extension('css', [
+ *         'save' => 'save.css'
+ *     ]);
+ *
+ * Есть возможность указать глубину рекурсии. По умолчанию рекурсия не ограничивается.
+ *
+ *     $join = new ten\join([
+ *         'directory' => 'path/to/files/',
+ *         'depth' => 1
+ *     ]);
+ *
+ * Возможно указать несколько входящих директорий.
+ *
+ *     $join = new ten\join([
+ *         'directory' => ['path/to/files1/', 'path/to/files2/']
+ *     ]);
+ *
+ * Можно объединять файлы нескольких расширений.
+ *
+ *     $result = $join->extension(['css', 'html']);
+ *
+ * Указание приоритетных файлов. Можно указывать файлы, которые должны быть подключены в первую очередь.
+ *
+ *     $result = $join->extension('css', [
+ *         'priority' => [
+ *             '/path/to/priority1.css',
+ *             '/path/to/priority2.css'
+ *         ]
+ *     ]);
+ *
+ * ### Объединение файлов по регулярному выражению
+ *
+ * Этот способ объединения полностью аналогичен объединению по расширениям.
+ *
+ * Простой пример объединения по регулярному выражению.
+ *
+ *     $result = $join->regexp('/\.css$/');
+ *
  */
-
-/* Использование
-
-    Конкатенация файлов:
-        $result = ten\join::files(array(
-
-            'files'       => 'ext: css, js, ... , etc',        // Обязательный. Мод расширений объединяемых файлов
-            // или
-            'files'       => 'reg: /\.ctrl\.js$/',             //               Мод регулярного выражения
-            // или
-            'files'       => array('file1', 'file2'),          //               Массив файлов к объединению (допускается указание URL)
-
-            'output_file' => '/assets/{ext}/file.{ext}',       // Обязательный. Выходящий файл
-                                                                  Это может быть маска формируемых на выходе файлов при передаче нескольких расширений.
-                                                                  Где {ext} - расширение (extension) файла.
-                                                                  Переменная существует только при использовании мода расширений ('files' => 'ext: ')
-
-            'priority'    => '/view/core.js',                  // Файл, который нужно подключить первым
-            // или
-            'priority'    => array('file1', 'file2'),          // или несколько первых файлов
-
-            'input_path'  => '/view/',                         // Корневая директория, содержащая объединяемые файлы
-            // или
-            'input_path'  => array('/view1/', '/view2/'),      // Массив корневых директорий
-                                                                  По умолчанию: array('/view/', mods), где mods - это пути к папками view подключенных модулей
-
-            'before'      => "\n start: {filename} { \n",      // Строка, помещаемая перед содержанием очередного файла
-            'after'       => "\n } {filename} :end \n",        // Строка, помещаемая после содержания очередного файла
-                                                                  Где {filename} - путь и имя текущего файла
-                                                                  По умолчанию: "\n"
-
-            'start_str'   => "start { \n",                     // Строка, помещаемая в начало файла, по умолчанию отсутствует
-            'end_str'     => "\n } end",                       // Строка, помещаемая в конец файла, по умолчанию отсутствует
-
-            'compress'    => true | false,                     // Флаг сжатия конечного файла (работает для CSS и JS), по умолчанию включено
-            'recursion'   => true | false                      // Флаг рекурсивного перебора дочерних директорий корневой директории, по умолчанию включено
-        ));
-
-        Если в качестве выходящего файла явно указан CSS или JS, то собираемые файлы
-        будут скомпрессованы вне зависимости от их истинного расширения,
-        например: 'assets/css/style.{ext}.css'
-
-        В случае успешной загрузки, в $result возвращается массив с подмассивом путей входящих файлов и
-        подмассивом (или строкой, если было указано одно расширение) выходящих файлов, например:
-            Array (
-                [input] => Array (
-                    [0] => view/blocks/dir_1/style.css
-                    [1] => view/blocks/dir_2/style.css
-                    [2] => view/blocks/dir_1/script.js
-                    [3] => view/blocks/dir_2/script.js
-                    ...
-                ) [output] => Array (
-                    [0] => assets/css/main.css
-                    [1] => assets/js/main.js
-                )
-            )
-*/
 
 namespace ten;
 
-class join extends file {
+class join extends core {
 
-    private static $folders = array();                                               // Массив директорий
-    private static $input_files = array();                                           // Массив путей объединённых файлов
-    private static $output_file;                                                     // Строка, в которую собираются файлы
+    /**
+     * Конструктор
+     *
+     * @param array [$options=[]] Массив опций
+     */
+    function __construct($options = []) {
 
-    public  static $input_path = array('/blocks/');                                  // Массив входящих директорий
-    public  static $debugJoin  = array();                                            // Массив объединённых файлов
+        $this->options = array_merge($this->defaultOptions, $options);
 
-    private static $options = array(                                                 // Дефолтные параметры объединения файлов
-        'before'    => '',
-        'after'     => "\n",
-        'start_str' => '',
-        'end_str'   => '',
-        'priority'  => '',
-        'compress'  => true,
-        'recursion' => true
+        $this->start = $this->options['start'];
+        $this->before = $this->options['before'];
+        $this->after = $this->options['after'];
+        $this->end = $this->options['end'];
+
+        $this->directory = $this->options['directory'];
+        $this->depth = $this->options['depth'];
+
+        $this->resolve = $this->options['resolve'];
+    }
+
+    /**
+     * Дефолтные опции
+     *
+     * @var array
+     */
+    private $defaultOptions = array(
+
+        'start' => '',
+        'before' => '',
+        'after' => '',
+        'end' => '',
+
+        'directory' => false,
+        'depth' => -1,
+
+        'resolve' => true
     );
 
     /**
-     * Функция объединения файлов
+     * Объединить файлы
      *
-     * @param  array $options Параметры объединения файлов
-     * @return array
-     */
-    public static function files($options) {
-
-        $options['output_file'] = parent::resolvePath($options['output_file']);      // Установление корректного пути до выходящего файла
-
-        foreach(self::$options as $key => $val)                                      // Установка значений по умолчанию
-            if(!isset($options[$key]))                                               // для незаданных опций
-                $options[$key] = $val;
-
-        if(!empty($options['priority']))                                             // Если указаны приоритетные файлы
-            self::concat($options['priority'], $options);                            // нужно сперва прилепить их
-
-        if(is_array($options['files'])) {                                            // Если передан массив файлов
-
-            $output = self::join_files('fls', $options['files'], $options);          // Нужно просто их объединить
-        }
-        else {                                                                       // Иначе передан мод расширений или регулярных выражений
-
-            $files = explode(':', $options['files']);                                // Разбиение строки объединяемых файлов в массив
-            $files_mod = trim($files[0]);                                            // Мод поиска файлов (ext или reg)
-
-            if($files_mod == 'ext')                                                  // Если задан мод расширений
-                $files_val    = explode(',', $files[1]);                             // то строку значения надо разбить в массив расширений
-            else if($files_mod == 'reg')                                             // Если задан мод регулярного выражения
-                $files_val[0] = $files[1];                                           // то достаточно просто переприсвоить строку значения
-
-            if(!isset($options['input_path']))                                       // Если входящие директории не указаны явно
-                $options['input_path'] = self::$input_path;                          // будут использоваться стандартные
-
-            if(
-                $files_mod == 'reg' ||                                               // Если задан мод регулярного выражения
-                $files_mod == 'ext' && count($files_val) == 1                        // или мод расширений и указано всего одно расширение
-            ) {
-                $output = self::join_files($files_mod, trim($files_val[0]), $options);  // То можно просто вызвать функцию объединения один раз
-            }
-            else {                                                                   // Иначе задан мод расширений и указано больше одного расширения
-
-                $output = array();                                                   // Массив для путей собранных файлов
-
-                foreach($files_val as $extension)                                    // Цикл по полученным расширениям
-                    array_push(                                                      // Добавление
-                        $output,                                                     // в массив путей
-                        self::join_files($files_mod, trim($extension), $options)     // результата слияния файлов
-                    );
-            }
-        }
-
-        $input = self::$input_files;
-        self::$input_files = array();                                                // Обнуление файла путей объединённых файлов
-
-        $result = array(
-            'input'  => $input,
-            'output' => $output
-        );
-
-        array_push(self::$debugJoin, $result);
-        return $result;
-    }
-
-    /**
-     * Функция непосредственного объединения файлов
-     *
-     * @param  string $mod       Мод поиска файлов (fls, ext или reg)
-     * @param  string $val       Значение поиска файлов (расширение, регулярное выражение или массив файлов)
-     * @param  array  $options   Параметры объединения файлов
+     * @param array $files Массив путей до файлов
+     * @param array [$options=[]] Опции объединения
      * @return string
      */
-    private static function join_files($mod, $val, $options) {
+    public function combine($files, $options = []) {
+        return $this->combineResolvedFiles($this->resolveFiles($files, true), $options);
+    }
 
-        $output_extension = file::info($options['output_file'])['extension'];        // Расширение выходящего файла
+    /**
+     * Объединить файлы по расширению
+     *
+     * @param string|array $extension Расширение или массив расширений
+     * @param array [$options=[]] Опции объединения
+     * @return string
+     */
+    public function extension($extension, $options = []) {
 
-        if($mod == 'fls') {                                                          // Если переданы конкретные файлы для объединения
+        $this->extension = is_string($extension) ? array($extension) : $extension;
 
-            self::concat($val, $options);                                            // Непосредственное прилепливание текущего файла к конечному
-        }
-        else {                                                                       // Иначе передано расширение или регулярное выражение
+        return $this->combineDirectoryFilesByCriterion($options, function($file) {
+            return in_array($file->getExtension(), $this->extension);
+        });
+    }
 
-            if(is_array($options['input_path']))                                     // Если указан массив входящих директорий
-                $input_path    = $options['input_path'];
-            else                                                                     // Иначе указана одна входящая директория
-                $input_path[0] = $options['input_path'];
+    /**
+     * Объединить файлы по регулярному выражению
+     *
+     * @param string $regexp Регулярное выражение
+     * @param array [$options=[]] Опции объединения
+     * @return string
+     */
+    public function regexp($regexp, $options = []) {
 
-            foreach($input_path as $path) {                                          // Цикл по входящим директориям
+        $this->regexp = $regexp;
 
-                $options['input_path'] = parent::resolvePath($path);                 // Установление корректного пути входящей корневой директории
+        return $this->combineDirectoryFilesByCriterion($options, function($file) {
+            return preg_match($this->regexp, $file->getFilename());
+        });
+    }
 
-                self::get_folders($mod, $val, $options);                             // Вызов функции рекурсивного перебора директорий
-            }
-        }
+    /**
+     * Объединить файлы с приведёнными путями
+     *
+     * @param array $files Массив приведённых путей до файлов
+     * @param array [$options=[]] Опции объединения
+     * @return string
+     */
+    private function combineResolvedFiles($files, $options = []) {
 
-        self::$output_file =                                                         // Добавление
-            $options['start_str']  .                                                 // первой строки
-                self::$output_file .                                                 // к выходящему файлу
-                $options['end_str'];                                                 // и последней строки
+        $concat = $this->concat($files);
 
-        $extension = ($mod == 'ext') ? $val : '';                                    // Переменная расширения будет существовать только когда задан мод расширений
-
-        if($extension == 'css' || $output_extension == 'css') {                      // Если текущее расширение или расширение выходящего файла является CSS
-
-            if(is_null($options['compress']) || $options['compress'])                // Если сжатие конечного файла не отключено
-                self::$output_file = \CssMin::minify(self::$output_file);
-        }
-        else if($extension == 'js' || $output_extension == 'js') {                   // Если текущее расширение или расширение выходящего файла является JS
-
-            if(is_null($options['compress']) || $options['compress'])                // Если сжатие конечного файла не отключено
-                self::$output_file = trim(\JSMin::minify(self::$output_file));       // Обрезать первую пустую строку, которую оставляет JSMin
-        }
-
-        $output_file = parent::resolvePath(                                          // Установление корректного пути до файла
-            str_replace('{ext}', $extension, $options['output_file'])
+        $imploded = $this->implode(
+            $this->start,
+            $this->before,
+            $this->after,
+            $this->end,
+            $concat
         );
 
-        parent::make_dir(dirname($output_file));                                     // Создание пути, если его не существует
+        if(array_key_exists('save', $options)) {
+            $resolveSave = $this->resolve($options['save']);
+            $this->save($resolveSave, $imploded) && $this->debug($files, $resolveSave);
+        }
 
-        file::autogen($output_file, self::$output_file, '');                         // Запись итоговой строки в выходящий файл
-
-        self::$output_file = '';                                                     // Обнуление строки собранного файла
-
-        return $output_file;                                                         // Возвращается путь к составленному файлу
+        return $imploded;
     }
 
     /**
-     * Функция рекурсивного перебора директорий для объединения файлов
+     * Объединить файлы в директории по критерию
      *
-     * @param  string $mod       Мод поиска файлов (ext или reg)
-     * @param  string $val       Значение поиска файлов (расширение, регулярное выражение или массив файлов)
-     * @param  array  $options   Параметры объединения файлов
-     * @return function
+     * @param array $options Опции объединения
+     * @param callback $criterion Критерий искомых файлов
+     * @return string
+     * @throws \Exception При отсутствии опции directory в конструкторе
      */
-    private static function get_folders($mod, $val, $options) {
+    private function combineDirectoryFilesByCriterion($options, $criterion) {
 
-        if($input = opendir($options['input_path'])) {                               // Если открылась первоначальная директория
+        if(!$this->directory) throw new \Exception('Missing option: directory');
 
-            while($object = readdir($input)) {                                       // Цикл по объектам в текущей директории
+        $priorityList = $this->priorityList($options);
 
-                if($object != '.' && $object != '..') {                              // Если текущий объект является файлом или директорией
+        $fileList = $this->fileList($this->iteratorsInit(), $priorityList, $criterion);
 
-                    $directory = parent::resolveRealPath($options['input_path'], $object);
+        return $this->combineResolvedFiles(array_merge($priorityList, $fileList), $options);
+    }
 
-                    if(
-                        is_dir($directory) &&                                        // Если текущий объект является директорией
-                        $options['recursion']                                        // и требуется рекурсивный перебор директорий
-                    ) {
-                        array_push(self::$folders, $directory);                      // он добавляется в массив директорий
-                    }
-                    else if (                                                        // Иначе текущий объект - это файл
-                        $mod == 'ext' &&                                             // Если задан мод расширений
-                        file::info($object)['extension'] == $val ||                  // и расширение текущего файла соответствует заданному для поиска
+    /**
+     * Получение списка приоритетных файлов
+     *
+     * @param array $options Опции объединения
+     * @return array
+     */
+    private function priorityList($options) {
+        return array_key_exists('priority', $options) ? $this->resolveFiles($options['priority'], true) : array();
+    }
 
-                        $mod == 'reg' &&                                             // Или задан мод регулярного выражения
-                        preg_match($val, $object)                                    // и имя текущего файла удовлетворяет условия регулярного выражения
-                    ) {
-                        self::concat(                                                // Непосредственное прилепливание текущего файла
-                            parent::resolveRealPath($options['input_path'], $object),// Полный путь к файлу
-                            $options
-                        );
-                    }
+    /**
+     * Инициализация итераторов
+     *
+     * @return \RecursiveIteratorIterator[]
+     */
+    private function iteratorsInit() {
+
+        $directory = is_string($this->directory) ? array($this->directory) : $this->directory;
+        $iterators = array();
+
+        foreach($directory as $dir) {
+            $dirList  = new \RecursiveDirectoryIterator($this->resolve($dir, true));
+            $iterator = new \RecursiveIteratorIterator($dirList);
+            $iterator->setMaxDepth($this->depth);
+            array_push($iterators, $iterator);
+        }
+
+        return $iterators;
+    }
+
+    /**
+     * Получение массива файлов к объединению
+     *
+     * @param \RecursiveIteratorIterator[] $iterators Массив итераторов
+     * @param array $priority Массив файлов по приоритету
+     * @param callback $criterion Критерий искомых файлов
+     * @return array
+     */
+    private function fileList($iterators, $priority, $criterion) {
+
+        $list = array();
+
+        foreach($iterators as $iterator) {
+            foreach($iterator as $object) {
+                $pathname = $object->getPathname();
+                if($object->isFile() && !in_array($pathname, $priority) && $criterion($object)) {
+                    array_push($list, $pathname);
                 }
             }
-
-            if(count(self::$folders)) {                                              // Если имеются непросмотренные директории
-
-                $options['input_path'] = self::$folders[0];                          // Задание новой директории для дальнейшего рекурсивного вызова функции
-                array_shift(self::$folders);                                         // Удаление присвоенной директории из массива непросмотренных директорий
-                return self::get_folders($mod, $val, $options);                      // Рекурсивный вызов функции
-            }
-
-            closedir($input);                                                        // Закрытие текущего объекта
         }
-        else
-            message::error('Can\'t open directory: ' . $options['input_path']);
+
+        return $list;
     }
 
     /**
-     * Непосредственное прилепливание файлов к выходящему файлу
+     * Объединение массива содержимого файлов в строку
      *
-     * @param string | array $files   Полные пути конкатенируемых файлов
-     * @param array          $options Параметры объединения файлов
+     * @param string $start В начало результирующей строки
+     * @param string $before Перед каждым файлом
+     * @param string $after После каждого файла
+     * @param string $end В конец результирующей строки
+     * @param array $concat Массив сожержимого файлов
+     * @return string
      */
-    private static function concat($files, $options) {
+    private function implode($start, $before, $after, $end, $concat) {
+        return $start . $this->addBeforeAfter($before, $after, $concat) . $end;
+    }
 
-        if(is_string($files))                                                        // Если передан один файл
-            $files = array($files);                                                  // нужно сделать из него массив
+    /**
+     * Добавление значений опций before и after
+     *
+     * @param string $before Перед каждым файлом
+     * @param string $after После каждого файла
+     * @param array $concat Массив сожержимого файлов
+     * @return string
+     */
+    private function addBeforeAfter($before, $after, $concat) {
 
-        foreach($files as $file) {                                                   // Цикл по файлам
+        // Оптимизация для скорости при отсутствии опций
+        if(empty($before) && empty($after)) return implode('', $concat);
 
-            if(!filter_var($file, FILTER_VALIDATE_URL)) {                            // Если не URL до файла
-                $file = parent::resolveRealPath($file);                              // Установление корректного пути до файла
-            }
+        $added = array();
 
-            if(in_array($file, self::$input_files))                                  // Если файл уже был прилеплен
-                return;                                                              // то его уже не нужно прилеплять
-
-            array_push(self::$input_files, $file);                                   // Добавление пути текущего файла в массив путей объединённых файлов
-
-            self::$output_file .=                                                    // Добавление
-                str_replace('{filename}', $file, $options['before']) .               // предваряющей строки
-                file_get_contents($file)                             .               // к содержанию текущего файла
-                str_replace('{filename}', $file, $options['after']);                 // и последующей строки
+        foreach($concat as $filename => $data) {
+            array_push(
+                $added,
+                $this->variable('{filename}', $filename, $before) .
+                $data .
+                $this->variable('{filename}', $filename, $after)
+            );
         }
+
+        return implode('', $added);
+    }
+
+    /**
+     * Замена переменной на значение
+     *
+     * @param string $name Имя переменной
+     * @param string $value Значение
+     * @param string $string Строка содержащая переменную
+     * @return mixed
+     */
+    private function variable($name, $value, $string) {
+        return str_replace($name, $value, $string);
+    }
+
+    /**
+     * Конкатенация содержимого файлов
+     *
+     * @param array $files Массив путей файлов
+     * @return array
+     */
+    private function concat($files) {
+
+        $joined = array();
+
+        foreach($files as $file) {
+            $joined[$file] = file_get_contents($file);
+        }
+
+        return $joined;
+    }
+
+    /**
+     * Сохранение содержимого в файл
+     *
+     * @param string $filename Путь до файла
+     * @param string $data Содержимое
+     * @return int
+     */
+    private function save($filename, $data) {
+        return file_put_contents($filename, $data);
+    }
+
+    /**
+     * Приведение пути
+     *
+     * @param string $path Путь
+     * @param boolean [$real=false] Существующий путь
+     * @return string
+     * @throws \Exception При отсутствии пути, который должен существовать
+     */
+    private function resolve($path, $real = false) {
+        if(!$this->resolve) return $path;
+
+        $resolve = is_string($this->resolve) ? $this->resolve : '';
+
+        if($real) {
+            $resolve = parent::resolveRealPath($resolve, $path);
+            if(!$resolve) throw new \Exception('Path not found: ' . $path);
+            return $resolve;
+        }
+
+        return parent::resolvePath($resolve, $path);
+    }
+
+    /**
+     * Приведение массива путей
+     *
+     * @param array $files Массив путей
+     * @param boolean [$real=false] Существующий путь
+     * @return array
+     */
+    private function resolveFiles($files, $real = false) {
+        return array_map(function($file) use ($real) {
+            return $this->resolve($file, $real);
+        }, $files);
+    }
+
+    /**
+     * Массив для хранения информации по объединённым файлам
+     *
+     * @var array
+     */
+    public static $debug = array();
+
+    /**
+     * Сохранение информации по объединённым файлам
+     *
+     * @param array $files Массив путей до файлов
+     * @param string $save Путь до результирующего файла
+     */
+    private function debug($files, $save) {
+        if(!DEV) return;
+
+        array_push(self::$debug, array(
+            'files' => $files,
+            'save' => $save
+        ));
     }
 }

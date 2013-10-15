@@ -44,7 +44,7 @@ class module extends core {
                 parent::resolveRealPath($path, '/routes.php')
             );
 
-            array_push(join::$input_path, $view);                       // Добавление пути к представлениям модуля для объединения файлов
+//            array_push(join::$input_path, $view);                       // Добавление пути к представлениям модуля для объединения файлов
             parent::requireFiles($init, $routes);
         }
     }
@@ -53,8 +53,6 @@ class module extends core {
      * Функция отображения readme модулей
      */
     public static function readme() {
-
-        $markdown = new \dflydev\markdown\MarkdownExtraParser();
 
         $mod = route::url()->mod;
 
@@ -66,7 +64,7 @@ class module extends core {
 
                 'title' => 'Модуль — ' . $mod,
                 'files' => statical::includes('markdown', GEN),
-                'body'  => $markdown->transformMarkdown(file_get_contents(parent::resolveRealPath('/mod/', $mod, '/readme.md')))
+                'body'  => markdown::html(file_get_contents(parent::resolveRealPath('/mod/', $mod, '/readme.md')))
             )
         ));
     }
