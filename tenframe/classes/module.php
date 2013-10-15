@@ -44,7 +44,7 @@ class module extends core {
                 parent::resolveRealPath($path, '/routes.php')
             );
 
-            array_push(join::$input_path, $view);                       // Добавление пути к представлениям модуля для объединения файлов
+//            array_push(join::$input_path, $view);                       // Добавление пути к представлениям модуля для объединения файлов
             parent::requireFiles($init, $routes);
         }
     }
