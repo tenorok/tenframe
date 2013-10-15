@@ -1,23 +1,18 @@
 <?php
 
-ten\join::files(array(                            // Сборка всех js-файлов
-    'files'       => 'ext: js',
-    'priority'    => array('/blocks/tenframe/tenframe.js'),
-    'output_file' => '/assets/js/main.js'
-));
+$join = new ten\join([
+    'directory' => 'blocks/',
+    'before' => "\n/* {filename} begin */\n",
+    'after' => "\n/* {filename} end */\n"
+]);
 
-ten\join::files(array(                            // Сборка основных стилей и необходимых библиотек
-    'files'       => 'reg: /\.less|\.style/',
-    'input_path'  => '/blocks/',
-    'output_file' => '/assets/css/main.less'
-));
+// Сборка js-файлов блоков
+$join->extension('js', [
+    'priority' => ['blocks/tenframe/tenframe.js'],
+    'save' => 'assets/js/main.js'
+]);
 
-ten\join::files(array(                            // Сборка стилей для печати и необходимых библиотек
-    'files'       => 'reg: /\.print/',
-    'output_file' => '/assets/css/print.less'
-));
-
-ten\join::files(array(                            // Сборка ie-стилей
-    'files'       => 'ext: ie567, ie',
-    'output_file' => '/assets/css/style.{ext}.css'
-));
+// Сборка less-файлов блоков
+$join->extension('less', [
+    'save' => 'assets/css/main.less'
+]);
