@@ -16,7 +16,8 @@ class test {
             'coreTest',
             'routeTest',
             'joinTest',
-            'docTest'
+            'docTest',
+            'depsTest'
         );
 
         foreach($tests as $test) {
