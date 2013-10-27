@@ -470,8 +470,8 @@ class depsTest extends PHPUnit_Framework_TestCase {
                 [
                     'block' => 'b',
                     'elems' => [
-                        [ 'elem' => 'c', 'mods' => ['e' => 'f'] ],
-                        [ 'elem' => 'd', 'mods' => ['g' => 'h'] ]
+                        [ 'elem' => 'c', 'mods' => [ 'e' => 'f' ]],
+                        [ 'elem' => 'd', 'mods' => [ 'g' => 'h' ]]
                     ]
                 ],
                 [
@@ -484,7 +484,7 @@ class depsTest extends PHPUnit_Framework_TestCase {
                 'mod' => 'a',
                 'val' => 'b',
                 'elems' => [
-                    [ 'elem' => 'e', 'mods' => ['f' => 'g', 'h' => 'i'] ],
+                    [ 'elem' => 'e', 'mods' => [ 'f' => 'g', 'h' => 'i' ]],
                     [ 'elem' => 'f' ]
                 ]
             ]
@@ -503,6 +503,45 @@ class depsTest extends PHPUnit_Framework_TestCase {
             [ 'block' => 'b', 'elem' => 'd' ],
             [ 'block' => 'b', 'elem' => 'd', 'mod' => 'g', 'val' => 'h' ],
             [ 'block' => 'c', 'elem' => 'd' ]
+        ]);
+    }
+
+    function testABCelemsArrayModsArray() {
+
+        $deps = new ten\deps([
+            'block' => 'a',
+            'shouldDeps' => [
+                [
+                    'block' => 'b',
+                    'elems' => [
+                        [ 'elem' => 'c', 'mods' => [ 'e' => ['f', 'g', 'h' ]]],
+                    ]
+                ]
+            ],
+            'mustDeps' => [
+                'block' => 'd',
+                'mod' => 'a',
+                'val' => 'b',
+                'elems' => [
+                    [ 'elem' => 'e', 'mods' => ['f' => ['g'], 'h' => ['i', 'j']]],
+                    [ 'elem' => 'f' ]
+                ]
+            ]
+        ]);
+
+        $this->assertEquals($deps->getDecl(), [
+            [ 'block' => 'd', 'mod' => 'a', 'val' => 'b' ],
+            [ 'block' => 'd', 'elem' => 'e' ],
+            [ 'block' => 'd', 'elem' => 'e', 'mod' => 'f', 'val' => 'g' ],
+            [ 'block' => 'd', 'elem' => 'e', 'mod' => 'h', 'val' => 'i' ],
+            [ 'block' => 'd', 'elem' => 'e', 'mod' => 'h', 'val' => 'j' ],
+            [ 'block' => 'd', 'elem' => 'f' ],
+            [ 'block' => 'a' ],
+            [ 'block' => 'b' ],
+            [ 'block' => 'b', 'elem' => 'c' ],
+            [ 'block' => 'b', 'elem' => 'c', 'mod' => 'e', 'val' => 'f' ],
+            [ 'block' => 'b', 'elem' => 'c', 'mod' => 'e', 'val' => 'g' ],
+            [ 'block' => 'b', 'elem' => 'c', 'mod' => 'e', 'val' => 'h' ],
         ]);
     }
 }

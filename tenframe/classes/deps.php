@@ -129,7 +129,7 @@ class deps extends core {
 
         $expandedDependencies = array_merge(
             [$this->getClearDepsEntity($dependency)],
-            $this->expandModsList($this->expandElems($dependency)),
+            $this->expandModsVals($this->expandModsList($this->expandElems($dependency))),
             $this->expandModsVals($this->expandMods($dependency))
         );
 
@@ -211,14 +211,14 @@ class deps extends core {
     /**
      * Развернуть сахарный массив в качестве значения модификатора
      *
-     * @param array $expandMods Сущности, развёрнутые в результате выполнения expandMods
+     * @param array $expandedMods Сущности, полученные в результате развёртывания сахарного поля mods
      * @return array
      */
-    private function expandModsVals($expandMods) {
+    private function expandModsVals($expandedMods) {
 
         $vals = [];
 
-        foreach($expandMods as $dependency) {
+        foreach($expandedMods as $dependency) {
 
             if(!array_key_exists('val', $dependency) || !is_array($dependency['val'])) {
                 array_push($vals, $dependency);
