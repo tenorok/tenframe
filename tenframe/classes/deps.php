@@ -25,8 +25,9 @@ class deps extends core {
     public function getDecl() {
 
         foreach($this->deps as $dependency) {
-            array_push($this->decl, $this->getEntity($dependency));
-            array_push($this->decl, $this->getShould($dependency));
+            $this->addEntity($dependency);
+            $this->addShould($dependency);
+            $this->addMust($dependency);
         }
 
         return $this->decl;
@@ -38,7 +39,7 @@ class deps extends core {
      * @param array $dependency Зависимость сущности
      * @return array
      */
-    private function getEntity($dependency) {
+    private function addEntity($dependency) {
 
         $entity = [];
 
@@ -48,17 +49,45 @@ class deps extends core {
             }
         }
 
+        array_push($this->decl, $entity);
         return $entity;
     }
 
-    private function getShould($dependency) {
-        if(!array_key_exists('shouldDeps', $dependency)) return false;
+    private function addShould($dependency) {
+        if(!array_key_exists('shouldDeps', $dependency)) return $this->decl;
 
         $shouldDeps = $dependency['shouldDeps'];
 
         // Если указана одна сущность
         if(parent::isAssoc($shouldDeps)) {
-            return $shouldDeps;
+            array_push($this->decl, $shouldDeps);
+            return $this->decl;
         }
+
+        // Указано несколько сущностей
+        foreach($shouldDeps as $shouldDependency) {
+            array_push($this->decl, $shouldDependency);
+        }
+
+        return $this->decl;
+    }
+
+    private function addMust($dependency) {
+        if(!array_key_exists('mustDeps', $dependency)) return $this->decl;
+
+        $mustDeps = $dependency['mustDeps'];
+
+        // Если указана одна сущность
+        if(parent::isAssoc($mustDeps)) {
+            array_unshift($this->decl, $mustDeps);
+            return $this->decl;
+        }
+
+        // Указано несколько сущностей
+        foreach($mustDeps as $mustDependency) {
+            array_unshift($this->decl, $mustDependency);
+        }
+
+        return $this->decl;
     }
 }
