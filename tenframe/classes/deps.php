@@ -5,6 +5,20 @@ namespace ten;
 class deps extends core {
 
     /**
+     * Массив зависимостей для обработки
+     *
+     * @var array
+     */
+    private $deps;
+
+    /**
+     * Массив результирующей декларации
+     *
+     * @var array
+     */
+    private $decl;
+
+    /**
      * Конструктор
      *
      * @param array $deps Одна зависимость или массив зависимостей
@@ -116,7 +130,7 @@ class deps extends core {
         $expandedDependencies = array_merge(
             [$this->getClearDepsEntity($dependency)],
             $this->expandElems($dependency),
-            $this->expandMods($dependency)
+            $this->expandModsVals($this->expandMods($dependency))
         );
 
         foreach($expandedDependencies as $expandedDependency) {
@@ -134,7 +148,7 @@ class deps extends core {
      */
     private function getClearDepsEntity($dependency) {
 
-        foreach(['elems', 'mods', 'vals'] as $expandField) {
+        foreach(['elems', 'mods'] as $expandField) {
             unset($dependency[$expandField]);
         }
 
@@ -163,21 +177,43 @@ class deps extends core {
      * @return array
      */
     private function expandMods($dependency) {
-
         return $this->expandKey('mods', $dependency, function($mod, $val) use ($dependency) {
-
-            $expand = [
+            return parent::copyField('elem', $dependency, [
                 'block' => $dependency['block'],
                 'mod' => $mod,
                 'val' => $val
-            ];
+            ]);
+        });
+    }
 
-            if(array_key_exists('elem', $dependency)) {
-                $expand['elem'] = $dependency['elem'];
+    /**
+     * Развернуть сахарный массив в качестве значения модификатора
+     *
+     * @param array $expandMods Сущности, развёрнутые в результате выполнения expandMods
+     * @return array
+     */
+    private function expandModsVals($expandMods) {
+
+        $vals = [];
+
+        foreach($expandMods as $dependency) {
+
+            if(!array_key_exists('val', $dependency) || !is_array($dependency['val'])) {
+                array_push($vals, $dependency);
+                continue;
             }
 
-            return $expand;
-        });
+            $vals = array_merge($vals, $this->expandKey('val', $dependency, function($index, $val) use ($dependency) {
+                return parent::copyField('elem', $dependency, [
+                    'block' => $dependency['block'],
+                    'mod' => $dependency['mod'],
+                    'val' => $val
+                ]);
+
+            }));
+        }
+
+        return $vals;
     }
 
     /**
