@@ -510,4 +510,13 @@ class core {
 
         debug::init(self::$settings['debug']);                             // Напечатать отладочную информацию в соответствии с переданными опциями
     }
+
+    /**
+     * Проверка на ассоциативный массив
+     * @param array $array
+     * @return bool
+     */
+    function isAssoc($array) {
+        return array_keys($array) !== range(0, count($array) - 1);
+    }
 }
