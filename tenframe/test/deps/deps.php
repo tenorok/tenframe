@@ -240,4 +240,98 @@ class depsTest extends PHPUnit_Framework_TestCase {
             [ 'block' => 'a' ]
         ]);
     }
+
+    function testABCelem() {
+
+        $deps = new ten\deps([
+            'block' => 'a',
+            'shouldDeps' => [
+                [
+                    'block' => 'b'
+                ],
+                [
+                    'block' => 'c',
+                    'elem' => 'cc'
+                ]
+            ],
+            'mustDeps' => [
+                [
+                    'block' => 'b',
+                    'elem' => 'bb'
+                ]
+            ]
+        ]);
+
+        $this->assertEquals($deps->getDecl(), [
+            [ 'block' => 'b', 'elem' => 'bb' ],
+            [ 'block' => 'a' ],
+            [ 'block' => 'b' ],
+            [ 'block' => 'c', 'elem' => 'cc' ]
+        ]);
+    }
+
+    function testABCDelem() {
+
+        $deps = new ten\deps([
+            'block' => 'a',
+            'shouldDeps' => [
+                [
+                    'block' => 'b',
+                    'mod' => 'c',
+                    'val' => 'd'
+                ],
+                [
+                    'block' => 'c',
+                    'elem' => 'd'
+                ]
+            ],
+            'mustDeps' => [
+                'block' => 'b',
+                'elem' => 'c',
+                'mod' => 'd',
+                'val' => 'e'
+            ]
+        ]);
+
+        $this->assertEquals($deps->getDecl(), [
+            [ 'block' => 'b', 'elem' => 'c', 'mod' => 'd', 'val' => 'e' ],
+            [ 'block' => 'a' ],
+            [ 'block' => 'b', 'mod' => 'c', 'val' => 'd' ],
+            [ 'block' => 'c', 'elem' => 'd' ]
+        ]);
+    }
+
+    function testABCelems() {
+
+        $deps = new ten\deps([
+            'block' => 'a',
+            'shouldDeps' => [
+                [
+                    'block' => 'b',
+                    'elems' => ['c', 'd']
+                ],
+                [
+                    'block' => 'c',
+                    'elem' => 'd'
+                ]
+            ],
+            'mustDeps' => [
+                'block' => 'd',
+                'mod' => 'a',
+                'val' => 'b',
+                'elems' => ['e', 'f']
+            ]
+        ]);
+
+        $this->assertEquals($deps->getDecl(), [
+            [ 'block' => 'd', 'mod' => 'a', 'val' => 'b' ],
+            [ 'block' => 'd', 'elem' => 'e' ],
+            [ 'block' => 'd', 'elem' => 'f' ],
+            [ 'block' => 'a' ],
+            [ 'block' => 'b' ],
+            [ 'block' => 'b', 'elem' => 'c' ],
+            [ 'block' => 'b', 'elem' => 'd' ],
+            [ 'block' => 'c', 'elem' => 'd' ]
+        ]);
+    }
 }

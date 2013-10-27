@@ -64,7 +64,7 @@ class deps extends core {
      */
     private function addShould($dependency) {
         return $this->addDeps($dependency, 'shouldDeps', function($dependency) {
-            array_push($this->decl, $dependency);
+            return array_merge($this->decl, $dependency);
         });
     }
 
@@ -76,7 +76,7 @@ class deps extends core {
      */
     private function addMust($dependency) {
         return $this->addDeps($dependency, 'mustDeps', function($dependency) {
-            array_unshift($this->decl, $dependency);
+            return array_merge($dependency, $this->decl);
         });
     }
 
@@ -93,18 +93,72 @@ class deps extends core {
 
         // Если указана одна сущность
         if(parent::isAssoc($dependency[$key])) {
-            $this->unsetExistDeps($dependency[$key]);
-            $callback($dependency[$key]);
-            return $this->decl;
+            return $this->expandDeps($dependency[$key], $callback);
         }
 
         // Указано несколько сущностей
         foreach($dependency[$key] as $curDependency) {
-            $this->unsetExistDeps($curDependency);
-            $callback($curDependency);
+            $this->expandDeps($curDependency, $callback);
         }
 
         return $this->decl;
+    }
+
+    /**
+     * Развернуть сахарные поля
+     *
+     * @param array $dependency Зависимость сущности
+     * @param callback $callback Функция с инструкциями по добавлению зависимости
+     * @return array
+     */
+    private function expandDeps($dependency, $callback) {
+
+        $expandedDependencies = array_merge(
+            [$this->getClearDepsEntity($dependency)],
+            $this->expandElems($dependency)
+        );
+
+        foreach($expandedDependencies as $expandedDependency) {
+            $this->unsetExistDeps($expandedDependency);
+        }
+
+        return $this->decl = $callback($expandedDependencies);
+    }
+
+    /**
+     * Получить чистую сущность без сахарных полей
+     *
+     * @param array $dependency Зависимость сущности
+     * @return array
+     */
+    private function getClearDepsEntity($dependency) {
+
+        foreach(['elems', 'mods', 'vals'] as $expandField) {
+            unset($dependency[$expandField]);
+        }
+
+        return $dependency;
+    }
+
+    /**
+     * Развернуть сахарное поле elems
+     *
+     * @param array $dependency Зависимость сущности
+     * @return array
+     */
+    private function expandElems($dependency) {
+        if(!array_key_exists('elems', $dependency)) return [];
+
+        $elems = [];
+
+        foreach($dependency['elems'] as $elem) {
+            array_push($elems, [
+                'block' => $dependency['block'],
+                'elem' => $elem
+            ]);
+        }
+
+        return $elems;
     }
 
     /**
