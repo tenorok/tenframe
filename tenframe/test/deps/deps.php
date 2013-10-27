@@ -334,4 +334,46 @@ class depsTest extends PHPUnit_Framework_TestCase {
             [ 'block' => 'c', 'elem' => 'd' ]
         ]);
     }
+
+    function testABCmods() {
+
+        $deps = new ten\deps([
+            'block' => 'a',
+            'shouldDeps' => [
+                [
+                    'block' => 'b',
+                    'mod' => 'g',
+                    'val' => 'h',
+                    'mods' => [
+                        'c' => 'd',
+                        'e' => 'f'
+                    ]
+                ],
+                [
+                    'block' => 'c',
+                    'mod' => 'd',
+                    'val' => 'e'
+                ]
+            ],
+            'mustDeps' => [
+                'block' => 'd',
+                'elem' => 'e',
+                'mods' => [
+                    'f' => 'g',
+                    'h' => 'i'
+                ]
+            ]
+        ]);
+
+        $this->assertEquals($deps->getDecl(), [
+            [ 'block' => 'd', 'elem' => 'e' ],
+            [ 'block' => 'd', 'elem' => 'e', 'mod' => 'f', 'val' => 'g' ],
+            [ 'block' => 'd', 'elem' => 'e', 'mod' => 'h', 'val' => 'i' ],
+            [ 'block' => 'a' ],
+            [ 'block' => 'b', 'mod' => 'g', 'val' => 'h' ],
+            [ 'block' => 'b', 'mod' => 'c', 'val' => 'd' ],
+            [ 'block' => 'b', 'mod' => 'e', 'val' => 'f' ],
+            [ 'block' => 'c', 'mod' => 'd', 'val' => 'e' ]
+        ]);
+    }
 }

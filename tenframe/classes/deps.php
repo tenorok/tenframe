@@ -115,7 +115,8 @@ class deps extends core {
 
         $expandedDependencies = array_merge(
             [$this->getClearDepsEntity($dependency)],
-            $this->expandElems($dependency)
+            $this->expandElems($dependency),
+            $this->expandMods($dependency)
         );
 
         foreach($expandedDependencies as $expandedDependency) {
@@ -147,18 +148,56 @@ class deps extends core {
      * @return array
      */
     private function expandElems($dependency) {
-        if(!array_key_exists('elems', $dependency)) return [];
-
-        $elems = [];
-
-        foreach($dependency['elems'] as $elem) {
-            array_push($elems, [
+        return $this->expandKey('elems', $dependency, function($index, $elem) use ($dependency) {
+            return [
                 'block' => $dependency['block'],
                 'elem' => $elem
-            ]);
+            ];
+        });
+    }
+
+    /**
+     * Развернуть сахарное поле mods
+     *
+     * @param array $dependency Зависимость сущности
+     * @return array
+     */
+    private function expandMods($dependency) {
+
+        return $this->expandKey('mods', $dependency, function($mod, $val) use ($dependency) {
+
+            $expand = [
+                'block' => $dependency['block'],
+                'mod' => $mod,
+                'val' => $val
+            ];
+
+            if(array_key_exists('elem', $dependency)) {
+                $expand['elem'] = $dependency['elem'];
+            }
+
+            return $expand;
+        });
+    }
+
+    /**
+     * Помощник для развёртывания сахарных полей
+     *
+     * @param string $key Имя сахарного поля
+     * @param array $dependency Зависимость сущности
+     * @param callback $callback Функция возвращающая развёрнутую зависимость
+     * @return array
+     */
+    private function expandKey($key, $dependency, $callback) {
+        if(!array_key_exists($key, $dependency)) return [];
+
+        $expandKey = [];
+
+        foreach($dependency[$key] as $index => $value) {
+            array_push($expandKey, $callback($index, $value));
         }
 
-        return $elems;
+        return $expandKey;
     }
 
     /**
