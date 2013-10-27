@@ -163,10 +163,9 @@ class deps extends core {
      */
     private function expandElems($dependency) {
         return $this->expandKey('elems', $dependency, function($index, $elem) use ($dependency) {
-            return [
-                'block' => $dependency['block'],
-                'elem' => $elem
-            ];
+            return is_string($elem)
+                ? [ 'block' => $dependency['block'], 'elem' => $elem ]
+                : parent::addNotExistField($elem, 'block', $dependency['block']);
         });
     }
 
