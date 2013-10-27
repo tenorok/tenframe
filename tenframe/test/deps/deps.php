@@ -163,4 +163,81 @@ class depsTest extends PHPUnit_Framework_TestCase {
             [ 'block' => 'h' ]
         ]);
     }
+
+    function testRepeatABC() {
+
+        $deps = new ten\deps([
+            [
+                'block' => 'a',
+                'shouldDeps' => [ 'block' => 'b' ]
+            ],
+            [
+                'block' => 'b',
+                'shouldDeps' => [ 'block' => 'c' ]
+            ]
+        ]);
+
+        $this->assertEquals($deps->getDecl(), [
+            [ 'block' => 'a' ],
+            [ 'block' => 'b' ],
+            [ 'block' => 'c' ]
+        ]);
+    }
+
+    function testRepeatACB() {
+
+        $deps = new ten\deps([
+            [
+                'block' => 'a',
+                'shouldDeps' => [ 'block' => 'b' ]
+            ],
+            [
+                'block' => 'c',
+                'mustDeps' => [ 'block' => 'b' ]
+            ]
+        ]);
+
+        $this->assertEquals($deps->getDecl(), [
+            [ 'block' => 'b' ],
+            [ 'block' => 'a' ],
+            [ 'block' => 'c' ]
+        ]);
+    }
+
+    function testRepearABCShouldDEMustAndFGHShouldIJMust() {
+
+        $deps = new ten\deps([
+            [
+                'block' => 'a',
+                'shouldDeps' => [
+                    [ 'block' => 'b' ],
+                    [ 'block' => 'c' ]
+                ],
+                'mustDeps' => [
+                    [ 'block' => 'd' ],
+                    [ 'block' => 'e' ]
+                ]
+            ],
+            [
+                'block' => 'c',
+                'shouldDeps' => [
+                    [ 'block' => 'i' ],
+                    [ 'block' => 'a' ]
+                ],
+                'mustDeps' => [
+                    [ 'block' => 'd' ],
+                    [ 'block' => 'b' ]
+                ]
+            ]
+        ]);
+
+        $this->assertEquals($deps->getDecl(), [
+            [ 'block' => 'b' ],
+            [ 'block' => 'd' ],
+            [ 'block' => 'e' ],
+            [ 'block' => 'c' ],
+            [ 'block' => 'i' ],
+            [ 'block' => 'a' ]
+        ]);
+    }
 }

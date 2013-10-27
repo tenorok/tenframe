@@ -49,45 +49,95 @@ class deps extends core {
             }
         }
 
-        array_push($this->decl, $entity);
+        if(!$this->isDepsExist($entity)){
+            array_push($this->decl, $entity);
+        }
+
         return $entity;
     }
 
+    /**
+     * Добавить зависимости сущности из shouldDeps
+     *
+     * @param array $dependency Зависимость сущности
+     * @return array
+     */
     private function addShould($dependency) {
-        if(!array_key_exists('shouldDeps', $dependency)) return $this->decl;
+        return $this->addDeps($dependency, 'shouldDeps', function($dependency) {
+            array_push($this->decl, $dependency);
+        });
+    }
 
-        $shouldDeps = $dependency['shouldDeps'];
+    /**
+     * Добавить зависимости сущности из mustDeps
+     *
+     * @param array $dependency Зависимость сущности
+     * @return array
+     */
+    private function addMust($dependency) {
+        return $this->addDeps($dependency, 'mustDeps', function($dependency) {
+            array_unshift($this->decl, $dependency);
+        });
+    }
+
+    /**
+     * Добавить зависимости сущности
+     *
+     * @param array $dependency Зависимость сущности
+     * @param string $key Ключ зависимостей
+     * @param callback $callback Функция с инструкциями по добавлению зависимости
+     * @return array
+     */
+    private function addDeps($dependency, $key, $callback) {
+        if(!array_key_exists($key, $dependency)) return $this->decl;
 
         // Если указана одна сущность
-        if(parent::isAssoc($shouldDeps)) {
-            array_push($this->decl, $shouldDeps);
+        if(parent::isAssoc($dependency[$key])) {
+            $this->unsetExistDeps($dependency[$key]);
+            $callback($dependency[$key]);
             return $this->decl;
         }
 
         // Указано несколько сущностей
-        foreach($shouldDeps as $shouldDependency) {
-            array_push($this->decl, $shouldDependency);
+        foreach($dependency[$key] as $curDependency) {
+            $this->unsetExistDeps($curDependency);
+            $callback($curDependency);
         }
 
         return $this->decl;
     }
 
-    private function addMust($dependency) {
-        if(!array_key_exists('mustDeps', $dependency)) return $this->decl;
+    /**
+     * Удалить зависимость, если она повторяется
+     *
+     * @param array $dependency Зависимость сущности
+     * @return array
+     */
+    private function unsetExistDeps($dependency) {
 
-        $mustDeps = $dependency['mustDeps'];
+        $existIndex = $this->isDepsExist($dependency);
 
-        // Если указана одна сущность
-        if(parent::isAssoc($mustDeps)) {
-            array_unshift($this->decl, $mustDeps);
-            return $this->decl;
-        }
+        // Если такой зависимости ещё нет
+        if(!$existIndex) return $this->decl;
 
-        // Указано несколько сущностей
-        foreach($mustDeps as $mustDependency) {
-            array_unshift($this->decl, $mustDependency);
-        }
+        // Повтор зависимости, старую нужно удалить
+        unset($this->decl[$existIndex]);
 
         return $this->decl;
+    }
+
+    /**
+     * Является ли зависимость повторной
+     *
+     * @param array $dependency Зависимость сущности
+     * @return number|boolean Индекс повторяющейся зависимости или false, если она не является повтором
+     */
+    private function isDepsExist($dependency) {
+
+        foreach($this->decl as $index => $declDependency) {
+            if($declDependency === $dependency) return $index;
+        }
+
+        return false;
     }
 }
