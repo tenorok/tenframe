@@ -461,4 +461,48 @@ class depsTest extends PHPUnit_Framework_TestCase {
             [ 'block' => 'c', 'mod' => 'd', 'val' => 'f' ]
         ]);
     }
+
+    function testABCelemsArrayMods() {
+
+        $deps = new ten\deps([
+            'block' => 'a',
+            'shouldDeps' => [
+                [
+                    'block' => 'b',
+                    'elems' => [
+                        [ 'elem' => 'c', 'mods' => ['e' => 'f'] ],
+                        [ 'elem' => 'd', 'mods' => ['g' => 'h'] ]
+                    ]
+                ],
+                [
+                    'block' => 'c',
+                    'elem' => 'd'
+                ]
+            ],
+            'mustDeps' => [
+                'block' => 'd',
+                'mod' => 'a',
+                'val' => 'b',
+                'elems' => [
+                    [ 'elem' => 'e', 'mods' => ['f' => 'g', 'h' => 'i'] ],
+                    [ 'elem' => 'f' ]
+                ]
+            ]
+        ]);
+
+        $this->assertEquals($deps->getDecl(), [
+            [ 'block' => 'd', 'mod' => 'a', 'val' => 'b' ],
+            [ 'block' => 'd', 'elem' => 'e' ],
+            [ 'block' => 'd', 'elem' => 'e', 'mod' => 'f', 'val' => 'g' ],
+            [ 'block' => 'd', 'elem' => 'e', 'mod' => 'h', 'val' => 'i' ],
+            [ 'block' => 'd', 'elem' => 'f' ],
+            [ 'block' => 'a' ],
+            [ 'block' => 'b' ],
+            [ 'block' => 'b', 'elem' => 'c' ],
+            [ 'block' => 'b', 'elem' => 'c', 'mod' => 'e', 'val' => 'f' ],
+            [ 'block' => 'b', 'elem' => 'd' ],
+            [ 'block' => 'b', 'elem' => 'd', 'mod' => 'g', 'val' => 'h' ],
+            [ 'block' => 'c', 'elem' => 'd' ]
+        ]);
+    }
 }

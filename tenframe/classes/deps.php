@@ -129,7 +129,7 @@ class deps extends core {
 
         $expandedDependencies = array_merge(
             [$this->getClearDepsEntity($dependency)],
-            $this->expandElems($dependency),
+            $this->expandModsList($this->expandElems($dependency)),
             $this->expandModsVals($this->expandMods($dependency))
         );
 
@@ -183,6 +183,29 @@ class deps extends core {
                 'val' => $val
             ]);
         });
+    }
+
+    /**
+     * Развернуть список зависимостей с сахарным полем mods
+     *
+     * @param array $dependencyList Массив зависимостей
+     * @return array
+     */
+    private function expandModsList($dependencyList) {
+
+        $expand = [];
+
+        foreach($dependencyList as $dependency) {
+
+            array_push($expand, $this->getClearDepsEntity($dependency));
+
+            $expandMods = $this->expandMods($dependency);
+            if($expandMods) {
+                $expand = array_merge($expand, $expandMods);
+            }
+        }
+
+        return $expand;
     }
 
     /**
