@@ -510,4 +510,56 @@ class core {
 
         debug::init(self::$settings['debug']);                             // Напечатать отладочную информацию в соответствии с переданными опциями
     }
+
+    /**
+     * Проверка на ассоциативный массив
+     * @param array $array
+     * @return bool
+     */
+    public static function isAssoc($array) {
+        return array_keys($array) !== range(0, count($array) - 1);
+    }
+
+    /**
+     * Добавить в массив поле, если оно не существует
+     *
+     * @param array $array Массив
+     * @param string $key Ключ
+     * @param mixed $val Значение
+     * @return array
+     */
+    public static function addNotExistField($array, $key, $val) {
+        if(array_key_exists($key, $array)) return $array;
+        $array[$key] = $val;
+        return $array;
+    }
+
+    /**
+     * Скопировать поле из одного массива в другой
+     * Поле будет скопировано только при отсутствии одноимённого поля в целевом массиве
+     *
+     * @param string $key Ключ
+     * @param array $from Массив, откуда копировать
+     * @param array $to Массив, куда копировать
+     * @return array
+     */
+    public static function copyField($key, $from, $to) {
+        if(!array_key_exists($key, $from)) return $to;
+        return self::addNotExistField($to, $key, $from[$key]);
+    }
+
+    /**
+     * Скопировать поле из одного массива в другой
+     * Если в целевом массиве уже имеется одноимённое поле, то его значение будет заменено
+     *
+     * @param string $key Ключ
+     * @param array $from Массив, откуда копировать
+     * @param array $to Массив, куда копировать
+     * @return array
+     */
+    public static function copyFieldForce($key, $from, $to) {
+        if(!array_key_exists($key, $from)) return $to;
+        $to[$key] = $from[$key];
+        return $to;
+    }
 }

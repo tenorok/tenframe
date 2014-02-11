@@ -61,4 +61,56 @@ class coreTest extends PHPUnit_Framework_TestCase {
             __DIR__ . '/virtualPath'
         );
     }
+
+    public function testIsAssoc() {
+
+        $this->assertFalse(ten\core::isAssoc([1, 2, 3]));
+        $this->assertFalse(ten\core::isAssoc([1, [ 'a' => 2 ], 3]));
+        $this->assertTrue(ten\core::isAssoc([1, 2, 'a' => 3]));
+        $this->assertTrue(ten\core::isAssoc(['a' => 1, 'b' => 2, 'c' => 3]));
+    }
+
+    public function testAddNotExistField() {
+
+        $this->assertEquals(ten\core::addNotExistField([0, 1, 2], 'a', 3), [
+            0, 1, 2, 'a' => 3
+        ]);
+
+        $this->assertEquals(ten\core::addNotExistField([ 'a' => 1 ], 'a', 2), [
+            'a' => 1
+        ]);
+
+        $this->assertEquals(ten\core::addNotExistField([ 'a' => 1 ], 'b', 2), [
+            'a' => 1,
+            'b' => 2
+        ]);
+    }
+
+    public function testCopyField() {
+
+        $this->assertEquals(ten\core::copyField('a', [1, 2, 3], []), []);
+
+        $this->assertEquals(ten\core::copyField('a', [ 'a' => 1 ], [ 'a' => 2 ]), [
+            'a' => 2
+        ]);
+
+        $this->assertEquals(ten\core::copyField('a', [ 'a' => 1 ], [ 'b' => 2 ]), [
+            'a' => 1,
+            'b' => 2
+        ]);
+    }
+
+    public function testCopyFieldForce() {
+
+        $this->assertEquals(ten\core::copyFieldForce('a', [1, 2, 3], []), []);
+
+        $this->assertEquals(ten\core::copyFieldForce('a', [ 'a' => 1 ], [ 'a' => 2 ]), [
+            'a' => 1
+        ]);
+
+        $this->assertEquals(ten\core::copyFieldForce('a', [ 'a' => 1 ], [ 'b' => 2 ]), [
+            'a' => 1,
+            'b' => 2
+        ]);
+    }
 }
