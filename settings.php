@@ -1,22 +1,29 @@
 <?php
 
-core::$settings = array(                    // Параметры работы фреймворка
+/**
+ * Параметры работы фреймворка
+ */
 
-    'develop'  => true,                     // Режим разработки
-    'clearURI' => true,                     // Маршрутизировать относительный путь
-    'compressHTML' => true,                 // Сжимать отдаваемый HTML (для tpl-шаблонов)
-    'tenhtml'  => true,                     // Использовать tenhtml-шаблоны (автоматически сжимаются)
+ten\core::settings(array(
 
-    'mysql'    => array(                    // Подключение к БД
-        'host'     => 'localhost',
-        'user'     => 'root',
-        'password' => '',
-        'database' => 'tmod_shop'
+    'develop' => true,
+    'debug' => true,
+
+    'devFiles' => array(
+//        'get',              // Выкачивание файлов
+        'join',             // Сборка файлов
+        'css',              // CSS препроцессоры
+        'statical'          // Подключение файлов
+    ),
+    'files' => array(
+        'routes'            // Подключение файла маршрутизации
     ),
 
-    'modules' => array(                     // Подключаемые модули
+    'mysql' => true,
+    'tenhtml' => '/assets/' . GEN . 'tenhtml/',
+    'compressHTML' => '/assets/' . GEN . 'compressed/',
+    'modules' => array(
         'admin',
         'shop'
     )
-
-);
+));

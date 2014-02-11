@@ -1,0 +1,114 @@
+ul%mod-shop-fielditem: {
+    li
+        .__labelitem
+        .__existlist: {
+            label
+                .__label
+                ._long: {
+                    select
+                        .__selectinput
+                        ._right-column
+                        .__existfield: {
+                            attr: {
+                                name: 'existfield[]'
+                            },
+                            content: {
+                                option.__optioninput: {
+                                    attr: {
+                                        value: 'new'
+                                    },
+                                    content: 'Новое поле'
+                                },
+                                for.existfields: {
+                                    option.__optioninput: {
+                                        attr: {
+                                            value: '{id}'
+                                        },
+                                        content: '{category} &mdash; {field}'
+                                    }
+                                }
+                            }
+                    }
+                }
+        },
+    li.__labelitem._type_option: {
+        label.__label: 'Имя поля',
+        input
+            .__textinput
+            .__name: {
+                attr: {
+                    type: 'text',
+                    name: 'name[]',
+                    placeholder: 'Цена'
+                }
+        }
+    },
+    li.__labelitem._type_option: {
+        label.__label: 'Тип поля',
+        select.__selectinput: {
+            attr: {
+                name: 'type[]'
+            },
+            for.types: {
+                option.__optioninput: {
+                    attr: {
+                        value: '{value}'
+                    },
+                    content: '{text}'
+                }
+            }
+        }
+    },
+    li.__labelitem._type_option: {
+        label.__label: 'Количество',
+        input.__numberinput: {
+            attr: {
+                type: 'number',
+                name: 'count[]',
+                value: 1,
+                placeholder: 1
+            }
+        }
+    },
+    li.__labelitem._type_option: {
+        label
+            .__label
+            ._long: [
+                {
+                    input.__checkboxinput: {
+                        attr: {
+                            type: 'checkbox'
+                        }
+                    }
+                },
+                ' выпадающий список',
+                {
+                    input.__hiddeninput: {
+                        attr: {
+                            type: 'hidden',
+                            name: 'list[]',
+                            value: 0
+                        }
+                    }
+                }
+            ]
+    },
+    li
+        .__labelitem
+        ._type_option
+        .__hiddenitem: {
+            label
+                .__label
+                ._left_column: 'Значения',
+            input
+                .__textinput
+                ._right-column
+                .__classifier: {
+                    attr: {
+                        type: 'text',
+                        name: 'options_0[]',
+                        placeholder: 'Значение 1'
+                    }
+                }
+        }
+}

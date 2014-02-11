@@ -1,0 +1,43 @@
+.mod-shop-edit__link_pseudo {
+    text-decoration: none;
+
+    color: #4F3FFF;
+
+    &:hover .mod-shop-edit__link-text {
+        color: #f00;
+        border-bottom-color: #f00;
+    }
+}
+    .mod-shop-edit__link-text {
+        cursor: pointer;
+
+        border-bottom: 1px dotted #4F3FFF;
+
+        &:hover {
+            border-bottom-color: #f00;
+        }
+
+        &:hover + .mod-shop-edit__harr {
+            color: #f00;
+        }
+    }
+    .mod-shop-edit__harr {
+        display: inline-block;
+
+        width: 25px;
+
+        cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+
+        opacity: 0.3;
+        color: #3232FF;
+
+        font-size: 10px;
+    }
+
+.mod-shop-edit__list_editable_yes {
+    display: none;
+
+    margin-left: 100px;
+}

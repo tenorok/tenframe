@@ -10,13 +10,13 @@ class index {
      */
     public static function page() {
 
-        echo core::block(array(
+        echo ten\tpl::block(array(
 
             'block' => 'html',
 
             'parse' => array(
                 'title' => 'Готов?',
-                'files' => core::includes('libs, developer, require', '__autogen__'),
+                'files' => ten\statical::includes('libs, require', GEN),
                 'body'  => 'Поехали!'
             )
         ));

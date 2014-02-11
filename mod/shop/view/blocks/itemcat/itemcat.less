@@ -1,0 +1,67 @@
+.mod-shop-itemcat {
+    margin-bottom: 15px;
+}
+    .mod-shop-itemcat__name {
+
+        margin-left: -20px;
+
+        &:hover .mod-shop-itemcat__draggable {
+            opacity: 1;
+        }
+    }
+        .mod-shop-itemcat__draggable {
+            opacity: 0;
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            padding-right: 4px;
+
+            background: url(/mod/shop/view/blocks/itemcat/img/draggable.png) no-repeat;
+            vertical-align: bottom;
+            cursor: url(/mod/shop/view/blocks/itemcat/img/openhand.cur), move;
+
+            .transition(opacity);
+        }
+        .mod-shop-itemcat__draggable:active {
+            cursor: url(/mod/shop/view/blocks/itemcat/img/closehand.cur);
+        }
+        .mod-shop-itemcat__cat {
+            border-bottom: 1px dotted #3232FF;
+            color: #3232FF;
+            text-decoration: none;
+            outline: none;
+
+            &:hover {
+                border-bottom-color: #f00;
+            }
+        }
+        .mod-shop-itemcat__cat_edit {
+            color: #333;
+            border-bottom-color: #888;
+        }
+        .mod-shop-itemcat__cat_selected_yes {
+            margin: 0 -4px;
+            padding: 2px 4px;
+
+            border-bottom: medium none;
+            background: #C0DCED;
+        }
+        .mod-shop-itemcat__cat_hided {
+            color: #777;
+            border-bottom-color: #aaa;
+        }
+        .mod-shop-itemcat__harr {
+            opacity: 0.3;
+            display: inline-block;
+            width: 25px;
+
+            color: #3232FF;
+            font-size: 10px;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+
+            &:hover {
+                color: #f00;
+            }
+        }

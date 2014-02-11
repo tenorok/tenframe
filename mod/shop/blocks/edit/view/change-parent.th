@@ -1,0 +1,22 @@
+%mod-shop-edit: {
+    a
+        .__link
+        ._pseudo
+        ._change_parent: {
+            span.__link-text: 'Изменить родительскую категорию',
+            span.__harr: '&#9650;'
+        },
+
+    ul
+        &mod-shop-listcat
+        .__list
+        ._editable_yes: '{categories}',
+
+    input.__catparent: {
+        attr: {
+            type: 'hidden',
+            name: 'catparent',
+            value: '{parent}'
+        }
+    }
+}

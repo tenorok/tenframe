@@ -1,0 +1,19 @@
+doctype: 'html',
+html: {
+    head: [
+        {
+            title: '{title}',
+            lang: 'ru',
+            charset: 'utf-8',
+            favicon: '/assets/images/favicon.ico'
+        }
+    ],
+    body: {
+        ctx%404: [
+            {
+                h1: '{header}'
+            },
+            '{content}'
+        ]
+    }
+}

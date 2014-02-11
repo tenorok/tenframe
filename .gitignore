@@ -1,10 +1,9 @@
 .DS_Store
 .idea
+
+composer.lock
+composer.phar
+/vendor/
+
 *__autogen__*
-/assets/css/main.css
-/assets/css/main.less
-/assets/css/print.css
-/assets/css/print.less
-/assets/css/style.ie.css
-/assets/css/style.ie567.css
-/assets/js/main.js
+/assets/

@@ -1,7 +1,6 @@
 <?php
 
-$settings = array(
-
+return array(
     'urls' => array(
         'page'  => '/admin/',
         'index' => '/categories/'

@@ -1,3 +1,8 @@
 <?php
 
-    get('/', 'index->page');
+namespace ten;
+
+route::get([
+    'url' => '/',
+    'call' => 'index::page'
+]);

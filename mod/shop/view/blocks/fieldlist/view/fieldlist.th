@@ -1,0 +1,3 @@
+ul%mod-shop-fieldlist: {
+    li.__item: '{fielditem}'
+}

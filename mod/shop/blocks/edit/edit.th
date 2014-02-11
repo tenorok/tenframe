@@ -1,0 +1,8 @@
+ctx%mod-shop-fielditem: {
+    li
+        .__labelitem
+        ._position_right: '{hided}',
+    li
+        .__labelitem
+        ._independent: '{change-parent}'
+}
